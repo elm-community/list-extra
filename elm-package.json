@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "summary": "Convenience functions for working with Lsit",
+    "repository": "https://github.com/circuithub/elm-list-extra.git",
+    "license": "MIT",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [
+        "List.Extra"
+    ],
+    "dependencies": {
+        "elm-lang/core": "1.1.0 <= v < 2.0.0"
+    }
+}
