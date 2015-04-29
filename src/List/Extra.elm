@@ -1,4 +1,11 @@
-module List.Extra (minimumBy, maximumBy) where
+module List.Extra
+  ( minimumBy
+  , maximumBy
+  , zip
+  , zip3
+  , zip4
+  , zip5
+  ) where
 {-| Convenience functions for working with List
 
 # Common Helpers
