@@ -54,4 +54,4 @@ zip4 = map4 (,,,)
 {-| Take five lists and returns a list of quintuples
 -}
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
-zip5 = map5 (,,,)
+zip5 = map5 (,,,,)
