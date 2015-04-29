@@ -1,5 +1,5 @@
 {
-    "version": "2.0.0",
+    "version": "2.0.1",
     "summary": "Convenience functions for working with List",
     "repository": "https://github.com/circuithub/elm-list-extra.git",
     "license": "MIT",

@@ -39,8 +39,12 @@ zip = map2 (,)
 zip3 : List a -> List b -> List c -> List (a,b,c)
 zip3 = map3 (,,)
 
+{-| Take four lists and returns a list of quadruples
+-}
 zip4 : List a -> List b -> List c -> List d -> List (a,b,c,d)
 zip4 = map4 (,,,)
 
+{-| Take five lists and returns a list of quintuples
+-}
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
 zip5 = map5 (,,,)
