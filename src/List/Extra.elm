@@ -5,7 +5,7 @@ module List.Extra (minimumBy, maximumBy) where
 @docs maximumBy, minimumBy
 
 # Zipping
-@docs zip, zip3
+@docs zip, zip3, zip4, zip5
 
 -}
 
@@ -39,3 +39,8 @@ zip = map2 (,)
 zip3 : List a -> List b -> List c -> List (a,b,c)
 zip3 = map3 (,,)
 
+zip4 : List a -> List b -> List c -> List d -> List (a,b,c,d)
+zip4 = map4 (,,,)
+
+zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
+zip5 = map5 (,,,)
