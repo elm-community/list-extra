@@ -1,6 +1,7 @@
 module List.Extra
   ( minimumBy
   , maximumBy
+  , andMap
   , zip
   , zip3
   , zip4
@@ -36,15 +37,13 @@ minimumBy f ls =
         l'::ls' -> Just <| foldl (minBy f) l' ls'
         _       -> Nothing
 
-{-| Useful for mapping functions with multiple arguments over lists of the same
-size:
+{-| Useful for mapping functions with multiple arguments over lists of the same length.
 
-```
-map (\a b c -> a + b * c) [1,2,3]
-  `andMap` [4,5,6]
-  `andMap` [2,1,1]
-== [9,7,9]
-```
+    ( (\a b c -> a + b * c)
+        `map` [1,2,3]
+        `andMap` [4,5,6]
+        `andMap` [2,1,1]
+    ) == [9,7,9]
 -}
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
