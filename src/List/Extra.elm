@@ -9,7 +9,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Common Helpers
-@docs maximumBy, minimumBy
+@docs maximumBy, minimumBy, andMap
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -35,6 +35,19 @@ minimumBy f ls =
   in case ls of
         l'::ls' -> Just <| foldl (minBy f) l' ls'
         _       -> Nothing
+
+{-| Useful for mapping functions with multiple arguments over lists of the same
+size:
+
+```
+map (\a b c -> a + b * c) [1,2,3]
+  `andMap` [4,5,6]
+  `andMap` [2,1,1]
+== [9,7,9]
+```
+-}
+andMap : List (a -> b) -> List a -> List b
+andMap fl l = map2 (<|) fl l
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
