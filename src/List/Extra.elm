@@ -37,7 +37,7 @@ minimumBy f ls =
         l'::ls' -> Just <| foldl (minBy f) l' ls'
         _       -> Nothing
 
-{-| Useful for mapping functions with multiple arguments over lists of the same length.
+{-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
     ( (\a b c -> a + b * c)
         `map` [1,2,3]
