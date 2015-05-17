@@ -2,6 +2,8 @@ module List.Extra
   ( minimumBy
   , maximumBy
   , andMap
+  , takeWhile
+  , dropWhile
   , zip
   , zip3
   , zip4
@@ -10,7 +12,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Common Helpers
-@docs maximumBy, minimumBy, andMap
+@docs maximumBy, minimumBy, takeWhile, dropWhile, andMap
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -36,6 +38,24 @@ minimumBy f ls =
   in case ls of
         l'::ls' -> Just <| foldl (minBy f) l' ls'
         _       -> Nothing
+
+{-| Take elements in order as long as the predicate evaluates to `True`
+-}
+takeWhile : (a -> Bool) -> List a -> List a
+takeWhile predicate list =
+  case list of
+    []      -> []
+    x::xs   -> if | (predicate x) -> x :: takeWhile predicate xs
+                  | otherwise -> []
+
+{-| Drop elements in order as long as the predicate evaluates to `True`
+-}
+dropWhile : (a -> Bool) -> List a -> List a
+dropWhile predicate list =
+  case list of
+    []      -> []
+    x::xs   -> if | (predicate x) -> dropWhile predicate xs
+                  | otherwise -> xs
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
@@ -67,21 +87,3 @@ zip4 = map4 (,,,)
 -}
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
 zip5 = map5 (,,,,)
-
-{-| Take elements in order as long as the predicate returns True
--}
-takeWhile : (a -> Bool) -> List a -> List a
-takeWhile predicate list =
-  case list of
-    []       -> []
-    hd::tl   -> if | (predicate hd) -> hd :: takeWhile predicate tl
-                   | otherwise -> []
-
-{-| Drop elements in order as long as the predicate returns True
--}
-dropWhile : (a -> Bool) -> List a -> List a
-dropWhile predicate list =
-  case list of
-    []       -> []
-    hd::tl   -> if | (predicate hd) -> dropWhile predicate tl
-                   | otherwise -> tl
