@@ -67,3 +67,21 @@ zip4 = map4 (,,,)
 -}
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
 zip5 = map5 (,,,,)
+
+{-| Take elements in order as long as the predicate returns True
+-}
+takeWhile : (a -> Bool) -> List a -> List a
+takeWhile predicate list =
+  case list of
+    []       -> []
+    hd::tl   -> if | (predicate hd) -> hd :: takeWhile predicate tl
+                   | otherwise -> []
+
+{-| Drop elements in order as long as the predicate returns True
+-}
+dropWhile : (a -> Bool) -> List a -> List a
+dropWhile predicate list =
+  case list of
+    []       -> []
+    hd::tl   -> if | (predicate hd) -> dropWhile predicate tl
+                   | otherwise -> tl
