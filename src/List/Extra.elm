@@ -55,7 +55,7 @@ dropWhile predicate list =
   case list of
     []      -> []
     x::xs   -> if | (predicate x) -> dropWhile predicate xs
-                  | otherwise -> x::xs
+                  | otherwise -> list
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
