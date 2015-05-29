@@ -1,8 +1,8 @@
 module List.Extra
-  ( groupInto
-  , minimumBy
+  ( minimumBy
   , maximumBy
   , andMap
+  , groupInto
   , takeWhile
   , dropWhile
   , zip
