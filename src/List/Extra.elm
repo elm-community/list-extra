@@ -2,9 +2,9 @@ module List.Extra
   ( minimumBy
   , maximumBy
   , andMap
-  , groupInto
   , takeWhile
   , dropWhile
+  , splitEvery
   , zip
   , zip3
   , zip4
@@ -13,7 +13,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Common Helpers
-@docs maximumBy, minimumBy, takeWhile, dropWhile, andMap, groupInto
+@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, splitEvery
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -69,19 +69,17 @@ dropWhile predicate list =
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
 
-{-| splitEvery n splits a list into length-n pieces. The last piece will be shorter if n does not evenly divide the length of the list. 
+{-| splitEvery n splits a list into length-n pieces. The last piece will be shorter if n does not evenly divide the length of the list.
 -}
 
 splitEvery : Int -> List a -> List (List a)
 splitEvery n l =
-    let 
-        loop : Int -> List a -> List (List a) -> List (List a)
-        loop n rem acc =
-            case rem of 
-                []  -> acc |> List.reverse
-                _   -> loop n (List.drop n rem) ((List.take n rem)::acc)
-    in
-        loop n l []
+  let loop : Int -> List a -> List (List a) -> List (List a)
+      loop n rem acc =
+        case rem of
+          []  -> List.reverse acc
+          _   -> loop n (List.drop n rem) (List.take n rem :: acc)
+  in loop n l []
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
