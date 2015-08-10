@@ -87,6 +87,14 @@ find predicate list =
             else
                 find predicate rest
 
+{-| Replace instances of a value with another within a list
+-}
+replace : a -> a -> List a -> List a
+replace old new list=
+  let r item =
+    if | item == old -> new
+       | otherwise   -> item
+  in List.map r list
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
