@@ -5,6 +5,7 @@ module List.Extra
   , takeWhile
   , dropWhile
   , find
+  , replaceIf
   , zip
   , zip3
   , zip4
@@ -13,7 +14,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Common Helpers
-@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, find
+@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, find, replaceIf
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -87,14 +88,11 @@ find predicate list =
             else
                 find predicate rest
 
-{-| Replace instances of a value with another within a list
+{-| Replace all values that satisfy a predicate with a replacement value.
 -}
-replace : a -> a -> List a -> List a
-replace old new list=
-  let r item =
-    if | item == old -> new
-       | otherwise   -> item
-  in List.map r list
+replaceIf : (a -> Bool) -> a -> List a -> List a
+replaceIf predicate replacement list =
+  List.map (\item -> if predicate item then replacement else item) list
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
