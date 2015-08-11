@@ -4,6 +4,7 @@ module List.Extra
   , andMap
   , takeWhile
   , dropWhile
+  , dropDuplicates
   , find
   , replaceIf
   , zip
@@ -14,7 +15,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Common Helpers
-@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, find, replaceIf
+@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, dropDuplicates, find, replaceIf
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -22,6 +23,7 @@ module List.Extra
 -}
 
 import List exposing (..)
+import Set exposing (member)
 
 {-| Find the first maximum element in a list using a comparable transformation
 -}
@@ -58,6 +60,18 @@ dropWhile predicate list =
     []      -> []
     x::xs   -> if | (predicate x) -> dropWhile predicate xs
                   | otherwise -> list
+
+{-| Drop _all_ duplicate elements from the list
+-}
+dropDuplicates : List comparable -> List comparable
+dropDuplicates list =
+  let
+    step next (set, acc) =
+      if Set.member next set
+        then (set, acc)
+        else (Set.insert next set, next::acc)
+  in
+    List.foldl step (Set.empty, []) list |> snd |> List.reverse
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
