@@ -2,9 +2,6 @@ module List.Extra
   ( minimumBy
   , maximumBy
   , andMap
-  , lift2
-  , lift3
-  , lift4
   , takeWhile
   , dropWhile
   , dropDuplicates
@@ -14,6 +11,9 @@ module List.Extra
   , zip3
   , zip4
   , zip5
+  , lift2
+  , lift3
+  , lift4
   ) where
 {-| Convenience functions for working with List
 
@@ -22,6 +22,9 @@ module List.Extra
 
 # Zipping
 @docs zip, zip3, zip4, zip5
+
+# Lift functions onto multiple lists of arguments
+@docs lift2, lift3, lift4 
 
 -}
 
@@ -87,25 +90,6 @@ dropDuplicates list =
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
 
-{-| Map functions taking multiple arguments over multiple lists, regardless of list length.
-  All possible combinations will be explored.
-
-  lift2 (+) [1,2,3] [4,5] == [5,6,6,7,7,8]
--}
-(>>=) = flip concatMap
-
-lift2 : (a -> b -> c) -> List a -> List b -> List c
-lift2 f la lb =
-  la >>= (\a -> lb >>= (\b -> [f a b]))
-
-lift3 : (a -> b -> c -> d) -> List a -> List b -> List c -> List d
-lift3 f la lb lc =
-  la >>= (\a -> lb >>= (\b -> lc >>= (\c -> [f a b c])))
-
-lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
-lift4 f la lb lc ld =
-  la >>= (\a -> lb >>= (\b -> lc >>= (\c -> ld >>= (\d -> [f a b c d]))))
-
 {-| Find the first element that satisfies a predicate and return
 Just that element. If none match, return Nothing.
 
@@ -148,3 +132,29 @@ zip4 = map4 (,,,)
 -}
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
 zip5 = map5 (,,,,)
+
+-- TODO: Document and export this
+andThen : List a -> (a -> List b) -> List b
+andThen = flip concatMap
+
+{-| Map functions taking multiple arguments over multiple lists, regardless of list length.
+  All possible combinations will be explored.
+
+  lift2 (+) [1,2,3] [4,5] == [5,6,6,7,7,8]
+-}
+lift2 : (a -> b -> c) -> List a -> List b -> List c
+lift2 f la lb =
+  la `andThen` (\a -> lb `andThen` (\b -> [f a b]))
+
+{-|
+-}
+lift3 : (a -> b -> c -> d) -> List a -> List b -> List c -> List d
+lift3 f la lb lc =
+  la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> [f a b c])))
+
+{-|
+-}
+lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
+lift4 f la lb lc ld =
+  la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> ld `andThen` (\d -> [f a b c d]))))
+
