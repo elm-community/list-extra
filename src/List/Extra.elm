@@ -1,12 +1,22 @@
 module List.Extra
-  ( minimumBy
+  ( last
+  , init
+  , uncons
+  , minimumBy
   , maximumBy
   , andMap
   , takeWhile
   , dropWhile
   , dropDuplicates
-  , find
   , replaceIf
+  , intercalate, transpose, subsequences, permutations
+  , foldl1, foldr1, and, or
+  , scanl1, scanr, scanr1, unfoldr
+  , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
+  , group, groupBy, groupByTransitive, inits, tails, select, selectSplit
+  , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
+  , notMember, lookup, find, filterM
+  , elemIndex, elemIndices, findIndex, findIndices
   , zip
   , zip3
   , zip4
@@ -17,19 +27,69 @@ module List.Extra
   ) where
 {-| Convenience functions for working with List
 
-# Common Helpers
-@docs maximumBy, minimumBy, andMap, takeWhile, dropWhile, dropDuplicates, find, replaceIf
+# Basics
+@docs last, init, uncons, maximumBy, minimumBy, andMap, takeWhile, dropWhile, dropDuplicates, find, replaceIf
+
+# List transformations
+@docs intercalate, transpose, subsequences, permutations
+
+# Folds
+@docs foldl1, foldr1, and, or
+
+# Building lists
+@docs scanl1, scanr, scanr1, unfoldr
+
+# Sublists
+@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupBy, groupByTransitive, inits, tails, select, selectSplit
+
+# Predicates
+@docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
+
+# Searching
+@docs notMember, lookup, find, filterM, elemIndex, elemIndices, findIndex, findIndices
 
 # Zipping
 @docs zip, zip3, zip4, zip5
 
 # Lift functions onto multiple lists of arguments
-@docs lift2, lift3, lift4 
-
+@docs lift2, lift3, lift4
 -}
 
 import List exposing (..)
-import Set exposing (member)
+import Set
+
+
+{-| Extract the last element of a list.
+
+    last [1,2,3] == Just 3
+    last [] == Nothing
+-}
+last : List a -> Maybe a
+last = foldl1 (flip always)
+
+{-| Return all elements of the list except the last one.
+
+    init [1,2,3] == Just [1,2]
+    init [] == Nothing
+-}
+init : List a -> Maybe (List a)
+init =
+  let
+    maybe : b -> (a -> b) -> Maybe a -> b
+    maybe d f = Maybe.withDefault d << Maybe.map f
+  in
+    foldr ((<<) Just << maybe [] << (::)) Nothing
+
+{-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.
+
+    uncons [1,2,3] == Just (1, [2,3])
+    uncons [] = Nothing
+-}
+uncons : List a -> Maybe (a, List a)
+uncons xs =
+  case xs of
+    [] -> Nothing
+    (x::xs) -> Just (x,xs)
 
 {-| Find the first maximum element in a list using a comparable transformation
 -}
@@ -90,6 +150,23 @@ dropDuplicates list =
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
 
+{-| Negation of `member`.
+
+    1 `notMember` [1,2,3] == False
+    4 `notMember` [1,2,3] == True
+-}
+notMember : a -> List a -> Bool
+notMember x = not << member x
+
+{-| Look up a key in an association list, return corresponding value, wrapped in `Just`. If no value is found, return `Nothing`. If multiple values correspond to the same key, return the first found value.
+
+    lookup 'a' [('a',1),('b',2),('c',3)] == Just 1
+    lookup 'd' [('a',1),('b',2),('c',3)] == Nothing
+    lookup 3 [(1,"John"),(1,"Paul"),(2,"Mary")] == Just "John"
+-}
+lookup : a -> List (a, b) -> Maybe b
+lookup key = Maybe.map snd << find (\item -> fst item == key)
+
 {-| Find the first element that satisfies a predicate and return
 Just that element. If none match, return Nothing.
 
@@ -107,11 +184,390 @@ find predicate list =
             else
                 find predicate rest
 
+{-| Filter that exploits the behavior of `andThen`.
+
+Return all subsequences of a list:
+
+    filterM (\x -> [True, False]) [1,2,3] == [[1,2,3],[1,2],[1,3],[1],[2,3],[2],[3],[]]
+
+Return all subsequences that contain 2:
+
+    filterM (\x -> if x==2 then [True] else [True,False]) [1,2,3] == [[1,2,3],[1,2],[2,3],[2]]
+
+-}
+filterM : (a -> List Bool) -> List a -> List (List a)
+filterM p =
+  let
+    go x r = p x `andThen`
+             (\flg -> r `andThen`
+                      (\ys -> [if flg then x::ys else ys]))
+  in
+    foldr go [[]]
+
+{-| Return the index of the first occurrence of the element. Otherwise, return `Nothing`. Indexing starts from 0.
+
+    elemIndex 1 [1,2,3] == Just 0
+    elemIndex 4 [1,2,3] == Nothing
+    elemIndex 1 [1,2,1] == Just 0
+-}
+elemIndex : a -> List a -> Maybe Int
+elemIndex x = findIndex ((==)x)
+
+{-| Return all indices of occurrences of the element. If element is not found, return empty list. Indexing starts from 0.
+
+    elemIndices 1 [1,2,3] == [0]
+    elemIndices 4 [1,2,3] == []
+    elemIndices 1 [1,2,1] == [0,2]
+-}
+elemIndices : a -> List a -> List Int
+elemIndices x = findIndices ((==)x)
+
+{-| Take a predicate and a list, return the index of the first element that satisfies the predicate. Otherwise, return `Nothing`. Indexing starts from 0.
+
+    findIndex isEven [1,2,3] == Just 1
+    findIndex isEven [1,3,5] == Nothing
+    findIndex isEven [1,2,4] == Just 1
+-}
+findIndex : (a -> Bool) -> List a -> Maybe Int
+findIndex p = head << findIndices p
+
+{-| Take a predicate and a list, return indices of all elements satisfying the predicate. Otherwise, return empty list. Indexing starts from 0.
+
+    findIndices isEven [1,2,3] == [1]
+    findIndices isEven [1,3,5] == []
+    findIndices isEven [1,2,4] == [1,2]
+-}
+findIndices : (a -> Bool) -> List a -> List Int
+findIndices p = map fst << filter (\(i,x) -> p x) << indexedMap (,)
+
 {-| Replace all values that satisfy a predicate with a replacement value.
 -}
 replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
   List.map (\item -> if predicate item then replacement else item) list
+
+{-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
+
+    intercalate [0,0] [[1,2],[3,4],[5,6]] == [1,2,0,0,3,4,0,0,5,6]
+-}
+intercalate : List a -> List (List a) -> List a
+intercalate xs = concat << intersperse xs
+
+{-| Transpose rows and columns of the list of lists.
+
+    transpose [[1,2,3],[4,5,6]] == [[1,4],[2,5],[3,6]]
+
+If some rows are shorter than the following rows, their elements are skipped:
+
+    transpose [[10,11],[20],[],[30,31,32]] == [[10,20,30],[11,31],[32]]
+-}
+transpose : List (List a) -> List (List a)
+transpose ll =
+  case ll of
+    [] -> []
+    ([]::xss) -> transpose xss
+    ((x::xs)::xss) ->
+      let
+        heads = filterMap head xss
+        tails = filterMap tail xss
+      in
+        (x::heads)::transpose (xs::tails)
+
+{-| Return the list of all subsequences of a list.
+
+    subsequences [1,2,3] == [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+-}
+subsequences : List a -> List (List a)
+subsequences xs = []::subsequencesNonEmpty xs
+
+{-| Return the list of all subsequences of the argument, except for the empty list.
+
+    subsequencesNonEmpty [1,2,3] == [[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+-}
+subsequencesNonEmpty : List a -> List (List a)
+subsequencesNonEmpty xs =
+  case xs of
+    [] -> []
+    (x::xs) ->
+      let f ys r = ys::(x::ys)::r
+      in [x]::foldr f [] (subsequencesNonEmpty xs)
+
+{-| Return the list of of all permutations of a list. The result is in lexicographic order.
+
+    permutations [1,2,3] == [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+-}
+permutations : List a -> List (List a)
+permutations xs' =
+  case xs' of
+    [] -> [[]]
+    xs -> let f (y,ys) = map ((::)y) (permutations ys)
+          in concatMap f (select xs)
+
+{-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
+
+    foldl1 max [1,2,3,2,1] == Just 3
+    foldl1 max [] == Nothing
+    foldl1 (-) [1,2,3] == Just -4
+-}
+foldl1 : (a -> a -> a) -> List a -> Maybe a
+foldl1 f xs =
+  let
+    mf x m = Just (case m of
+                     Nothing -> x
+                     Just y -> f y x)
+  in
+    List.foldl mf Nothing xs
+
+{-| Variant of `foldr` that has no starting value argument and treats the last element of the list as its starting value. If the list is empty, return `Nothing`.
+
+    foldr1 min [1,2,3,2,1] == Just 1
+    foldr1 min [] == Nothing
+    foldr1 (-) [1,2,3] == Just 2
+-}
+foldr1 : (a -> a -> a) -> List a -> Maybe a
+foldr1 f xs =
+  let
+    mf x m = Just (case m of
+                     Nothing -> x
+                     Just y -> f x y)
+  in
+    List.foldr mf Nothing xs
+
+{-| Return the conjunction of all `Bool`s in a list. In other words, return True if all elements are True, return False otherwise. `and` is equivalent to `all identity`. Return True on an empty list.
+-}
+and : List Bool -> Bool
+and = all identity
+
+{-| Return the disjunction of all `Bool`s in a list. In other words, return True if any element is True, return False otherwise. `or` is equivalent to `any identity`. Return False on an empty list.
+-}
+or : List Bool -> Bool
+or = any identity
+
+{-| `scanl1` is a variant of `scanl` that has no starting value argument.
+
+Compare:
+
+    List.scanl (+) 0 [1,2,3] == [0,1,3,6]
+    scanl1 (+) [1,2,3] == [1,3,6]
+
+    List.scanl (-) 0 [1,2,3] == [0,1,1,2]
+    scanl1 (-) [1,2,3] == [1,1,2]
+
+    List.scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
+    scanl1 (flip (-)) [1,2,3] == [1,-1,4]
+-}
+scanl1 : (a -> a -> a) -> List a -> List a
+scanl1 f xs' =
+  case xs' of
+    [] -> []
+    (x::xs) -> scanl f x xs
+
+{-| `scanr` is a right-to-left dual of `scanl`. Note that:
+
+    head (scanr f z xs) == foldr f z xs
+
+Examples:
+
+    scanr (+) 0 [1,2,3] == [6,5,3,0]
+    scanr (-) 0 [1,2,3] == [2,-1,3,0]
+-}
+scanr : (a -> b -> b) -> b -> List a -> List b
+scanr f acc xs' =
+  case xs' of
+    [] -> [acc]
+    (x::xs) -> let ((q::_) as qs) = scanr f acc xs
+               in f x q :: qs
+
+{-| `scanr1` is a variant of `scanr` that has no starting value argument.
+
+    scanr1 (+) [1,2,3] == [6,5,3]
+    scanr1 (-) [1,2,3] == [2,-1,3]
+    scanr1 (flip (-)) [1,2,3] == [0,1,3]
+-}
+scanr1 : (a -> a -> a) -> List a -> List a
+scanr1 f xs' =
+  case xs' of
+    [] -> []
+    [x] -> [x]
+    (x::xs) -> let ((q::_) as qs) = scanr1 f xs
+               in f x q :: qs
+
+{-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
+
+    unfoldr (\b -> if b == 0 then Nothing else Just (b, b-1)) 5 == [5,4,3,2,1]
+-}
+unfoldr : (b -> Maybe (a, b)) -> b -> List a
+unfoldr f seed =
+  case f seed of
+    Nothing -> []
+    Just (a, b) -> a :: unfoldr f b
+
+{-| Take a number and a list, return a tuple of lists, where first part is prefix of the list of length equal the number, and second part is the remainder of the list. `splitAt n xs` is equivalent to `(take n xs, drop n xs)`.
+
+    splitAt 3 [1,2,3,4,5] == ([1,2,3],[4,5])
+    splitAt 1 [1,2,3] == ([1],[2,3])
+    splitAt 3 [1,2,3] == ([1,2,3],[])
+    splitAt 4 [1,2,3] == ([1,2,3],[])
+    splitAt 0 [1,2,3] == ([],[1,2,3])
+    splitAt (-1) [1,2,3] == ([],[1,2,3])
+-}
+splitAt : Int -> List a -> (List a, List a)
+splitAt n xs = (take n xs, drop n xs)
+
+{-| Take elements from the end, while predicate still holds.
+
+    takeWhileEnd ((<)5) [1..10] == [6,7,8,9,10]
+-}
+takeWhileEnd : (a -> Bool) -> List a -> List a
+takeWhileEnd p =
+  let
+    step x (xs,free) = if p x && free then (x::xs,True) else (xs, False)
+  in
+    fst << foldr step ([], True)
+
+{-| Drop elements from the end, while predicate still holds.
+
+    dropWhileEnd ((<)5) [1..10] == [1,2,3,4,5]
+-}
+dropWhileEnd : (a -> Bool) -> List a -> List a
+dropWhileEnd p = foldr (\x xs -> if p x && isEmpty xs then [] else x::xs) []
+
+{-| Take a predicate and a list, return a tuple. The first part of the tuple is longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
+
+    span (< 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
+    span (< 5) [1,2,3] == ([1,2,3],[])
+    span (< 0) [1,2,3] == ([],[1,2,3])
+-}
+span : (a -> Bool) -> List a -> (List a, List a)
+span p xs = (takeWhile p xs, dropWhile p xs)
+
+{-| Take a predicate and a list, return a tuple. The first part of the tuple is longest prefix of that list, for each element of which the predicate *does not* hold. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(dropWhile p xs, takeWhile p xs)`.
+
+    break (> 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
+    break (< 5) [1,2,3] == ([],[1,2,3])
+    break (> 5) [1,2,3] == ([1,2,3],[])
+-}
+break : (a -> Bool) -> List a -> (List a, List a)
+break p = span (not << p)
+
+{-| Drop the given prefix from the list. If the list doesn't start with that prefix, return `Nothing`.
+
+    stripPrefix [1,2] [1,2,3,4] == Just [3,4]
+    stripPrefix [1,2,3] [1,2,3,4,5] == Just [4,5]
+    stripPrefix [1,2,3] [1,2,3] == Just []
+    stripPrefix [1,2,3] [1,2] == Nothing
+    stripPrefix [3,2,1] [1,2,3,4,5] == Nothing
+-}
+stripPrefix : List a -> List a -> Maybe (List a)
+stripPrefix prefix xs =
+  let
+    step e m =
+      case m of
+        Nothing -> Nothing
+        Just [] -> Nothing
+        Just (x::xs') -> if e == x
+                         then Just xs'
+                         else Nothing
+  in
+    foldl step (Just xs) prefix
+
+{-| Group similar elements together. `group` is equivalent to `groupBy (==)`.
+
+    group [1,2,2,3,3,3,2,2,1] == [[1],[2,2],[3,3,3],[2,2],[1]]
+-}
+group : List a -> List (List a)
+group = groupBy (==)
+
+{-| Group elements together, using a custom equality test.
+
+    groupBy (\x y -> fst x == fst y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
+
+The equality test should be an equivalent relationship, i.e. it should have the properties of reflexivity, symmetry, and transitivity. For non-equivalent relations it gives non-intuitive behavior:
+
+    groupBy (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3,2,4],[1,3,2],[1]]
+
+For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupByTransitive`.
+-}
+groupBy : (a -> a -> Bool) -> List a -> List (List a)
+groupBy eq xs' =
+  case xs' of
+    [] -> []
+    (x::xs) -> let (ys,zs) = span (eq x) xs
+               in (x::ys)::groupBy eq zs
+
+{-| Group elements together, using a custom comparison test. Start a new group each time the comparison test doesn't hold for two adjacent elements.
+
+    groupByTransitive (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
+-}
+groupByTransitive : (a -> a -> Bool) -> List a -> List (List a)
+groupByTransitive cmp xs' =
+  case xs' of
+    [] -> []
+    [x] -> [[x]]
+    (x::((x'::_) as xs)) ->
+      let ((y::ys) as r) = groupByTransitive cmp xs
+      in if cmp x x'
+         then (x::y)::ys
+         else [x]::r
+
+{-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
+
+    inits [1,2,3] == [[],[1],[1,2],[1,2,3]]
+-}
+inits : List a -> List (List a)
+inits = foldr (\e acc -> []::map ((::)e) acc) [[]]
+
+{-| Return all final segments of a list, from longest to shortest, the list itself first, empty list last.
+
+    tails [1,2,3] == [[1,2,3],[2,3],[3],[]]
+-}
+tails : List a -> List (List a)
+tails = foldr (\e (x::xs) -> (e::x)::x::xs) [[]]
+
+{-| Return all combinations in the form of (element, rest of the list). Read [Haskell Libraries proposal](https://mail.haskell.org/pipermail/libraries/2008-February/009270.html) for further ideas on how to use this function.
+
+    select [1,2,3,4] == [(1,[2,3,4]),(2,[1,3,4]),(3,[1,2,4]),(4,[1,2,3])]
+-}
+select : List a -> List (a, List a)
+select xs =
+  case xs of
+    [] -> []
+    (x::xs) -> (x,xs)::map (\(y,ys) -> (y,x::ys)) (select xs)
+
+{-| Return all combinations in the form of (elements before, element, elements after).
+
+    selectSplit [1,2,3] == [([],1,[2,3]),([1],2,[3]),([1,2],3,[])]
+-}
+selectSplit : List a -> List (List a, a, List a)
+selectSplit xs =
+  case xs of
+    [] -> []
+    (x::xs) -> ([],x,xs)::map (\(lys,y,rys) -> (x::lys,y,rys)) (selectSplit xs)
+
+{-| Take 2 lists and return True, if the first list is the prefix of the second list.
+-}
+isPrefixOf : List a -> List a -> Bool
+isPrefixOf prefix = and << map2 (==) prefix
+
+{-| Take 2 lists and return True, if the first list is the suffix of the second list.
+-}
+isSuffixOf : List a -> List a -> Bool
+isSuffixOf suffix xs = isPrefixOf (reverse suffix) (reverse xs)
+
+{-| Take 2 lists and return True, if the first list is an infix of the second list.
+-}
+isInfixOf : List a -> List a -> Bool
+isInfixOf infix xs = any (isPrefixOf infix) (tails xs)
+
+{-| Take 2 lists and return True, if the first list is a subsequence of the second list.
+-}
+isSubsequenceOf : List a -> List a -> Bool
+isSubsequenceOf subseq xs = subseq `member` subsequences xs
+
+{-| Take 2 lists and return True, if the first list is a permutation of the second list.
+-}
+isPermutationOf : List a -> List a -> Bool
+isPermutationOf permut xs = permut `member` permutations xs
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
@@ -157,4 +613,3 @@ lift3 f la lb lc =
 lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
 lift4 f la lb lc ld =
   la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> ld `andThen` (\d -> [f a b c d]))))
-
