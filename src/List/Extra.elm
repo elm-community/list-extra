@@ -10,12 +10,12 @@ module List.Extra
   , dropDuplicates
   , replaceIf
   , intercalate, transpose, subsequences, permutations
-  , foldl1, foldr1, and, or
+  , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
   , group, groupBy, groupByTransitive, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
-  , notMember, lookup, find, filterM
+  , notMember, find
   , elemIndex, elemIndices, findIndex, findIndices
   , zip
   , zip3
@@ -34,7 +34,7 @@ module List.Extra
 @docs intercalate, transpose, subsequences, permutations
 
 # Folds
-@docs foldl1, foldr1, and, or
+@docs foldl1, foldr1
 
 # Building lists
 @docs scanl1, scanr, scanr1, unfoldr
@@ -46,7 +46,7 @@ module List.Extra
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
 
 # Searching
-@docs notMember, lookup, find, filterM, elemIndex, elemIndices, findIndex, findIndices
+@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices
 
 # Zipping
 @docs zip, zip3, zip4, zip5
@@ -158,15 +158,6 @@ andMap fl l = map2 (<|) fl l
 notMember : a -> List a -> Bool
 notMember x = not << member x
 
-{-| Look up a key in an association list, return corresponding value, wrapped in `Just`. If no value is found, return `Nothing`. If multiple values correspond to the same key, return the first found value.
-
-    lookup 'a' [('a',1),('b',2),('c',3)] == Just 1
-    lookup 'd' [('a',1),('b',2),('c',3)] == Nothing
-    lookup 3 [(1,"John"),(1,"Paul"),(2,"Mary")] == Just "John"
--}
-lookup : a -> List (a, b) -> Maybe b
-lookup key = Maybe.map snd << find (\item -> fst item == key)
-
 {-| Find the first element that satisfies a predicate and return
 Just that element. If none match, return Nothing.
 
@@ -183,26 +174,6 @@ find predicate list =
                 Just first
             else
                 find predicate rest
-
-{-| Filter that exploits the behavior of `andThen`.
-
-Return all subsequences of a list:
-
-    filterM (\x -> [True, False]) [1,2,3] == [[1,2,3],[1,2],[1,3],[1],[2,3],[2],[3],[]]
-
-Return all subsequences that contain 2:
-
-    filterM (\x -> if x==2 then [True] else [True,False]) [1,2,3] == [[1,2,3],[1,2],[2,3],[2]]
-
--}
-filterM : (a -> List Bool) -> List a -> List (List a)
-filterM p =
-  let
-    go x r = p x `andThen`
-             (\flg -> r `andThen`
-                      (\ys -> [if flg then x::ys else ys]))
-  in
-    foldr go [[]]
 
 {-| Return the index of the first occurrence of the element. Otherwise, return `Nothing`. Indexing starts from 0.
 
@@ -332,16 +303,6 @@ foldr1 f xs =
                      Just y -> f x y)
   in
     List.foldr mf Nothing xs
-
-{-| Return the conjunction of all `Bool`s in a list. In other words, return True if all elements are True, return False otherwise. `and` is equivalent to `all identity`. Return True on an empty list.
--}
-and : List Bool -> Bool
-and = all identity
-
-{-| Return the disjunction of all `Bool`s in a list. In other words, return True if any element is True, return False otherwise. `or` is equivalent to `any identity`. Return False on an empty list.
--}
-or : List Bool -> Bool
-or = any identity
 
 {-| `scanl1` is a variant of `scanl` that has no starting value argument.
 
@@ -547,7 +508,7 @@ selectSplit xs =
 {-| Take 2 lists and return True, if the first list is the prefix of the second list.
 -}
 isPrefixOf : List a -> List a -> Bool
-isPrefixOf prefix = and << map2 (==) prefix
+isPrefixOf prefix = all identity << map2 (==) prefix
 
 {-| Take 2 lists and return True, if the first list is the suffix of the second list.
 -}
