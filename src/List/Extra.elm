@@ -4,7 +4,7 @@ module List.Extra
   , uncons
   , minimumBy
   , maximumBy
-  , andMap
+  , andMap, andThen
   , takeWhile
   , dropWhile
   , dropDuplicates
@@ -28,7 +28,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, uncons, maximumBy, minimumBy, andMap, takeWhile, dropWhile, dropDuplicates, find, replaceIf
+@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations
@@ -149,6 +149,34 @@ dropDuplicates list =
 -}
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
+
+
+{-| Equivalent to `concatMap` with arguments reversed. Ideal to use as an infix function, chaining together functions that return List. For example, suppose you want to have a cartesian product of [1,2] and [3,4]:
+
+    [1,2] `andThen` \x ->
+    [3,4] `andThen` \y ->
+    [(x,y)]
+
+will give back the list:
+
+    [(1,3),(1,4),(2,3),(2,4)]
+
+Now suppose we want to have a cartesian product between the first list and the second list and its doubles:
+
+    [1,2] `andThen` \x ->
+    [3,4] `andThen` \y ->
+    [y,y*2] `andThen` \z ->
+    [(x,z)]
+
+will give back the list:
+
+    [(1,3),(1,6),(1,4),(1,8),(2,3),(2,6),(2,4),(2,8)]
+
+Advanced functional programmers will recognize this as the implementation of bind operator (>>=) for lists from the `Monad` typeclass.
+-}
+andThen : List a -> (a -> List b) -> List b
+andThen = flip concatMap
+
 
 {-| Negation of `member`.
 
@@ -550,9 +578,6 @@ zip4 = map4 (,,,)
 zip5 : List a -> List b -> List c -> List d -> List e -> List (a,b,c,d,e)
 zip5 = map5 (,,,,)
 
--- TODO: Document and export this
-andThen : List a -> (a -> List b) -> List b
-andThen = flip concatMap
 
 {-| Map functions taking multiple arguments over multiple lists, regardless of list length.
   All possible combinations will be explored.
