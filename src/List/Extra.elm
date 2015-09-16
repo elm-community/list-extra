@@ -4,11 +4,12 @@ module List.Extra
   , uncons
   , minimumBy
   , maximumBy
-  , andMap, singleton, andThen
+  , andMap, andThen
   , takeWhile
   , dropWhile
   , dropDuplicates
   , replaceIf
+  , singleton
   , intercalate, transpose, subsequences, permutations
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
@@ -28,7 +29,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf
+@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations
@@ -150,13 +151,6 @@ dropDuplicates list =
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
 
-{-| Convert a value to a list containing one value. 
-  singleton 3 == [3]
--}
-
-singleton : a -> List a
-signleton x = [x]
-
 {-| Equivalent to `concatMap` with arguments reversed. Ideal to use as an infix function, chaining together functions that return List. For example, suppose you want to have a cartesian product of [1,2] and [3,4]:
 
     [1,2] `andThen` \x ->
@@ -250,6 +244,13 @@ findIndices p = map fst << filter (\(i,x) -> p x) << indexedMap (,)
 replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
   List.map (\item -> if predicate item then replacement else item) list
+
+{-| Convert a value to a list containing one value.
+
+    singleton 3 == [3]
+-}
+singleton : a -> List a
+singleton x = [x]
 
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
 
