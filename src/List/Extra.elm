@@ -4,7 +4,7 @@ module List.Extra
   , uncons
   , minimumBy
   , maximumBy
-  , andMap, andThen
+  , andMap, singleton, andThen
   , takeWhile
   , dropWhile
   , dropDuplicates
