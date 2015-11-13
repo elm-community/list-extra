@@ -116,8 +116,8 @@ takeWhile : (a -> Bool) -> List a -> List a
 takeWhile predicate list =
   case list of
     []      -> []
-    x::xs   -> if | (predicate x) -> x :: takeWhile predicate xs
-                  | otherwise -> []
+    x::xs   -> if (predicate x) then x :: takeWhile predicate xs
+               else []
 
 {-| Drop elements in order as long as the predicate evaluates to `True`
 -}
@@ -125,8 +125,8 @@ dropWhile : (a -> Bool) -> List a -> List a
 dropWhile predicate list =
   case list of
     []      -> []
-    x::xs   -> if | (predicate x) -> dropWhile predicate xs
-                  | otherwise -> list
+    x::xs   -> if (predicate x) then dropWhile predicate xs
+               else list
 
 {-| Drop _all_ duplicate elements from the list
 -}
