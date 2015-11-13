@@ -1,5 +1,5 @@
 {
-    "version": "3.7.0",
+    "version": "3.7.1",
     "summary": "Convenience functions for working with List",
     "repository": "https://github.com/circuithub/elm-list-extra.git",
     "license": "MIT",
@@ -10,7 +10,7 @@
         "List.Extra"
     ],
     "dependencies": {
-        "elm-lang/core": "2.0.0 <= v < 3.0.0"
+        "elm-lang/core": "2.0.0 <= v < 4.0.0"
     },
-    "elm-version": "0.15.0 <= v < 0.16.0"
+    "elm-version": "0.15.0 <= v < 0.17.0"
 }

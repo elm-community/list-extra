@@ -116,8 +116,8 @@ takeWhile : (a -> Bool) -> List a -> List a
 takeWhile predicate list =
   case list of
     []      -> []
-    x::xs   -> if | (predicate x) -> x :: takeWhile predicate xs
-                  | otherwise -> []
+    x::xs   -> if (predicate x) then x :: takeWhile predicate xs
+               else []
 
 {-| Drop elements in order as long as the predicate evaluates to `True`
 -}
@@ -125,8 +125,8 @@ dropWhile : (a -> Bool) -> List a -> List a
 dropWhile predicate list =
   case list of
     []      -> []
-    x::xs   -> if | (predicate x) -> dropWhile predicate xs
-                  | otherwise -> list
+    x::xs   -> if (predicate x) then dropWhile predicate xs
+               else list
 
 {-| Drop _all_ duplicate elements from the list
 -}
@@ -371,8 +371,13 @@ scanr : (a -> b -> b) -> b -> List a -> List b
 scanr f acc xs' =
   case xs' of
     [] -> [acc]
-    (x::xs) -> let ((q::_) as qs) = scanr f acc xs
-               in f x q :: qs
+    (x::xs) ->
+        case scanr f acc xs of
+          (q::_) as qs ->
+            f x q :: qs
+
+          [] ->
+            []
 
 {-| `scanr1` is a variant of `scanr` that has no starting value argument.
 
@@ -385,8 +390,13 @@ scanr1 f xs' =
   case xs' of
     [] -> []
     [x] -> [x]
-    (x::xs) -> let ((q::_) as qs) = scanr1 f xs
-               in f x q :: qs
+    (x::xs) ->
+      case scanr1 f xs of
+        (q::_) as qs ->
+          f x q :: qs
+
+        [] ->
+          []
 
 {-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
 
@@ -501,10 +511,14 @@ groupByTransitive cmp xs' =
     [] -> []
     [x] -> [[x]]
     (x::((x'::_) as xs)) ->
-      let ((y::ys) as r) = groupByTransitive cmp xs
-      in if cmp x x'
-         then (x::y)::ys
-         else [x]::r
+      case groupByTransitive cmp xs of
+        (y::ys) as r ->
+          if cmp x x'
+             then (x::y)::ys
+             else [x]::r
+
+        [] ->
+          []
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
 
@@ -518,7 +532,16 @@ inits = foldr (\e acc -> []::map ((::)e) acc) [[]]
     tails [1,2,3] == [[1,2,3],[2,3],[3],[]]
 -}
 tails : List a -> List (List a)
-tails = foldr (\e (x::xs) -> (e::x)::x::xs) [[]]
+tails = foldr tailsHelp [[]]
+
+
+tailsHelp e list =
+  case list of
+    (x::xs) ->
+      (e::x)::x::xs
+
+    [] ->
+      []
 
 {-| Return all combinations in the form of (element, rest of the list). Read [Haskell Libraries proposal](https://mail.haskell.org/pipermail/libraries/2008-February/009270.html) for further ideas on how to use this function.
 
