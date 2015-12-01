@@ -10,6 +10,7 @@ module List.Extra
   , dropDuplicates
   , replaceIf
   , singleton
+  , iterate
   , intercalate, transpose, subsequences, permutations
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
@@ -38,7 +39,7 @@ module List.Extra
 @docs foldl1, foldr1
 
 # Building lists
-@docs scanl1, scanr, scanr1, unfoldr
+@docs scanl1, scanr, scanr1, unfoldr, iterate
 
 # Sublists
 @docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupBy, groupByTransitive, inits, tails, select, selectSplit
@@ -80,6 +81,26 @@ init =
     maybe d f = Maybe.withDefault d << Maybe.map f
   in
     foldr ((<<) Just << maybe [] << (::)) Nothing
+
+
+{-| Returns a list of repeated applications of `f`.
+
+If `f` returns `Nothing` the iteration will stop. If it returns `Just y` then `y` will be added to the list and the iteration will continue with `f y`.
+    nextYear : Int -> Maybe Int
+    nextYear year =
+      if year >= 2030 then
+        Nothing
+      else
+        Just (year + 1)
+    -- Will evaluate to [2010, 2011, ..., 2030]
+    iterate nextYear 2010
+-}
+iterate : (a -> Maybe a) -> a -> List a
+iterate f x =
+  case f x of
+    Just x' -> x :: iterate f x'
+    Nothing -> [x]
+
 
 {-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.
 
