@@ -11,7 +11,7 @@ module List.Extra
   , replaceIf
   , singleton
   , iterate
-  , intercalate, transpose, subsequences, permutations
+  , intercalate, transpose, subsequences, permutations, interweave
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
@@ -33,7 +33,7 @@ module List.Extra
 @docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton
 
 # List transformations
-@docs intercalate, transpose, subsequences, permutations
+@docs intercalate, transpose, subsequences, permutations, interweave
 
 # Folds
 @docs foldl1, foldr1
@@ -329,6 +329,31 @@ permutations xs' =
     [] -> [[]]
     xs -> let f (y,ys) = map ((::)y) (permutations ys)
           in concatMap f (select xs)
+
+
+{-| Return a list that contains elements from the two provided, in alternate order.
+    If one list runs out of items, append the items from the remaining list.
+
+    interweave [1,3] [2,4] == [1,2,3,4]
+    interweave [1,3,5,7] [2,4] == [1,2,3,4,5,7]
+-}
+interweave : List a -> List a -> List a
+interweave l1 l2 =
+  interweaveHelp l1 l2 []
+
+
+interweaveHelp : List a -> List a -> List a -> List a
+interweaveHelp l1 l2 acc =
+  case (l1, l2) of
+    (x::xs, y::ys) ->
+      interweaveHelp xs ys <| acc ++ [x, y]
+
+    (x, []) ->
+      acc ++ x
+
+    ([], y) ->
+      acc ++ y
+
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
 
