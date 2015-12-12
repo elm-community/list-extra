@@ -556,6 +556,7 @@ tails : List a -> List (List a)
 tails = foldr tailsHelp [[]]
 
 
+tailsHelp : a -> List (List a) -> List (List a)
 tailsHelp e list =
   case list of
     (x::xs) ->
