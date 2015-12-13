@@ -10,6 +10,7 @@ module List.Extra
   , dropDuplicates
   , replaceIf
   , singleton
+  , removeWhen
   , iterate
   , intercalate, transpose, subsequences, permutations, interweave
   , foldl1, foldr1
@@ -30,7 +31,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton
+@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -272,6 +273,17 @@ replaceIf predicate replacement list =
 -}
 singleton : a -> List a
 singleton x = [x]
+
+
+{-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
+    This is equivalent to `List.filter (not << predicate) list`.
+
+    removeWhen isEven [1,2,3,4] == [1,3]
+-}
+removeWhen : (a -> Bool) -> List a -> List a
+removeWhen pred list =
+  List.filter (not << pred) list
+
 
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
 
