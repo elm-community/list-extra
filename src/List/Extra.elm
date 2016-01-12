@@ -1,6 +1,7 @@
 module List.Extra
   ( last
   , init
+  , getAt, (!!)
   , uncons
   , minimumBy
   , maximumBy
@@ -31,7 +32,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -83,6 +84,16 @@ init =
   in
     foldr ((<<) Just << maybe [] << (::)) Nothing
 
+{-| Returns Just the element at the given index in the list,
+or Nothing if the list is empty.
+-}
+getAt : List a -> Int -> Maybe a
+getAt xs idx = List.head <| List.drop idx xs
+
+{-| Alias for getAt
+-}
+(!!) : List a -> Int -> Maybe a
+(!!) = getAt
 
 {-| Returns a list of repeated applications of `f`.
 
