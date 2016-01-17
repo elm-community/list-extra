@@ -120,6 +120,7 @@ maximumBy : (a -> comparable) -> List a -> Maybe a
 maximumBy f ls =
   let maxBy x (y, fy) = let fx = f x in if fx > fy then (x, fx) else (y, fy)
   in case ls of
+        [l']    -> Just l'
         l'::ls' -> Just <| fst <| foldl maxBy (l', f l') ls'
         _       -> Nothing
 
@@ -129,6 +130,7 @@ minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy f ls =
   let minBy x (y, fy) = let fx = f x in if fx < fy then (x, fx) else (y, fy)
   in case ls of
+        [l']    -> Just l'
         l'::ls' -> Just <| fst <| foldl minBy (l', f l') ls'
         _       -> Nothing
 
