@@ -118,18 +118,20 @@ uncons xs =
 -}
 maximumBy : (a -> comparable) -> List a -> Maybe a
 maximumBy f ls =
-  let maxBy f x y = if (f x) > (f y) then x else y
+  let maxBy x (y, fy) = let fx = f x in if fx > fy then (x, fx) else (y, fy)
   in case ls of
-        l'::ls' -> Just <| foldl (maxBy f) l' ls'
+        [l']    -> Just l'
+        l'::ls' -> Just <| fst <| foldl maxBy (l', f l') ls'
         _       -> Nothing
 
 {-| Find the first minimum element in a list using a comparable transformation
 -}
 minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy f ls =
-  let minBy f x y = if (f x) < (f y) then x else y
+  let minBy x (y, fy) = let fx = f x in if fx < fy then (x, fx) else (y, fy)
   in case ls of
-        l'::ls' -> Just <| foldl (minBy f) l' ls'
+        [l']    -> Just l'
+        l'::ls' -> Just <| fst <| foldl minBy (l', f l') ls'
         _       -> Nothing
 
 {-| Take elements in order as long as the predicate evaluates to `True`
