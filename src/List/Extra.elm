@@ -10,7 +10,9 @@ module List.Extra
   , dropWhile
   , dropDuplicates
   , replaceIf
+  , setAt
   , singleton
+  , removeAt
   , removeWhen
   , iterate
   , intercalate, transpose, subsequences, permutations, interweave
@@ -32,7 +34,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, setAt, singleton, removeAt, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -280,6 +282,21 @@ replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
   List.map (\item -> if predicate item then replacement else item) list
 
+{-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
+ -}
+setAt : List a -> Int -> a -> Maybe (List a)
+setAt l index value =
+  let
+    head = List.take index l
+    tail = List.drop index l |> List.tail
+  in
+    case tail of
+      Nothing ->
+        Nothing
+
+      Just t ->
+        Just (value :: t |> List.append head)
+
 {-| Convert a value to a list containing one value.
 
     singleton 3 == [3]
@@ -287,6 +304,20 @@ replaceIf predicate replacement list =
 singleton : a -> List a
 singleton x = [x]
 
+{-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
+-}
+removeAt : List a -> Int -> List a
+removeAt l index =
+  let
+    head = List.take index l
+    tail = List.drop index l |> List.tail
+  in
+    case tail of
+      Nothing ->
+        l
+
+      Just t ->
+        List.append head t
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
     This is equivalent to `List.filter (not << predicate) list`.
