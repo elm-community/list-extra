@@ -13,7 +13,7 @@ module List.Extra
   , singleton
   , removeWhen
   , iterate
-  , intercalate, transpose, subsequences, permutations, interweave
+  , intercalate, transpose, subsequences, permutations, interweave, unique
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
@@ -35,7 +35,7 @@ module List.Extra
 @docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, singleton, removeWhen
 
 # List transformations
-@docs intercalate, transpose, subsequences, permutations, interweave
+@docs intercalate, transpose, subsequences, permutations, interweave, unique
 
 # Folds
 @docs foldl1, foldr1
@@ -60,7 +60,7 @@ module List.Extra
 -}
 
 import List exposing (..)
-import Set
+import Set exposing (Set)
 
 
 {-| Extract the last element of a list.
@@ -378,6 +378,27 @@ interweaveHelp l1 l2 acc =
 
     ([], y) ->
       acc ++ y
+
+
+{-| Remove all duplicates from a list and return a list of distinct elements.
+-}
+unique : List comparable -> List comparable
+unique list =
+  uniqueHelp Set.empty [] list
+    |> List.reverse
+
+
+uniqueHelp : Set comparable -> List comparable -> List comparable -> List comparable
+uniqueHelp existing result remaining =
+  case remaining of
+    [] ->
+      result
+
+    first :: rest ->
+      if Set.member first existing then
+        uniqueHelp existing result rest
+      else
+        uniqueHelp (Set.insert first existing) (first :: result) rest
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
