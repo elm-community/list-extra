@@ -384,21 +384,20 @@ interweaveHelp l1 l2 acc =
 -}
 unique : List comparable -> List comparable
 unique list =
-  uniqueHelp Set.empty [] list
-    |> List.reverse
+  uniqueHelp Set.empty list
 
 
-uniqueHelp : Set comparable -> List comparable -> List comparable -> List comparable
-uniqueHelp existing result remaining =
+uniqueHelp : Set comparable -> List comparable -> List comparable
+uniqueHelp existing remaining =
   case remaining of
     [] ->
-      result
+      []
 
     first :: rest ->
       if Set.member first existing then
-        uniqueHelp existing result rest
+        uniqueHelp existing rest
       else
-        uniqueHelp (Set.insert first existing) (first :: result) rest
+        first :: uniqueHelp (Set.insert first existing) rest
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
