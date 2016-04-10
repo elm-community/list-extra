@@ -13,7 +13,7 @@ module List.Extra
   , singleton
   , removeWhen
   , iterate
-  , intercalate, transpose, subsequences, permutations, interweave, unique
+  , intercalate, transpose, subsequences, permutations, interweave
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
@@ -35,7 +35,7 @@ module List.Extra
 @docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, singleton, removeWhen
 
 # List transformations
-@docs intercalate, transpose, subsequences, permutations, interweave, unique
+@docs intercalate, transpose, subsequences, permutations, interweave
 
 # Folds
 @docs foldl1, foldr1
@@ -163,17 +163,25 @@ dropWhile predicate list =
     x::xs   -> if (predicate x) then dropWhile predicate xs
                else list
 
-{-| Drop _all_ duplicate elements from the list
+{-| Drop all duplicates
 -}
 dropDuplicates : List comparable -> List comparable
 dropDuplicates list =
-  let
-    step next (set, acc) =
-      if Set.member next set
-        then (set, acc)
-        else (Set.insert next set, next::acc)
-  in
-    List.foldl step (Set.empty, []) list |> snd |> List.reverse
+  dropDuplicatesHelp Set.empty list
+
+
+dropDuplicatesHelp : Set comparable -> List comparable -> List comparable
+dropDuplicatesHelp existing remaining =
+  case remaining of
+    [] ->
+      []
+
+    first :: rest ->
+      if Set.member first existing then
+        dropDuplicatesHelp existing rest
+      else
+        first :: dropDuplicatesHelp (Set.insert first existing) rest
+
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
@@ -378,26 +386,6 @@ interweaveHelp l1 l2 acc =
 
     ([], y) ->
       acc ++ y
-
-
-{-| Remove all duplicates from a list and return a list of distinct elements.
--}
-unique : List comparable -> List comparable
-unique list =
-  uniqueHelp Set.empty list
-
-
-uniqueHelp : Set comparable -> List comparable -> List comparable
-uniqueHelp existing remaining =
-  case remaining of
-    [] ->
-      []
-
-    first :: rest ->
-      if Set.member first existing then
-        uniqueHelp existing rest
-      else
-        first :: uniqueHelp (Set.insert first existing) rest
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
