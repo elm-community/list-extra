@@ -85,10 +85,14 @@ init =
     foldr ((<<) Just << maybe [] << (::)) Nothing
 
 {-| Returns `Just` the element at the given index in the list,
-or `Nothing` if the list is not long enough.
+or `Nothing` if the index is out of range.
 -}
 getAt : List a -> Int -> Maybe a
-getAt xs idx = List.head <| List.drop idx xs
+getAt xs idx = 
+  if idx < 0 then
+    Nothing
+  else
+    List.head <| List.drop idx xs
 
 {-| Alias for getAt
 -}
