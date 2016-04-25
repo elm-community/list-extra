@@ -11,6 +11,8 @@ module List.Extra
   , dropDuplicates
   , replaceIf
   , setAt
+  , deleteIf
+  , updateIf
   , singleton
   , removeAt
   , removeWhen
@@ -34,7 +36,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, find, replaceIf, setAt, singleton, removeAt, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, singleton, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -62,7 +64,7 @@ module List.Extra
 -}
 
 import List exposing (..)
-import Set
+import Set exposing (Set)
 
 
 {-| Extract the last element of a list.
@@ -87,10 +89,14 @@ init =
     foldr ((<<) Just << maybe [] << (::)) Nothing
 
 {-| Returns `Just` the element at the given index in the list,
-or `Nothing` if the list is not long enough.
+or `Nothing` if the index is out of range.
 -}
 getAt : List a -> Int -> Maybe a
-getAt xs idx = List.head <| List.drop idx xs
+getAt xs idx =
+  if idx < 0 then
+    Nothing
+  else
+    List.head <| List.drop idx xs
 
 {-| Alias for getAt
 -}
@@ -165,17 +171,25 @@ dropWhile predicate list =
     x::xs   -> if (predicate x) then dropWhile predicate xs
                else list
 
-{-| Drop _all_ duplicate elements from the list
+{-| Drop all duplicates
 -}
 dropDuplicates : List comparable -> List comparable
 dropDuplicates list =
-  let
-    step next (set, acc) =
-      if Set.member next set
-        then (set, acc)
-        else (Set.insert next set, next::acc)
-  in
-    List.foldl step (Set.empty, []) list |> snd |> List.reverse
+  dropDuplicatesHelp Set.empty list
+
+
+dropDuplicatesHelp : Set comparable -> List comparable -> List comparable
+dropDuplicatesHelp existing remaining =
+  case remaining of
+    [] ->
+      []
+
+    first :: rest ->
+      if Set.member first existing then
+        dropDuplicatesHelp existing rest
+      else
+        first :: dropDuplicatesHelp (Set.insert first existing) rest
+
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
@@ -280,7 +294,23 @@ findIndices p = map fst << filter (\(i,x) -> p x) << indexedMap (,)
 -}
 replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
-  List.map (\item -> if predicate item then replacement else item) list
+  updateIf predicate (always replacement) list
+
+{-| Replace all values that satisfy a predicate by calling an update function
+-}
+updateIf : (a -> Bool) -> (a -> a) -> List a -> List a
+updateIf predicate update list =
+  List.map (\item -> if predicate item then update item else item) list
+
+{-| Remove all values that satisfy a predicate
+-}
+deleteIf : (a -> Bool) -> List a -> List a
+deleteIf predicate items =
+  List.filter (not << predicate) items
+
+
+
+
 
 {-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
  -}

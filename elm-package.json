@@ -1,7 +1,7 @@
 {
-    "version": "3.9.0",
+    "version": "1.0.0",
     "summary": "Convenience functions for working with List",
-    "repository": "https://github.com/circuithub/elm-list-extra.git",
+    "repository": "https://github.com/elm-community/elm-list-extra.git",
     "license": "MIT",
     "source-directories": [
         "src"
