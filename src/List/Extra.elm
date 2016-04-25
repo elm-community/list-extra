@@ -36,7 +36,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, singleton, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, singleton, removeAt, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
