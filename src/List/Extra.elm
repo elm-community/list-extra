@@ -10,9 +10,11 @@ module List.Extra
   , dropWhile
   , dropDuplicates
   , replaceIf
+  , setAt
   , deleteIf
   , updateIf
   , singleton
+  , removeAt
   , removeWhen
   , iterate
   , intercalate, transpose, subsequences, permutations, interweave
@@ -34,7 +36,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, deleteIf, updateIf, singleton, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, singleton, removeAt, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -90,7 +92,7 @@ init =
 or `Nothing` if the index is out of range.
 -}
 getAt : List a -> Int -> Maybe a
-getAt xs idx = 
+getAt xs idx =
   if idx < 0 then
     Nothing
   else
@@ -306,9 +308,23 @@ deleteIf : (a -> Bool) -> List a -> List a
 deleteIf predicate items =
   List.filter (not << predicate) items
 
+{-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
+ -}
+setAt : Int -> a -> List a -> Maybe (List a)
+setAt index value l =
+  if index < 0 then
+    Nothing
+  else
+    let
+      head = List.take index l
+      tail = List.drop index l |> List.tail
+    in
+      case tail of
+        Nothing ->
+          Nothing
 
-
-
+        Just t ->
+          Just (value :: t |> List.append head)
 
 {-| Convert a value to a list containing one value.
 
@@ -317,6 +333,23 @@ deleteIf predicate items =
 singleton : a -> List a
 singleton x = [x]
 
+{-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
+-}
+removeAt : Int -> List a -> List a
+removeAt index l =
+  if index < 0 then
+    l
+  else
+    let
+      head = List.take index l
+      tail = List.drop index l |> List.tail
+    in
+      case tail of
+        Nothing ->
+          l
+
+        Just t ->
+          List.append head t
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
     This is equivalent to `List.filter (not << predicate) list`.
