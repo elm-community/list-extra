@@ -312,16 +312,19 @@ deleteIf predicate items =
  -}
 setAt : Int -> a -> List a -> Maybe (List a)
 setAt index value l =
-  let
-    head = List.take index l
-    tail = List.drop index l |> List.tail
-  in
-    case tail of
-      Nothing ->
-        Nothing
+  if index < 0 then
+    Nothing
+  else
+    let
+      head = List.take index l
+      tail = List.drop index l |> List.tail
+    in
+      case tail of
+        Nothing ->
+          Nothing
 
-      Just t ->
-        Just (value :: t |> List.append head)
+        Just t ->
+          Just (value :: t |> List.append head)
 
 {-| Convert a value to a list containing one value.
 
@@ -334,16 +337,19 @@ singleton x = [x]
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
-  let
-    head = List.take index l
-    tail = List.drop index l |> List.tail
-  in
-    case tail of
-      Nothing ->
-        l
+  if index < 0 then
+    l
+  else
+    let
+      head = List.take index l
+      tail = List.drop index l |> List.tail
+    in
+      case tail of
+        Nothing ->
+          l
 
-      Just t ->
-        List.append head t
+        Just t ->
+          List.append head t
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
     This is equivalent to `List.filter (not << predicate) list`.
