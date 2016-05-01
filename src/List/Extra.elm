@@ -308,14 +308,10 @@ deleteIf : (a -> Bool) -> List a -> List a
 deleteIf predicate items =
   List.filter (not << predicate) items
 
-
-
-
-
 {-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
  -}
-setAt : List a -> Int -> a -> Maybe (List a)
-setAt l index value =
+setAt : Int -> List a -> a -> Maybe (List a)
+setAt index l value =
   let
     head = List.take index l
     tail = List.drop index l |> List.tail
@@ -336,8 +332,8 @@ singleton x = [x]
 
 {-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
 -}
-removeAt : List a -> Int -> List a
-removeAt l index =
+removeAt : Int -> List a -> List a
+removeAt index l =
   let
     head = List.take index l
     tail = List.drop index l |> List.tail
