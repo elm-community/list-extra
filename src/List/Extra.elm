@@ -308,7 +308,7 @@ deleteIf : (a -> Bool) -> List a -> List a
 deleteIf predicate items =
   List.filter (not << predicate) items
 
-{-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
+{-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
  -}
 setAt : Int -> a -> List a -> Maybe (List a)
 setAt index value l =
