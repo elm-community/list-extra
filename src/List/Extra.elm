@@ -310,8 +310,8 @@ deleteIf predicate items =
 
 {-| Set a value in a list by index. Returns the updated list if the index in range, or Nothing if it is out of range.
  -}
-setAt : Int -> List a -> a -> Maybe (List a)
-setAt index l value =
+setAt : Int -> a -> List a -> Maybe (List a)
+setAt index value l =
   let
     head = List.take index l
     tail = List.drop index l |> List.tail
