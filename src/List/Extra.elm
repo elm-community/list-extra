@@ -91,17 +91,17 @@ init =
 {-| Returns `Just` the element at the given index in the list,
 or `Nothing` if the index is out of range.
 -}
-getAt : List a -> Int -> Maybe a
-getAt xs idx =
+getAt : Int -> List a -> Maybe a
+getAt idx xs =
   if idx < 0 then
     Nothing
   else
     List.head <| List.drop idx xs
 
-{-| Alias for getAt
+{-| Alias for getAt, but with the parameters flipped.
 -}
 (!!) : List a -> Int -> Maybe a
-(!!) = getAt
+(!!) = flip getAt
 
 {-| Returns a list of repeated applications of `f`.
 
