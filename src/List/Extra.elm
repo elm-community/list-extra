@@ -12,6 +12,8 @@ module List.Extra exposing ( last
   , setAt
   , deleteIf
   , updateIf
+  , updateAt
+  , updateIfIndex
   , singleton
   , removeAt
   , removeWhen
@@ -35,7 +37,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, singleton, removeAt, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, updateAt, updateIfIndex, singleton, removeAt, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -295,11 +297,26 @@ replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
   updateIf predicate (always replacement) list
 
-{-| Replace all values that satisfy a predicate by calling an update function
+{-| Replace all values that satisfy a predicate by calling an update function.
 -}
 updateIf : (a -> Bool) -> (a -> a) -> List a -> List a
 updateIf predicate update list =
   List.map (\item -> if predicate item then update item else item) list
+
+{-| Replace a value at a specific index by calling an update function.
+-}
+updateAt : Int -> (a -> a) -> List a -> Maybe (List a)
+updateAt index update list =
+  if index < 0 || index >= List.length list then
+    Nothing
+  else
+    Just <| updateIfIndex ((==) index) update list
+
+{-| Replace a value at an index that satisfies a predicate.
+-}
+updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
+updateIfIndex predicate update list =
+  List.indexedMap (\i x -> if predicate i then update x else x) list
 
 {-| Remove all values that satisfy a predicate
 -}
@@ -324,6 +341,7 @@ setAt index value l =
 
         Just t ->
           Just (value :: t |> List.append head)
+
 
 {-| Convert a value to a list containing one value.
 
