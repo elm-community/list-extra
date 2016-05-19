@@ -22,7 +22,7 @@ module List.Extra exposing ( last
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
-  , group, groupBy, groupByTransitive, inits, tails, select, selectSplit
+  , group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
   , notMember, find
   , elemIndex, elemIndices, findIndex, findIndices
@@ -49,7 +49,7 @@ module List.Extra exposing ( last
 @docs scanl1, scanr, scanr1, unfoldr, iterate
 
 # Sublists
-@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupBy, groupByTransitive, inits, tails, select, selectSplit
+@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
 
 # Predicates
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -628,41 +628,41 @@ stripPrefix prefix xs =
   in
     foldl step (Just xs) prefix
 
-{-| Group similar elements together. `group` is equivalent to `groupBy (==)`.
+{-| Group similar elements together. `group` is equivalent to `groupWhile (==)`.
 
     group [1,2,2,3,3,3,2,2,1] == [[1],[2,2],[3,3,3],[2,2],[1]]
 -}
 group : List a -> List (List a)
-group = groupBy (==)
+group = groupWhile (==)
 
 {-| Group elements together, using a custom equality test.
 
-    groupBy (\x y -> fst x == fst y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
+    groupWhile (\x y -> fst x == fst y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
 
 The equality test should be an equivalent relationship, i.e. it should have the properties of reflexivity, symmetry, and transitivity. For non-equivalent relations it gives non-intuitive behavior:
 
-    groupBy (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3,2,4],[1,3,2],[1]]
+    groupWhile (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3,2,4],[1,3,2],[1]]
 
-For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupByTransitive`.
+For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupWhileTransitively`.
 -}
-groupBy : (a -> a -> Bool) -> List a -> List (List a)
-groupBy eq xs' =
+groupWhile : (a -> a -> Bool) -> List a -> List (List a)
+groupWhile eq xs' =
   case xs' of
     [] -> []
     (x::xs) -> let (ys,zs) = span (eq x) xs
-               in (x::ys)::groupBy eq zs
+               in (x::ys)::groupWhile eq zs
 
 {-| Group elements together, using a custom comparison test. Start a new group each time the comparison test doesn't hold for two adjacent elements.
 
-    groupByTransitive (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
+    groupWhileTransitively (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
 -}
-groupByTransitive : (a -> a -> Bool) -> List a -> List (List a)
-groupByTransitive cmp xs' =
+groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
+groupWhileTransitively cmp xs' =
   case xs' of
     [] -> []
     [x] -> [[x]]
     (x::((x'::_) as xs)) ->
-      case groupByTransitive cmp xs of
+      case groupWhileTransitively cmp xs of
         (y::ys) as r ->
           if cmp x x'
              then (x::y)::ys
