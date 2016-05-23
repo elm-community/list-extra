@@ -33,6 +33,7 @@ module List.Extra exposing ( last
   , lift2
   , lift3
   , lift4
+  , groupsOf, groupsOfWithStep, greedyGroupsOf, greedyGroupsOfWithStep
   )
 {-| Convenience functions for working with List
 
@@ -62,6 +63,9 @@ module List.Extra exposing ( last
 
 # Lift functions onto multiple lists of arguments
 @docs lift2, lift3, lift4
+
+# Split to groups of given size
+@docs groupsOf, groupsOfWithStep, greedyGroupsOf, greedyGroupsOfWithStep
 -}
 
 import List exposing (..)
@@ -781,3 +785,74 @@ lift3 f la lb lc =
 lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
 lift4 f la lb lc ld =
   la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> ld `andThen` (\d -> [f a b c d]))))
+
+{-| Split list into groups of size given by the first argument.
+
+    groupsOf 3 [1..10]
+      == [[1,2,3],[4,5,6],[7,8,9]]
+-}
+groupsOf : Int -> List a -> List (List a)
+groupsOf size xs =
+  groupsOfWithStep size size xs
+
+
+{-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argumet before starting the next group.
+
+    groupsOfWithStep 2 1 [1..4]
+      == [[1,2],[2,3],[3,4]]
+-}
+groupsOfWithStep : Int -> Int -> List a -> List (List a)
+groupsOfWithStep size step xs =
+  let
+    group =
+      List.take size xs
+
+    xs' =
+      List.drop step xs
+
+    okayArgs =
+      size > 0 && step > 0
+
+    okayLength =
+      size == List.length group
+  in
+    if okayArgs && okayLength then
+      group :: groupsOfWithStep size step xs'
+    else
+      []
+
+
+{-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
+
+    greedyGroupsOf 3 [1..10]
+      == [[1,2,3],[4,5,6],[7,8,9],[10]]
+-}
+greedyGroupsOf : Int -> List a -> List (List a)
+greedyGroupsOf size xs =
+  greedyGroupsOfWithStep size size xs
+
+
+{-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
+
+    greedyGroupsOfWithStep 3 2 [1..6]
+      == [[1,2,3],[3,4,5],[5,6]]
+-}
+greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
+greedyGroupsOfWithStep size step xs =
+  let
+    group =
+      List.take size xs
+
+    xs' =
+      List.drop step xs
+
+    okayArgs =
+      size > 0 && step > 0
+
+    okayXs =
+      List.length xs > 0
+  in
+    if okayArgs && okayXs then
+      group :: greedyGroupsOfWithStep size step xs'
+    else
+      []
