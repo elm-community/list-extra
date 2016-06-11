@@ -7,7 +7,7 @@ module List.Extra exposing ( last
   , andMap, andThen
   , takeWhile
   , dropWhile
-  , unique
+  , unique, uniqueBy
   , replaceIf
   , setAt
   , remove
@@ -38,7 +38,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -182,20 +182,27 @@ dropWhile predicate list =
 -}
 unique : List comparable -> List comparable
 unique list =
-  uniqueHelp Set.empty list
+  uniqueHelp identity Set.empty list
+
+{-| Drop duplicates where what is considered to be a duplicate is the result of first applying the supplied function to the elements of the list.
+-}
+uniqueBy : (a -> comparable) -> List a -> List a
+uniqueBy f list =
+  uniqueHelp f Set.empty list
 
 
-uniqueHelp : Set comparable -> List comparable -> List comparable
-uniqueHelp existing remaining =
+uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a
+uniqueHelp f existing remaining =
   case remaining of
     [] ->
       []
 
     first :: rest ->
-      if Set.member first existing then
-        uniqueHelp existing rest
+      let computedFirst = f first in
+      if Set.member computedFirst existing then
+        uniqueHelp f existing rest
       else
-        first :: uniqueHelp (Set.insert first existing) rest
+        first :: uniqueHelp f (Set.insert computedFirst existing) rest
 
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
@@ -327,10 +334,10 @@ updateIfIndex predicate update list =
 {-| Remove the first occurrence of a value from a list.
 -}
 remove : a -> List a -> List a
-remove x xs = 
+remove x xs =
   case xs of
     []    -> []
-    y::ys -> if x == y then ys 
+    y::ys -> if x == y then ys
              else y :: remove x ys
 
 {-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
