@@ -22,7 +22,7 @@ module List.Extra exposing ( last
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
-  , group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+  , group, groupBy, groupByTransitively, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
   , notMember, find
   , elemIndex, elemIndices, findIndex, findIndices
@@ -50,7 +50,7 @@ module List.Extra exposing ( last
 @docs scanl1, scanr, scanr1, unfoldr, iterate
 
 # Sublists
-@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupBy, groupByTransitively, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
 
 # Predicates
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -638,6 +638,22 @@ stripPrefix prefix xs =
 -}
 group : List a -> List (List a)
 group = groupWhile (==)
+
+{-| Group similar elements together by a particular comparable aspect of each element
+
+    groupBy .x [ { x = 1 }, { x = 1 }, { x = 2 } ] == [ [ { x = 1 }, { x = 1 } ], [ { x = 2 } ] ]
+-}
+groupBy : (a -> comparable) -> List a -> List (List a)
+groupBy toComparable =
+  groupWhile (\left right -> toComparable left == toComparable right)
+
+{-| Group elements together by a particular comparable aspect of each element. Start a new group each time the comparison test doesn't hold for two adjacent elements.
+
+    groupByTransitively .x [ { x = 1 }, { x = 2 }, { x = 1 } ] == [ [ { x = 1 } ], [ { x = 2 } ], [ { x = 1 } ] ]
+-}
+groupByTransitively : (a -> comparable) -> List a -> List (List a)
+groupByTransitively toComparable =
+  groupWhileTransitively (\left right -> toComparable left == toComparable right)
 
 {-| Group elements together, using a custom equality test.
 
