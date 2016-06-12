@@ -10,6 +10,7 @@ module List.Extra exposing ( last
   , dropDuplicates
   , replaceIf
   , setAt
+  , deleteFirst
   , deleteIf
   , updateIf
   , updateAt
@@ -38,7 +39,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, updateAt, updateIfIndex, singleton, removeAt, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteFirst, deleteIf, updateIf, updateAt, updateIfIndex, singleton, removeAt, removeWhen
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -322,6 +323,15 @@ updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
 updateIfIndex predicate update list =
   List.indexedMap (\i x -> if predicate i then update x else x) list
 
+{-| Remove the first occurrence of a value from a list.
+-}
+deleteFirst : a -> List a -> List a
+deleteFirst x xs = 
+  case xs of
+    []    -> []
+    y::ys -> if x == y then ys 
+             else y :: deleteFirst x ys
+
 {-| Remove all values that satisfy a predicate
 -}
 deleteIf : (a -> Bool) -> List a -> List a
@@ -380,7 +390,6 @@ removeAt index l =
 removeWhen : (a -> Bool) -> List a -> List a
 removeWhen pred list =
   List.filter (not << pred) list
-
 
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
 
