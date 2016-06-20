@@ -7,21 +7,21 @@ module List.Extra exposing ( last
   , andMap, andThen
   , takeWhile
   , dropWhile
-  , dropDuplicates
+  , unique
   , replaceIf
   , setAt
-  , deleteIf
+  , remove
   , updateIf
   , updateAt
   , updateIfIndex
   , singleton
   , removeAt
-  , removeWhen
+  , filterNot
   , iterate
   , intercalate, transpose, subsequences, permutations, interweave
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
-  , splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix
+  , splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix
   , group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
   , notMember, find
@@ -38,7 +38,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, dropDuplicates, replaceIf, setAt, deleteIf, updateIf, updateAt, updateIfIndex, singleton, removeAt, removeWhen
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -50,7 +50,7 @@ module List.Extra exposing ( last
 @docs scanl1, scanr, scanr1, unfoldr, iterate
 
 # Sublists
-@docs splitAt, takeWhileEnd, dropWhileEnd, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+@docs splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
 
 # Predicates
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -176,24 +176,26 @@ dropWhile predicate list =
     x::xs   -> if (predicate x) then dropWhile predicate xs
                else list
 
-{-| Drop all duplicates
+{-| Remove duplicate values, keeping the first instance of each element which appears more than once.
+
+    unique [0,1,1,0,1] == [0,1]
 -}
-dropDuplicates : List comparable -> List comparable
-dropDuplicates list =
-  dropDuplicatesHelp Set.empty list
+unique : List comparable -> List comparable
+unique list =
+  uniqueHelp Set.empty list
 
 
-dropDuplicatesHelp : Set comparable -> List comparable -> List comparable
-dropDuplicatesHelp existing remaining =
+uniqueHelp : Set comparable -> List comparable -> List comparable
+uniqueHelp existing remaining =
   case remaining of
     [] ->
       []
 
     first :: rest ->
       if Set.member first existing then
-        dropDuplicatesHelp existing rest
+        uniqueHelp existing rest
       else
-        first :: dropDuplicatesHelp (Set.insert first existing) rest
+        first :: uniqueHelp (Set.insert first existing) rest
 
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
@@ -322,11 +324,14 @@ updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
 updateIfIndex predicate update list =
   List.indexedMap (\i x -> if predicate i then update x else x) list
 
-{-| Remove all values that satisfy a predicate
+{-| Remove the first occurrence of a value from a list.
 -}
-deleteIf : (a -> Bool) -> List a -> List a
-deleteIf predicate items =
-  List.filter (not << predicate) items
+remove : a -> List a -> List a
+remove x xs = 
+  case xs of
+    []    -> []
+    y::ys -> if x == y then ys 
+             else y :: remove x ys
 
 {-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
  -}
@@ -375,12 +380,11 @@ removeAt index l =
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
     This is equivalent to `List.filter (not << predicate) list`.
 
-    removeWhen isEven [1,2,3,4] == [1,3]
+    filterNot isEven [1,2,3,4] == [1,3]
 -}
-removeWhen : (a -> Bool) -> List a -> List a
-removeWhen pred list =
+filterNot : (a -> Bool) -> List a -> List a
+filterNot pred list =
   List.filter (not << pred) list
-
 
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
 
@@ -575,23 +579,23 @@ unfoldr f seed =
 splitAt : Int -> List a -> (List a, List a)
 splitAt n xs = (take n xs, drop n xs)
 
-{-| Take elements from the end, while predicate still holds.
+{-| Take elements from the right, while predicate still holds.
 
-    takeWhileEnd ((<)5) [1..10] == [6,7,8,9,10]
+    takeWhileRight ((<)5) [1..10] == [6,7,8,9,10]
 -}
-takeWhileEnd : (a -> Bool) -> List a -> List a
-takeWhileEnd p =
+takeWhileRight : (a -> Bool) -> List a -> List a
+takeWhileRight p =
   let
     step x (xs,free) = if p x && free then (x::xs,True) else (xs, False)
   in
     fst << foldr step ([], True)
 
-{-| Drop elements from the end, while predicate still holds.
+{-| Drop elements from the right, while predicate still holds.
 
-    dropWhileEnd ((<)5) [1..10] == [1,2,3,4,5]
+    dropWhileRight ((<)5) [1..10] == [1,2,3,4,5]
 -}
-dropWhileEnd : (a -> Bool) -> List a -> List a
-dropWhileEnd p = foldr (\x xs -> if p x && isEmpty xs then [] else x::xs) []
+dropWhileRight : (a -> Bool) -> List a -> List a
+dropWhileRight p = foldr (\x xs -> if p x && isEmpty xs then [] else x::xs) []
 
 {-| Take a predicate and a list, return a tuple. The first part of the tuple is longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
 
