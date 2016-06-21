@@ -800,7 +800,7 @@ groupsOf size xs =
   groupsOfWithStep size size xs
 
 
-{-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argumet before starting the next group.
+{-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argument before starting the next group.
 
     groupsOfWithStep 2 1 [1..4]
       == [[1,2],[2,3],[3,4]]
