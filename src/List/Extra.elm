@@ -586,6 +586,31 @@ unfoldr f seed =
 splitAt : Int -> List a -> (List a, List a)
 splitAt n xs = (take n xs, drop n xs)
 
+{-| Take a list of lengths and a list, return a list of lists, where each list has the length described by the element of the first list. If there are more lengths provided than the list has elements the result will be shorter.
+
+    splitByListOfLengths [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
+    splitByListOfLengths [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
+    splitByListOfLengths [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
+-}
+splitByListOfLengths : List Int -> List a -> List (List a)
+splitByListOfLengths listOflengths list =
+    splitByListOfLengths' listOflengths list []
+
+splitByListOfLengths' : List Int -> List a -> List (List a) -> List (List a)
+splitByListOfLengths' listOflengths list accu =
+    case listOflengths of
+        [] ->
+            List.reverse accu
+
+        currentLength :: restLengths ->
+            case list of
+                [] ->
+                    List.reverse accu
+
+                head :: rest ->
+                    splitByListOfLengths' restLengths (List.drop currentLength list) ((List.take currentLength list) :: accu)
+
+
 {-| Take elements from the right, while predicate still holds.
 
     takeWhileRight ((<)5) [1..10] == [6,7,8,9,10]
