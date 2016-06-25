@@ -21,7 +21,7 @@ module List.Extra exposing ( last
   , intercalate, transpose, subsequences, permutations, interweave
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
-  , splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix
+  , splitAt, chunks, takeWhileRight, dropWhileRight, span, break, stripPrefix
   , group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
   , notMember, find
@@ -50,7 +50,7 @@ module List.Extra exposing ( last
 @docs scanl1, scanr, scanr1, unfoldr, iterate
 
 # Sublists
-@docs splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+@docs splitAt, chunks, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
 
 # Predicates
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -586,18 +586,18 @@ unfoldr f seed =
 splitAt : Int -> List a -> (List a, List a)
 splitAt n xs = (take n xs, drop n xs)
 
-{-| Take a list of lengths and a list, return a list of lists, where each list has the length described by the element of the first list. If there are more lengths provided than the list has elements the result will be shorter.
+{-| Chunks ns takes n elements from a list for each n in ns, splitting the list into variably sized segments
 
-    splitByListOfLengths [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
-    splitByListOfLengths [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
-    splitByListOfLengths [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
+    chunks [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
+    chunks [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
+    chunks [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
 -}
-splitByListOfLengths : List Int -> List a -> List (List a)
-splitByListOfLengths listOflengths list =
-    splitByListOfLengths' listOflengths list []
+chunks : List Int -> List a -> List (List a)
+chunks listOflengths list =
+    chunks' listOflengths list []
 
-splitByListOfLengths' : List Int -> List a -> List (List a) -> List (List a)
-splitByListOfLengths' listOflengths list accu =
+chunks' : List Int -> List a -> List (List a) -> List (List a)
+chunks' listOflengths list accu =
     case listOflengths of
         [] ->
             List.reverse accu
@@ -608,7 +608,11 @@ splitByListOfLengths' listOflengths list accu =
                     List.reverse accu
 
                 head :: rest ->
-                    splitByListOfLengths' restLengths (List.drop currentLength list) ((List.take currentLength list) :: accu)
+                    let
+                        (front, rest) =
+                            splitAt currentLength list
+                    in
+                        chunks' restLengths rest (front :: accu)
 
 
 {-| Take elements from the right, while predicate still holds.
