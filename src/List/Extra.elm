@@ -22,7 +22,7 @@ module List.Extra exposing ( last
   , foldl1, foldr1
   , scanl1, scanr, scanr1, unfoldr
   , splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix
-  , group, groupWhile, groupsOfVariableLength, groupWhileTransitively, inits, tails, select, selectSplit
+  , group, groupWhile, groupsOfVarying, groupWhileTransitively, inits, tails, select, selectSplit
   , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
   , notMember, find
   , elemIndex, elemIndices, findIndex, findIndices
@@ -65,7 +65,7 @@ module List.Extra exposing ( last
 @docs lift2, lift3, lift4
 
 # Split to groups of given size
-@docs groupsOf, groupsOfWithStep, groupsOfVariableLength, greedyGroupsOf, greedyGroupsOfWithStep
+@docs groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
 -}
 
 import List exposing (..)
@@ -832,18 +832,18 @@ groupsOfWithStep size step xs =
     else
       []
 
-{-| `groupsOfVariableLength ns` takes `n` elements from a list for each `n` in `ns`, splitting the list into variably sized segments
+{-| `groupsOfVarying ns` takes `n` elements from a list for each `n` in `ns`, splitting the list into variably sized segments
 
-    groupsOfVariableLength [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
-    groupsOfVariableLength [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
-    groupsOfVariableLength [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
+    groupsOfVarying [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
+    groupsOfVarying [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
+    groupsOfVarying [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
 -}
-groupsOfVariableLength : List Int -> List a -> List (List a)
-groupsOfVariableLength listOflengths list =
-    groupsOfVariableLength' listOflengths list []
+groupsOfVarying : List Int -> List a -> List (List a)
+groupsOfVarying listOflengths list =
+    groupsOfVarying' listOflengths list []
 
-groupsOfVariableLength' : List Int -> List a -> List (List a) -> List (List a)
-groupsOfVariableLength' listOflengths list accu =
+groupsOfVarying' : List Int -> List a -> List (List a) -> List (List a)
+groupsOfVarying' listOflengths list accu =
     case listOflengths of
         [] ->
             List.reverse accu
@@ -858,7 +858,7 @@ groupsOfVariableLength' listOflengths list accu =
                         (front, rest) =
                             splitAt currentLength list
                     in
-                        groupsOfVariableLength' restLengths rest (front :: accu)
+                        groupsOfVarying' restLengths rest (front :: accu)
 
 
 
