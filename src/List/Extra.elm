@@ -44,7 +44,7 @@ module List.Extra exposing ( last
 @docs intercalate, transpose, subsequences, permutations, interweave
 
 # Folds
-@docs foldl1, foldr1
+@docs foldl1, foldr1, indexedFoldl, indexedFoldr
 
 # Building lists
 @docs scanl1, scanr, scanr1, unfoldr, iterate
@@ -504,6 +504,22 @@ foldr1 f xs =
                      Just y -> f x y)
   in
     List.foldr mf Nothing xs
+
+{-| Variant of `foldl` that passes the index of the current element to the reducer function. `indexedFoldl` is to `List.foldl` as `List.indexedMap` is to `List.map`.
+-}
+indexedFoldl : (a -> Int -> b -> b) -> b -> List a -> b
+indexedFoldl func acc list =
+  list
+    |> List.foldl (\x (i, acc) -> (i + 1, func x i acc)) (0, acc)
+    |> snd
+
+{-| Variant of `foldr` that passes the index of the current element to the reducer function. `indexedFoldr` is to `List.foldr` as `List.indexedMap` is to `List.map`.
+-}
+indexedFoldr : (a -> Int -> b -> b) -> b -> List a -> b
+indexedFoldr func acc list =
+  list
+    |> List.foldr (\x (i, acc) -> (i - 1, func x i acc)) (List.length list - 1, acc)
+    |> snd
 
 {-| `scanl1` is a variant of `scanl` that has no starting value argument.
 
