@@ -10,6 +10,7 @@ module List.Extra exposing ( last
   , unique, uniqueBy
   , replaceIf
   , setAt
+  , stableSortWith
   , remove
   , updateIf
   , updateAt
@@ -38,7 +39,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, replaceIf, setAt, stableSortWith, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -358,6 +359,25 @@ setAt index value l =
         Just t ->
           Just (value :: t |> List.append head)
 
+{-| Similar to List.sortWith, this sorts values with a custom comparison function. 
+    Unlike List.sortWith, this sort is guaranteed to be a stable sort. 
+    Note that List.sortWith is faster and is preferred if sort stability is not required. 
+ -}
+stableSortWith : (a -> a -> Basics.Order) -> List a -> List a
+stableSortWith pred list =
+  let
+    listWithIndex = List.indexedMap (\i a -> (a, i)) list
+    predWithIndex (a1, i1) (a2, i2) = 
+      let 
+        result = pred a1 a2
+      in
+        case result of
+          Basics.EQ ->
+            Basics.compare i1 i2
+          _ ->
+            result
+  in
+    List.sortWith predWithIndex listWithIndex |> List.map fst
 
 {-| Convert a value to a list containing one value.
 
