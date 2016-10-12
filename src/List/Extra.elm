@@ -88,10 +88,10 @@ last = foldl1 (flip always)
 init : List a -> Maybe (List a)
 init =
   let
-    maybe : b -> (a -> b) -> Maybe a -> b
+    maybe : b -> ((List a) -> b) -> Maybe (List a) -> b
     maybe d f = Maybe.withDefault d << Maybe.map f
   in
-    foldr ((<<) Just << maybe [] << (::)) Nothing
+    foldr (\x -> maybe [] ((::) x) >> Just) Nothing
 
 {-| Returns `Just` the element at the given index in the list,
 or `Nothing` if the index is out of range.
@@ -123,7 +123,7 @@ If `f` returns `Nothing` the iteration will stop. If it returns `Just y` then `y
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
   case f x of
-    Just x' -> x :: iterate f x'
+    Just x_ -> x :: iterate f x_
     Nothing -> [x]
 
 
@@ -144,8 +144,8 @@ maximumBy : (a -> comparable) -> List a -> Maybe a
 maximumBy f ls =
   let maxBy x (y, fy) = let fx = f x in if fx > fy then (x, fx) else (y, fy)
   in case ls of
-        [l']    -> Just l'
-        l'::ls' -> Just <| fst <| foldl maxBy (l', f l') ls'
+        [l_]    -> Just l_
+        l_::ls_ -> Just <| first <| foldl maxBy (l_, f l_) ls_
         _       -> Nothing
 
 {-| Find the first minimum element in a list using a comparable transformation
@@ -154,8 +154,8 @@ minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy f ls =
   let minBy x (y, fy) = let fx = f x in if fx < fy then (x, fx) else (y, fy)
   in case ls of
-        [l']    -> Just l'
-        l'::ls' -> Just <| fst <| foldl minBy (l', f l') ls'
+        [l_]    -> Just l_
+        l_::ls_ -> Just <| first <| foldl minBy (l_, f l_) ls_
         _       -> Nothing
 
 {-| Take elements in order as long as the predicate evaluates to `True`
@@ -216,11 +216,10 @@ uniqueHelp f existing remaining =
 andMap : List (a -> b) -> List a -> List b
 andMap fl l = map2 (<|) fl l
 
-{-| Equivalent to `concatMap` with arguments reversed. Ideal to use as an infix function, chaining together functions that return List. For example, suppose you want to have a cartesian product of [1,2] and [3,4]:
+{-| Equivalent to `concatMap`. For example, suppose you want to have a cartesian product of [1,2] and [3,4]:
 
-    [1,2] `andThen` \x ->
-    [3,4] `andThen` \y ->
-    [(x,y)]
+    [1,2] |> andThen (\x -> [3,4]
+          |> andThen (\y -> [(x,y)]))
 
 will give back the list:
 
@@ -228,10 +227,9 @@ will give back the list:
 
 Now suppose we want to have a cartesian product between the first list and the second list and its doubles:
 
-    [1,2] `andThen` \x ->
-    [3,4] `andThen` \y ->
-    [y,y*2] `andThen` \z ->
-    [(x,z)]
+    [1,2] |> andThen (\x -> [3,4]
+          |> andThen (\y -> [y,y*2]
+          |> andThen (\z -> [(x,z)])))
 
 will give back the list:
 
@@ -239,8 +237,8 @@ will give back the list:
 
 Advanced functional programmers will recognize this as the implementation of bind operator (>>=) for lists from the `Monad` typeclass.
 -}
-andThen : List a -> (a -> List b) -> List b
-andThen = flip concatMap
+andThen : (a -> List b) -> List a -> List b
+andThen = concatMap
 
 
 {-| Negation of `member`.
@@ -302,7 +300,7 @@ findIndex p = head << findIndices p
     findIndices isEven [1,2,4] == [1,2]
 -}
 findIndices : (a -> Bool) -> List a -> List Int
-findIndices p = map fst << filter (\(i,x) -> p x) << indexedMap (,)
+findIndices p = map first << filter (\(i,x) -> p x) << indexedMap (,)
 
 {-| Replace all values that satisfy a predicate with a replacement value.
 -}
@@ -444,8 +442,8 @@ subsequencesNonEmpty xs =
     permutations [1,2,3] == [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
 -}
 permutations : List a -> List (List a)
-permutations xs' =
-  case xs' of
+permutations xs_ =
+  case xs_ of
     [] -> [[]]
     xs -> let f (y,ys) = map ((::)y) (permutations ys)
           in concatMap f (select xs)
@@ -533,8 +531,8 @@ Compare:
     scanl1 (flip (-)) [1,2,3] == [1,-1,4]
 -}
 scanl1 : (a -> a -> a) -> List a -> List a
-scanl1 f xs' =
-  case xs' of
+scanl1 f xs_ =
+  case xs_ of
     [] -> []
     (x::xs) -> scanl f x xs
 
@@ -548,8 +546,8 @@ Examples:
     scanr (-) 0 [1,2,3] == [2,-1,3,0]
 -}
 scanr : (a -> b -> b) -> b -> List a -> List b
-scanr f acc xs' =
-  case xs' of
+scanr f acc xs_ =
+  case xs_ of
     [] -> [acc]
     (x::xs) ->
         case scanr f acc xs of
@@ -566,8 +564,8 @@ scanr f acc xs' =
     scanr1 (flip (-)) [1,2,3] == [0,1,3]
 -}
 scanr1 : (a -> a -> a) -> List a -> List a
-scanr1 f xs' =
-  case xs' of
+scanr1 f xs_ =
+  case xs_ of
     [] -> []
     [x] -> [x]
     (x::xs) ->
@@ -609,7 +607,7 @@ takeWhileRight p =
   let
     step x (xs,free) = if p x && free then (x::xs,True) else (xs, False)
   in
-    fst << foldr step ([], True)
+    first << foldr step ([], True)
 
 {-| Drop elements from the right, while predicate still holds.
 
@@ -651,8 +649,8 @@ stripPrefix prefix xs =
       case m of
         Nothing -> Nothing
         Just [] -> Nothing
-        Just (x::xs') -> if e == x
-                         then Just xs'
+        Just (x::xs_) -> if e == x
+                         then Just xs_
                          else Nothing
   in
     foldl step (Just xs) prefix
@@ -666,7 +664,7 @@ group = groupWhile (==)
 
 {-| Group elements together, using a custom equality test.
 
-    groupWhile (\x y -> fst x == fst y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
+    groupWhile (\x y -> first x == first y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
 
 The equality test should be an equivalent relationship, i.e. it should have the properties of reflexivity, symmetry, and transitivity. For non-equivalent relations it gives non-intuitive behavior:
 
@@ -675,8 +673,8 @@ The equality test should be an equivalent relationship, i.e. it should have the 
 For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupWhileTransitively`.
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List (List a)
-groupWhile eq xs' =
-  case xs' of
+groupWhile eq xs_ =
+  case xs_ of
     [] -> []
     (x::xs) -> let (ys,zs) = span (eq x) xs
                in (x::ys)::groupWhile eq zs
@@ -686,14 +684,14 @@ groupWhile eq xs' =
     groupWhileTransitively (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
 -}
 groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
-groupWhileTransitively cmp xs' =
-  case xs' of
+groupWhileTransitively cmp xs_ =
+  case xs_ of
     [] -> []
     [x] -> [[x]]
-    (x::((x'::_) as xs)) ->
+    (x::((x_::_) as xs)) ->
       case groupWhileTransitively cmp xs of
         (y::ys) as r ->
-          if cmp x x'
+          if cmp x x_
              then (x::y)::ys
              else [x]::r
 
@@ -762,12 +760,12 @@ isInfixOf infix xs = any (isPrefixOf infix) (tails xs)
 {-| Take 2 lists and return True, if the first list is a subsequence of the second list.
 -}
 isSubsequenceOf : List a -> List a -> Bool
-isSubsequenceOf subseq xs = subseq `member` subsequences xs
+isSubsequenceOf subseq xs = member subseq (subsequences xs)
 
 {-| Take 2 lists and return True, if the first list is a permutation of the second list.
 -}
 isPermutationOf : List a -> List a -> Bool
-isPermutationOf permut xs = permut `member` permutations xs
+isPermutationOf permut xs = member permut (permutations xs)
 
 {-| Take two lists and returns a list of corresponding pairs
 -}
@@ -797,19 +795,19 @@ zip5 = map5 (,,,,)
 -}
 lift2 : (a -> b -> c) -> List a -> List b -> List c
 lift2 f la lb =
-  la `andThen` (\a -> lb `andThen` (\b -> [f a b]))
+  la |> andThen (\a -> lb |> andThen (\b -> [f a b]))
 
 {-|
 -}
 lift3 : (a -> b -> c -> d) -> List a -> List b -> List c -> List d
 lift3 f la lb lc =
-  la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> [f a b c])))
+  la |> andThen (\a -> lb |> andThen (\b -> lc |> andThen (\c -> [f a b c])))
 
 {-|
 -}
 lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
 lift4 f la lb lc ld =
-  la `andThen` (\a -> lb `andThen` (\b -> lc `andThen` (\c -> ld `andThen` (\d -> [f a b c d]))))
+  la |> andThen (\a -> lb |> andThen (\b -> lc |> andThen (\c -> ld |> andThen (\d -> [f a b c d]))))
 
 {-| Split list into groups of size given by the first argument.
 
@@ -832,7 +830,7 @@ groupsOfWithStep size step xs =
     group =
       List.take size xs
 
-    xs' =
+    xs_ =
       List.drop step xs
 
     okayArgs =
@@ -842,7 +840,7 @@ groupsOfWithStep size step xs =
       size == List.length group
   in
     if okayArgs && okayLength then
-      group :: groupsOfWithStep size step xs'
+      group :: groupsOfWithStep size step xs_
     else
       []
 
@@ -868,7 +866,7 @@ greedyGroupsOfWithStep size step xs =
     group =
       List.take size xs
 
-    xs' =
+    xs_ =
       List.drop step xs
 
     okayArgs =
@@ -878,6 +876,6 @@ greedyGroupsOfWithStep size step xs =
       List.length xs > 0
   in
     if okayArgs && okayXs then
-      group :: greedyGroupsOfWithStep size step xs'
+      group :: greedyGroupsOfWithStep size step xs_
     else
       []
