@@ -7,7 +7,7 @@ module List.Extra exposing ( last
   , andMap, andThen
   , takeWhile
   , dropWhile
-  , unique, uniqueBy, isUnique, isUniqueBy
+  , unique, uniqueBy, allDifferent, allDifferentBy
   , replaceIf
   , setAt
   , remove
@@ -38,7 +38,7 @@ module List.Extra exposing ( last
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, isUnique, isUniqueBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -192,16 +192,16 @@ uniqueBy f list =
 
 {-| Indicate if list has duplicate values.
 
-    isUnique [0,1,1,0,1] == True
+    allDifferent [0,1,1,0,1] == True
 -}
-isUnique : List comparable -> Bool
-isUnique list =
+allDifferent : List comparable -> Bool
+allDifferent list =
   List.length list == List.length (unique list)
 
 {-| Indicate if list has duplicate values when supplied function are applyed on each values.
 -}
-isUniqueBy : (a -> comparable) -> List a -> Bool
-isUniqueBy f list =
+allDifferentBy : (a -> comparable) -> List a -> Bool
+allDifferentBy f list =
   List.length list == List.length (uniqueBy f list)
 
 uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a
