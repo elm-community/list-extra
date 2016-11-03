@@ -13,6 +13,8 @@ module List.Extra
         , dropWhile
         , unique
         , uniqueBy
+        , allDifferent
+        , allDifferentBy
         , replaceIf
         , setAt
         , remove
@@ -76,7 +78,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -287,6 +289,22 @@ unique list =
 uniqueBy : (a -> comparable) -> List a -> List a
 uniqueBy f list =
     uniqueHelp f Set.empty list
+
+
+{-| Indicate if list has duplicate values.
+
+    allDifferent [0,1,1,0,1] == True
+-}
+allDifferent : List comparable -> Bool
+allDifferent list =
+    List.length list == List.length (unique list)
+
+
+{-| Indicate if list has duplicate values when supplied function are applyed on each values.
+-}
+allDifferentBy : (a -> comparable) -> List a -> Bool
+allDifferentBy f list =
+    List.length list == List.length (uniqueBy f list)
 
 
 uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a
