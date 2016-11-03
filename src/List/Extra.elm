@@ -1,32 +1,32 @@
 module List.Extra
     exposing
         ( last
-        , init
+  , init
         , getAt
         , (!!)
-        , uncons
-        , minimumBy
-        , maximumBy
+  , uncons
+  , minimumBy
+  , maximumBy
         , andMap
         , andThen
-        , takeWhile
-        , dropWhile
+  , takeWhile
+  , dropWhile
         , unique
         , uniqueBy
         , allDifferent
         , allDifferentBy
-        , replaceIf
-        , setAt
+  , replaceIf
+  , setAt
         , swapAt
         , stableSortWith
-        , remove
-        , updateIf
-        , updateAt
-        , updateIfIndex
-        , singleton
-        , removeAt
-        , filterNot
-        , iterate
+  , remove
+  , updateIf
+  , updateAt
+  , updateIfIndex
+  , singleton
+  , removeAt
+  , filterNot
+  , iterate
         , intercalate
         , transpose
         , subsequences
@@ -64,18 +64,19 @@ module List.Extra
         , elemIndices
         , findIndex
         , findIndices
-        , zip
-        , zip3
-        , zip4
-        , zip5
-        , lift2
-        , lift3
-        , lift4
+  , zip
+  , zip3
+  , zip4
+  , zip5
+  , lift2
+  , lift3
+  , lift4
         , groupsOf
         , groupsOfWithStep
         , greedyGroupsOf
         , greedyGroupsOfWithStep
-        )
+        , groupsOfVarying
+  )
 
 {-| Convenience functions for working with List
 
@@ -107,7 +108,7 @@ module List.Extra
 @docs lift2, lift3, lift4
 
 # Split to groups of given size
-@docs groupsOf, groupsOfWithStep, greedyGroupsOf, greedyGroupsOfWithStep
+@docs groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
 -}
 
 import List exposing (..)
@@ -132,11 +133,11 @@ last =
 -}
 init : List a -> Maybe (List a)
 init =
-    let
+  let
         maybe : b -> (List a -> b) -> Maybe (List a) -> b
         maybe d f =
             Maybe.withDefault d << Maybe.map f
-    in
+  in
         foldr (\x -> maybe [] ((::) x) >> Just) Nothing
 
 
@@ -145,10 +146,10 @@ or `Nothing` if the index is out of range.
 -}
 getAt : Int -> List a -> Maybe a
 getAt idx xs =
-    if idx < 0 then
-        Nothing
-    else
-        List.head <| List.drop idx xs
+  if idx < 0 then
+    Nothing
+  else
+    List.head <| List.drop idx xs
 
 
 {-| Alias for getAt, but with the parameters flipped.
@@ -172,7 +173,7 @@ If `f` returns `Nothing` the iteration will stop. If it returns `Just y` then `y
 -}
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
-    case f x of
+  case f x of
         Just x_ ->
             x :: iterate f x_
 
@@ -187,7 +188,7 @@ iterate f x =
 -}
 uncons : List a -> Maybe ( a, List a )
 uncons xs =
-    case xs of
+  case xs of
         [] ->
             Nothing
 
@@ -251,7 +252,7 @@ minimumBy f ls =
 -}
 takeWhile : (a -> Bool) -> List a -> List a
 takeWhile predicate list =
-    case list of
+  case list of
         [] ->
             []
 
@@ -266,7 +267,7 @@ takeWhile predicate list =
 -}
 dropWhile : (a -> Bool) -> List a -> List a
 dropWhile predicate list =
-    case list of
+  case list of
         [] ->
             []
 
@@ -283,14 +284,14 @@ dropWhile predicate list =
 -}
 unique : List comparable -> List comparable
 unique list =
-    uniqueHelp identity Set.empty list
+  uniqueHelp identity Set.empty list
 
 
 {-| Drop duplicates where what is considered to be a duplicate is the result of first applying the supplied function to the elements of the list.
 -}
 uniqueBy : (a -> comparable) -> List a -> List a
 uniqueBy f list =
-    uniqueHelp f Set.empty list
+  uniqueHelp f Set.empty list
 
 
 {-| Indicate if list has duplicate values.
@@ -311,19 +312,19 @@ allDifferentBy f list =
 
 uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a
 uniqueHelp f existing remaining =
-    case remaining of
-        [] ->
-            []
+  case remaining of
+    [] ->
+      []
 
-        first :: rest ->
+    first :: rest ->
             let
                 computedFirst =
                     f first
             in
-                if Set.member computedFirst existing then
-                    uniqueHelp f existing rest
-                else
-                    first :: uniqueHelp f (Set.insert computedFirst existing) rest
+      if Set.member computedFirst existing then
+        uniqueHelp f existing rest
+      else
+        first :: uniqueHelp f (Set.insert computedFirst existing) rest
 
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
@@ -441,7 +442,7 @@ findIndices p =
 -}
 replaceIf : (a -> Bool) -> a -> List a -> List a
 replaceIf predicate replacement list =
-    updateIf predicate (always replacement) list
+  updateIf predicate (always replacement) list
 
 
 {-| Replace all values that satisfy a predicate by calling an update function.
@@ -462,10 +463,10 @@ updateIf predicate update list =
 -}
 updateAt : Int -> (a -> a) -> List a -> Maybe (List a)
 updateAt index update list =
-    if index < 0 || index >= List.length list then
-        Nothing
-    else
-        Just <| updateIfIndex ((==) index) update list
+  if index < 0 || index >= List.length list then
+    Nothing
+  else
+    Just <| updateIfIndex ((==) index) update list
 
 
 {-| Replace a value at an index that satisfies a predicate.
@@ -486,7 +487,7 @@ updateIfIndex predicate update list =
 -}
 remove : a -> List a -> List a
 remove x xs =
-    case xs of
+  case xs of
         [] ->
             []
 
@@ -498,25 +499,25 @@ remove x xs =
 
 
 {-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
--}
+ -}
 setAt : Int -> a -> List a -> Maybe (List a)
 setAt index value l =
-    if index < 0 then
-        Nothing
-    else
-        let
+  if index < 0 then
+    Nothing
+  else
+    let
             head =
                 List.take index l
 
             tail =
                 List.drop index l |> List.tail
-        in
-            case tail of
-                Nothing ->
-                    Nothing
+    in
+      case tail of
+        Nothing ->
+          Nothing
 
-                Just t ->
-                    Just (value :: t |> List.append head)
+        Just t ->
+          Just (value :: t |> List.append head)
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
@@ -585,22 +586,22 @@ singleton x =
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
-    if index < 0 then
-        l
-    else
-        let
+  if index < 0 then
+    l
+  else
+    let
             head =
                 List.take index l
 
             tail =
                 List.drop index l |> List.tail
-        in
-            case tail of
-                Nothing ->
-                    l
+    in
+      case tail of
+        Nothing ->
+          l
 
-                Just t ->
-                    List.append head t
+        Just t ->
+          List.append head t
 
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
@@ -610,7 +611,7 @@ removeAt index l =
 -}
 filterNot : (a -> Bool) -> List a -> List a
 filterNot pred list =
-    List.filter (not << pred) list
+  List.filter (not << pred) list
 
 
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
@@ -632,7 +633,7 @@ If some rows are shorter than the following rows, their elements are skipped:
 -}
 transpose : List (List a) -> List (List a)
 transpose ll =
-    case ll of
+  case ll of
         [] ->
             []
 
@@ -640,13 +641,13 @@ transpose ll =
             transpose xss
 
         (x :: xs) :: xss ->
-            let
+      let
                 heads =
                     filterMap head xss
 
                 tails =
                     filterMap tail xss
-            in
+      in
                 (x :: heads) :: transpose (xs :: tails)
 
 
@@ -665,7 +666,7 @@ subsequences xs =
 -}
 subsequencesNonEmpty : List a -> List (List a)
 subsequencesNonEmpty xs =
-    case xs of
+  case xs of
         [] ->
             []
 
@@ -703,7 +704,7 @@ permutations xs_ =
 -}
 interweave : List a -> List a -> List a
 interweave l1 l2 =
-    interweaveHelp l1 l2 []
+  interweaveHelp l1 l2 []
 
 
 interweaveHelp : List a -> List a -> List a -> List a
@@ -713,10 +714,10 @@ interweaveHelp l1 l2 acc =
             interweaveHelp xs ys <| acc ++ [ x, y ]
 
         ( x, [] ) ->
-            acc ++ x
+      acc ++ x
 
         ( [], y ) ->
-            acc ++ y
+      acc ++ y
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
@@ -727,7 +728,7 @@ interweaveHelp l1 l2 acc =
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
 foldl1 f xs =
-    let
+  let
         mf x m =
             Just
                 (case m of
@@ -737,8 +738,8 @@ foldl1 f xs =
                     Just y ->
                         f y x
                 )
-    in
-        List.foldl mf Nothing xs
+  in
+    List.foldl mf Nothing xs
 
 
 {-| Variant of `foldr` that has no starting value argument and treats the last element of the list as its starting value. If the list is empty, return `Nothing`.
@@ -749,7 +750,7 @@ foldl1 f xs =
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
 foldr1 f xs =
-    let
+  let
         mf x m =
             Just
                 (case m of
@@ -759,8 +760,8 @@ foldr1 f xs =
                     Just y ->
                         f x y
                 )
-    in
-        List.foldr mf Nothing xs
+  in
+    List.foldr mf Nothing xs
 
 
 {-| Variant of `foldl` that passes the index of the current element to the step function. `indexedFoldl` is to `List.foldl` as `List.indexedMap` is to `List.map`.
@@ -824,12 +825,12 @@ scanr f acc xs_ =
             [ acc ]
 
         x :: xs ->
-            case scanr f acc xs of
-                (q :: _) as qs ->
-                    f x q :: qs
+        case scanr f acc xs of
+          (q :: _) as qs ->
+            f x q :: qs
 
-                [] ->
-                    []
+          [] ->
+            []
 
 
 {-| `scanr1` is a variant of `scanr` that has no starting value argument.
@@ -848,12 +849,12 @@ scanr1 f xs_ =
             [ x ]
 
         x :: xs ->
-            case scanr1 f xs of
-                (q :: _) as qs ->
-                    f x q :: qs
+      case scanr1 f xs of
+        (q :: _) as qs ->
+          f x q :: qs
 
-                [] ->
-                    []
+        [] ->
+          []
 
 
 {-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
@@ -862,7 +863,7 @@ scanr1 f xs_ =
 -}
 unfoldr : (b -> Maybe ( a, b )) -> b -> List a
 unfoldr f seed =
-    case f seed of
+  case f seed of
         Nothing ->
             []
 
@@ -890,13 +891,13 @@ splitAt n xs =
 -}
 takeWhileRight : (a -> Bool) -> List a -> List a
 takeWhileRight p =
-    let
+  let
         step x ( xs, free ) =
             if p x && free then
                 ( x :: xs, True )
             else
                 ( xs, False )
-    in
+  in
         first << foldr step ( [], True )
 
 
@@ -948,9 +949,9 @@ break p =
 -}
 stripPrefix : List a -> List a -> Maybe (List a)
 stripPrefix prefix xs =
-    let
-        step e m =
-            case m of
+  let
+    step e m =
+      case m of
                 Nothing ->
                     Nothing
 
@@ -962,8 +963,8 @@ stripPrefix prefix xs =
                         Just xs_
                     else
                         Nothing
-    in
-        foldl step (Just xs) prefix
+  in
+    foldl step (Just xs) prefix
 
 
 {-| Group similar elements together. `group` is equivalent to `groupWhile (==)`.
@@ -1013,15 +1014,15 @@ groupWhileTransitively cmp xs_ =
             [ [ x ] ]
 
         x :: ((x_ :: _) as xs) ->
-            case groupWhileTransitively cmp xs of
-                (y :: ys) as r ->
-                    if cmp x x_ then
-                        (x :: y) :: ys
-                    else
-                        [ x ] :: r
+      case groupWhileTransitively cmp xs of
+        (y :: ys) as r ->
+            if cmp x x_ then
+                (x :: y) :: ys
+            else
+                [ x ] :: r
 
-                [] ->
-                    []
+        [] ->
+          []
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
@@ -1044,12 +1045,12 @@ tails =
 
 tailsHelp : a -> List (List a) -> List (List a)
 tailsHelp e list =
-    case list of
-        x :: xs ->
-            (e :: x) :: x :: xs
+  case list of
+    x :: xs ->
+        (e :: x) :: x :: xs
 
-        [] ->
-            []
+    [] ->
+      []
 
 
 {-| Return all combinations in the form of (element, rest of the list). Read [Haskell Libraries proposal](https://mail.haskell.org/pipermail/libraries/2008-February/009270.html) for further ideas on how to use this function.
@@ -1058,7 +1059,7 @@ tailsHelp e list =
 -}
 select : List a -> List ( a, List a )
 select xs =
-    case xs of
+  case xs of
         [] ->
             []
 
@@ -1072,7 +1073,7 @@ select xs =
 -}
 selectSplit : List a -> List ( List a, a, List a )
 selectSplit xs =
-    case xs of
+  case xs of
         [] ->
             []
 
@@ -1174,7 +1175,7 @@ lift4 f la lb lc ld =
 -}
 groupsOf : Int -> List a -> List (List a)
 groupsOf size xs =
-    groupsOfWithStep size size xs
+  groupsOfWithStep size size xs
 
 
 {-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argument before starting the next group.
@@ -1184,23 +1185,47 @@ groupsOf size xs =
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
-    let
-        group =
-            List.take size xs
+  let
+    group =
+      List.take size xs
 
-        xs_ =
-            List.drop step xs
+    xs_ =
+      List.drop step xs
 
-        okayArgs =
-            size > 0 && step > 0
+    okayArgs =
+      size > 0 && step > 0
 
-        okayLength =
-            size == List.length group
-    in
-        if okayArgs && okayLength then
+    okayLength =
+      size == List.length group
+  in
+    if okayArgs && okayLength then
             group :: groupsOfWithStep size step xs_
-        else
-            []
+    else
+      []
+
+{-| `groupsOfVarying ns` takes `n` elements from a list for each `n` in `ns`, splitting the list into variably sized segments
+
+    groupsOfVarying [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
+    groupsOfVarying [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
+    groupsOfVarying [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
+-}
+groupsOfVarying : List Int -> List a -> List (List a)
+groupsOfVarying listOflengths list =
+    groupsOfVarying_ listOflengths list []
+
+groupsOfVarying_ : List Int -> List a -> List (List a) -> List (List a)
+groupsOfVarying_ listOflengths list accu =
+    case ( listOflengths, list ) of
+        ( length::tailLengths, _::_ ) ->
+            let
+                ( head, tail ) =
+                    splitAt length list
+            in
+                groupsOfVarying_ tailLengths tail (head::accu)
+
+        _ ->
+            List.reverse accu
+
 
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
@@ -1210,7 +1235,7 @@ groupsOfWithStep size step xs =
 -}
 greedyGroupsOf : Int -> List a -> List (List a)
 greedyGroupsOf size xs =
-    greedyGroupsOfWithStep size size xs
+  greedyGroupsOfWithStep size size xs
 
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
@@ -1220,20 +1245,20 @@ greedyGroupsOf size xs =
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
-    let
-        group =
-            List.take size xs
+  let
+    group =
+      List.take size xs
 
-        xs_ =
-            List.drop step xs
+    xs_ =
+      List.drop step xs
 
-        okayArgs =
-            size > 0 && step > 0
+    okayArgs =
+      size > 0 && step > 0
 
-        okayXs =
-            List.length xs > 0
-    in
-        if okayArgs && okayXs then
+    okayXs =
+      List.length xs > 0
+  in
+    if okayArgs && okayXs then
             group :: greedyGroupsOfWithStep size step xs_
-        else
-            []
+    else
+      []
