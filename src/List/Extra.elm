@@ -17,6 +17,7 @@ module List.Extra
         , allDifferentBy
         , replaceIf
         , setAt
+        , swapAt
         , remove
         , updateIf
         , updateAt
@@ -78,7 +79,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot, swapAt
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -515,6 +516,34 @@ setAt index value l =
 
                 Just t ->
                     Just (value :: t |> List.append head)
+
+
+{-| Swap two values in a list by index. Returns the updated list if both indices
+are in range, or Nothing if both are out of range. If the same index is
+supplied twice the original list is returned.
+-}
+swapAt : Int -> Int -> List a -> Maybe (List a)
+swapAt index1 index2 l =
+    if index1 == index2 then
+        Just l
+    else if index1 > index2 then
+        swapAt index2 index1 l
+    else if index1 < 0 then
+        Nothing
+    else
+        let
+            ( part1, tail1 ) =
+                splitAt index1 l
+
+            ( head2, tail2 ) =
+                splitAt (index2 - index1) tail1
+        in
+            Maybe.map2
+                (\( value1, part2 ) ( value2, part3 ) ->
+                    List.concat [ part1, value2 :: part2, value1 :: part3 ]
+                )
+                (uncons head2)
+                (uncons tail2)
 
 
 {-| Convert a value to a list containing one value.
