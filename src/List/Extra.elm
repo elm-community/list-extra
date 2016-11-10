@@ -917,7 +917,7 @@ dropWhileRight p =
         []
 
 
-{-| Take a predicate and a list, return a tuple. The first part of the tuple is longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
+{-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
 
     span (< 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
     span (< 5) [1,2,3] == ([1,2,3],[])
@@ -928,7 +928,7 @@ span p xs =
     ( takeWhile p xs, dropWhile p xs )
 
 
-{-| Take a predicate and a list, return a tuple. The first part of the tuple is longest prefix of that list, for each element of which the predicate *does not* hold. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(dropWhile p xs, takeWhile p xs)`.
+{-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate *does not* hold. The second part of the tuple is the remainder of the list. `break p xs` is equivalent to `(takeWhile (not p) xs, dropWhile (not p) xs)`.
 
     break (> 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
     break (< 5) [1,2,3] == ([],[1,2,3])
