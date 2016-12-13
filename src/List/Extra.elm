@@ -368,8 +368,8 @@ andThen =
 
 {-| Negation of `member`.
 
-    1 `notMember` [1,2,3] == False
-    4 `notMember` [1,2,3] == True
+    notMember 1 [1,2,3] == False
+    notMember 4 [1,2,3] == True
 -}
 notMember : a -> List a -> Bool
 notMember x =
