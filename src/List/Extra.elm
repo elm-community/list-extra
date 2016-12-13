@@ -296,11 +296,11 @@ uniqueBy f list =
 
 {-| Indicate if list has duplicate values.
 
-    allDifferent [0,1,1,0,1] == True
+    allDifferent [0,1,1,0,1] == False
 -}
 allDifferent : List comparable -> Bool
 allDifferent list =
-    List.length list == List.length (unique list)
+    allDifferentBy identity list
 
 
 {-| Indicate if list has duplicate values when supplied function are applyed on each values.
@@ -797,7 +797,7 @@ Compare:
     scanl1 (-) [1,2,3] == [1,1,2]
 
     List.scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
-    scanl1 (flip (-)) [1,2,3] == [1,-1,4]
+    scanl1 (flip (-)) [1,2,3] == [1,-1,-4]
 -}
 scanl1 : (a -> a -> a) -> List a -> List a
 scanl1 f xs_ =
@@ -919,9 +919,9 @@ dropWhileRight p =
 
 {-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
 
-    span (< 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
-    span (< 5) [1,2,3] == ([1,2,3],[])
-    span (< 0) [1,2,3] == ([],[1,2,3])
+    span ((>) 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
+    span ((>) 5) [1,2,3] == ([1,2,3],[])
+    span ((>) 0) [1,2,3] == ([],[1,2,3])
 -}
 span : (a -> Bool) -> List a -> ( List a, List a )
 span p xs =
@@ -930,9 +930,9 @@ span p xs =
 
 {-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate *does not* hold. The second part of the tuple is the remainder of the list. `break p xs` is equivalent to `(takeWhile (not p) xs, dropWhile (not p) xs)`.
 
-    break (> 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
-    break (< 5) [1,2,3] == ([],[1,2,3])
-    break (> 5) [1,2,3] == ([1,2,3],[])
+    break ((<) 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
+    break ((>) 5) [1,2,3] == ([],[1,2,3])
+    break ((<) 5) [1,2,3] == ([1,2,3],[])
 -}
 break : (a -> Bool) -> List a -> ( List a, List a )
 break p =
