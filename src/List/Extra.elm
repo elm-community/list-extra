@@ -887,7 +887,7 @@ splitAt n xs =
 
 {-| Take elements from the right, while predicate still holds.
 
-    takeWhileRight ((<)5) [1..10] == [6,7,8,9,10]
+    takeWhileRight ((<)5) (range 1 10) == [6,7,8,9,10]
 -}
 takeWhileRight : (a -> Bool) -> List a -> List a
 takeWhileRight p =
@@ -903,7 +903,7 @@ takeWhileRight p =
 
 {-| Drop elements from the right, while predicate still holds.
 
-    dropWhileRight ((<)5) [1..10] == [1,2,3,4,5]
+    dropWhileRight ((<)5) (range 1 10) == [1,2,3,4,5]
 -}
 dropWhileRight : (a -> Bool) -> List a -> List a
 dropWhileRight p =
@@ -1170,8 +1170,7 @@ lift4 f la lb lc ld =
 
 {-| Split list into groups of size given by the first argument.
 
-    groupsOf 3 [1..10]
-      == [[1,2,3],[4,5,6],[7,8,9]]
+    groupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9]]
 -}
 groupsOf : Int -> List a -> List (List a)
 groupsOf size xs =
@@ -1180,8 +1179,7 @@ groupsOf size xs =
 
 {-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argument before starting the next group.
 
-    groupsOfWithStep 2 1 [1..4]
-      == [[1,2],[2,3],[3,4]]
+    groupsOfWithStep 2 1 (range 1 4) == [[1,2],[2,3],[3,4]]
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
@@ -1231,8 +1229,7 @@ groupsOfVarying_ listOflengths list accu =
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
 
-    greedyGroupsOf 3 [1..10]
-      == [[1,2,3],[4,5,6],[7,8,9],[10]]
+    greedyGroupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9],[10]]
 -}
 greedyGroupsOf : Int -> List a -> List (List a)
 greedyGroupsOf size xs =
@@ -1241,8 +1238,7 @@ greedyGroupsOf size xs =
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
 
-    greedyGroupsOfWithStep 3 2 [1..6]
-      == [[1,2,3],[3,4,5],[5,6]]
+    greedyGroupsOfWithStep 3 2 (range 1 6) == [[1,2,3],[3,4,5],[5,6]]
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
