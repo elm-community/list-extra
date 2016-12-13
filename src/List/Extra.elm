@@ -1084,8 +1084,16 @@ selectSplit xs =
 {-| Take 2 lists and return True, if the first list is the prefix of the second list.
 -}
 isPrefixOf : List a -> List a -> Bool
-isPrefixOf prefix =
-    all identity << map2 (==) prefix
+isPrefixOf prefix xs =
+    case ( prefix, xs ) of
+        ( [], _ ) ->
+            True
+
+        ( _ :: _, [] ) ->
+            False
+
+        ( p :: ps, x :: xs ) ->
+            p == x && isPrefixOf ps xs
 
 
 {-| Take 2 lists and return True, if the first list is the suffix of the second list.

@@ -352,4 +352,48 @@ all =
                 \() ->
                     Expect.equal (greedyGroupsOfWithStep 3 2 (range 1 6)) [ [ 1, 2, 3 ], [ 3, 4, 5 ], [ 5, 6 ] ]
             ]
+        , describe "isPrefixOf"
+            [ fuzz (list int) "[] is prefix to anything" <|
+                \list ->
+                    List.Extra.isPrefixOf [] list
+                        |> Expect.true "Expected [] to be a prefix."
+            , fuzz (list int) "reflexivity" <|
+                \list ->
+                    List.Extra.isPrefixOf list list
+                        |> Expect.true "Expected list to be a prefix of itself."
+            , fuzz2 (list int) (list int) "antisymmetry" <|
+                \listA listB ->
+                    not (List.Extra.isPrefixOf listA listB)
+                        || not (List.Extra.isPrefixOf listB listA)
+                        || listA == listB
+                        |> Expect.true "Expected exactly one to be prefix of the other."
+            , fuzz3 (list int) (list int) (list int) "transitivity" <|
+                \listA listB listC ->
+                    not (List.Extra.isPrefixOf listA listB)
+                        || not (List.Extra.isPrefixOf listB listC)
+                        || List.Extra.isPrefixOf listA listC
+                        |> Expect.true "Expected prefix of prefix to be prefix."
+            ]
+        , describe "isSuffixOf"
+            [ fuzz (list int) "[] is suffix to anything" <|
+                \list ->
+                    List.Extra.isSuffixOf [] list
+                        |> Expect.true "Expected [] to be a suffix."
+            , fuzz (list int) "reflexivity" <|
+                \list ->
+                    List.Extra.isSuffixOf list list
+                        |> Expect.true "Expected list to be a suffix of itself."
+            , fuzz2 (list int) (list int) "antisymmetry" <|
+                \listA listB ->
+                    not (List.Extra.isSuffixOf listA listB)
+                        || not (List.Extra.isSuffixOf listB listA)
+                        || listA == listB
+                        |> Expect.true "Expected exactly one to be suffix of the other."
+            , fuzz3 (list int) (list int) (list int) "transitivity" <|
+                \listA listB listC ->
+                    not (List.Extra.isSuffixOf listA listB)
+                        || not (List.Extra.isSuffixOf listB listC)
+                        || List.Extra.isSuffixOf listA listC
+                        |> Expect.true "Expected suffix of suffix to be suffix."
+            ]
         ]
