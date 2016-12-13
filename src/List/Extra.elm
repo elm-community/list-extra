@@ -329,14 +329,14 @@ uniqueHelp f existing remaining =
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
-    ( (\a b c -> a + b * c)
-        `map` [1,2,3]
-        `andMap` [4,5,6]
-        `andMap` [2,1,1]
+    ((\a b c -> a + b * c)
+        |> map [1,2,3]
+        |> andMap [4,5,6]
+        |> andMap [2,1,1]
     ) == [9,7,9]
 -}
-andMap : List (a -> b) -> List a -> List b
-andMap fl l =
+andMap : List a -> List (a -> b) -> List b
+andMap l fl =
     map2 (<|) fl l
 
 
