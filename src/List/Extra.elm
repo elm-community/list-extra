@@ -296,11 +296,11 @@ uniqueBy f list =
 
 {-| Indicate if list has duplicate values.
 
-    allDifferent [0,1,1,0,1] == True
+    allDifferent [0,1,1,0,1] == False
 -}
 allDifferent : List comparable -> Bool
 allDifferent list =
-    List.length list == List.length (unique list)
+    allDifferentBy identity list
 
 
 {-| Indicate if list has duplicate values when supplied function are applyed on each values.
@@ -329,14 +329,14 @@ uniqueHelp f existing remaining =
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
 
-    ( (\a b c -> a + b * c)
-        `map` [1,2,3]
-        `andMap` [4,5,6]
-        `andMap` [2,1,1]
+    ((\a b c -> a + b * c)
+        |> map [1,2,3]
+        |> andMap [4,5,6]
+        |> andMap [2,1,1]
     ) == [9,7,9]
 -}
-andMap : List (a -> b) -> List a -> List b
-andMap fl l =
+andMap : List a -> List (a -> b) -> List b
+andMap l fl =
     map2 (<|) fl l
 
 
@@ -368,8 +368,8 @@ andThen =
 
 {-| Negation of `member`.
 
-    1 `notMember` [1,2,3] == False
-    4 `notMember` [1,2,3] == True
+    notMember 1 [1,2,3] == False
+    notMember 4 [1,2,3] == True
 -}
 notMember : a -> List a -> Bool
 notMember x =
@@ -797,7 +797,7 @@ Compare:
     scanl1 (-) [1,2,3] == [1,1,2]
 
     List.scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
-    scanl1 (flip (-)) [1,2,3] == [1,-1,4]
+    scanl1 (flip (-)) [1,2,3] == [1,-1,-4]
 -}
 scanl1 : (a -> a -> a) -> List a -> List a
 scanl1 f xs_ =
@@ -887,7 +887,7 @@ splitAt n xs =
 
 {-| Take elements from the right, while predicate still holds.
 
-    takeWhileRight ((<)5) [1..10] == [6,7,8,9,10]
+    takeWhileRight ((<)5) (range 1 10) == [6,7,8,9,10]
 -}
 takeWhileRight : (a -> Bool) -> List a -> List a
 takeWhileRight p =
@@ -903,7 +903,7 @@ takeWhileRight p =
 
 {-| Drop elements from the right, while predicate still holds.
 
-    dropWhileRight ((<)5) [1..10] == [1,2,3,4,5]
+    dropWhileRight ((<)5) (range 1 10) == [1,2,3,4,5]
 -}
 dropWhileRight : (a -> Bool) -> List a -> List a
 dropWhileRight p =
@@ -919,9 +919,9 @@ dropWhileRight p =
 
 {-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate holds. The second part of the tuple is the remainder of the list. `span p xs` is equivalent to `(takeWhile p xs, dropWhile p xs)`.
 
-    span (< 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
-    span (< 5) [1,2,3] == ([1,2,3],[])
-    span (< 0) [1,2,3] == ([],[1,2,3])
+    span ((>) 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
+    span ((>) 5) [1,2,3] == ([1,2,3],[])
+    span ((>) 0) [1,2,3] == ([],[1,2,3])
 -}
 span : (a -> Bool) -> List a -> ( List a, List a )
 span p xs =
@@ -930,9 +930,9 @@ span p xs =
 
 {-| Take a predicate and a list, return a tuple. The first part of the tuple is the longest prefix of that list, for each element of which the predicate *does not* hold. The second part of the tuple is the remainder of the list. `break p xs` is equivalent to `(takeWhile (not p) xs, dropWhile (not p) xs)`.
 
-    break (> 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
-    break (< 5) [1,2,3] == ([],[1,2,3])
-    break (> 5) [1,2,3] == ([1,2,3],[])
+    break ((<) 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
+    break ((>) 5) [1,2,3] == ([],[1,2,3])
+    break ((<) 5) [1,2,3] == ([1,2,3],[])
 -}
 break : (a -> Bool) -> List a -> ( List a, List a )
 break p =
@@ -1084,8 +1084,16 @@ selectSplit xs =
 {-| Take 2 lists and return True, if the first list is the prefix of the second list.
 -}
 isPrefixOf : List a -> List a -> Bool
-isPrefixOf prefix =
-    all identity << map2 (==) prefix
+isPrefixOf prefix xs =
+    case ( prefix, xs ) of
+        ( [], _ ) ->
+            True
+
+        ( _ :: _, [] ) ->
+            False
+
+        ( p :: ps, x :: xs ) ->
+            p == x && isPrefixOf ps xs
 
 
 {-| Take 2 lists and return True, if the first list is the suffix of the second list.
@@ -1170,8 +1178,7 @@ lift4 f la lb lc ld =
 
 {-| Split list into groups of size given by the first argument.
 
-    groupsOf 3 [1..10]
-      == [[1,2,3],[4,5,6],[7,8,9]]
+    groupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9]]
 -}
 groupsOf : Int -> List a -> List (List a)
 groupsOf size xs =
@@ -1180,8 +1187,7 @@ groupsOf size xs =
 
 {-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argument before starting the next group.
 
-    groupsOfWithStep 2 1 [1..4]
-      == [[1,2],[2,3],[3,4]]
+    groupsOfWithStep 2 1 (range 1 4) == [[1,2],[2,3],[3,4]]
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
@@ -1231,8 +1237,7 @@ groupsOfVarying_ listOflengths list accu =
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
 
-    greedyGroupsOf 3 [1..10]
-      == [[1,2,3],[4,5,6],[7,8,9],[10]]
+    greedyGroupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9],[10]]
 -}
 greedyGroupsOf : Int -> List a -> List (List a)
 greedyGroupsOf size xs =
@@ -1241,8 +1246,7 @@ greedyGroupsOf size xs =
 
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
 
-    greedyGroupsOfWithStep 3 2 [1..6]
-      == [[1,2,3],[3,4,5],[5,6]]
+    greedyGroupsOfWithStep 3 2 (range 1 6) == [[1,2,3],[3,4,5],[5,6]]
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
