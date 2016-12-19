@@ -225,6 +225,11 @@ all =
                 \() ->
                     Expect.equal (dropWhileRight ((<) 5) (range 1 10)) [ 1, 2, 3, 4, 5 ]
             ]
+        , describe "takeWhile" <|
+            [ test "doesn't exceed maximum call stack" <|
+                \() ->
+                    Expect.equal (takeWhile ((>) 19999) (range 1 20000)) (range 1 19998)
+            ]
         , describe "span" <|
             [ test "" <|
                 \() ->
