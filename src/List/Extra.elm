@@ -251,16 +251,20 @@ minimumBy f ls =
 {-| Take elements in order as long as the predicate evaluates to `True`
 -}
 takeWhile : (a -> Bool) -> List a -> List a
-takeWhile predicate list =
-    case list of
-        [] ->
-            []
+takeWhile predicate =
+    let
+        takeWhileMemo memo list =
+            case list of
+                [] ->
+                    List.reverse memo
 
-        x :: xs ->
-            if (predicate x) then
-                x :: takeWhile predicate xs
-            else
-                []
+                x :: xs ->
+                    if (predicate x) then
+                        takeWhileMemo (x :: memo) xs
+                    else
+                        List.reverse memo
+    in
+        takeWhileMemo []
 
 
 {-| Drop elements in order as long as the predicate evaluates to `True`
