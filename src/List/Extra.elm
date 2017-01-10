@@ -23,6 +23,7 @@ module List.Extra
         , updateIf
         , updateAt
         , updateIfIndex
+        , insertAt
         , singleton
         , removeAt
         , filterNot
@@ -81,7 +82,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, insertAt, singleton, removeAt, filterNot, swapAt, stableSortWith
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -487,6 +488,15 @@ updateIfIndex predicate update list =
         list
 
 
+{-| Insert an element at given index
+-}
+insertAt : Int -> a -> List a -> List a
+insertAt index value list =
+    splitAtWithReversedInit index [] list
+        |> Tuple.mapSecond ((::) value)
+        |> uncurry appendUsingReversedInit
+
+
 {-| Remove the first occurrence of a value from a list.
 -}
 remove : a -> List a -> List a
@@ -886,7 +896,8 @@ unfoldr f seed =
 -}
 splitAt : Int -> List a -> ( List a, List a )
 splitAt n xs =
-    ( take n xs, drop n xs )
+    splitAtWithReversedInit n [] xs
+        |> Tuple.mapFirst List.reverse
 
 
 {-| Take elements from the right, while predicate still holds.
@@ -1271,3 +1282,30 @@ greedyGroupsOfWithStep size step xs =
             group :: greedyGroupsOfWithStep size step xs_
         else
             []
+
+
+
+-- Helpers
+
+
+splitAtWithReversedInit : Int -> List a -> List a -> ( List a, List a )
+splitAtWithReversedInit n reversedInit tail =
+    if n <= 0 then
+        ( reversedInit, tail )
+    else
+        case tail of
+            head :: nextTail ->
+                splitAtWithReversedInit (n - 1) (head :: reversedInit) nextTail
+
+            [] ->
+                ( reversedInit, tail )
+
+
+appendUsingReversedInit : List a -> List a -> List a
+appendUsingReversedInit reversedInit tail =
+    case reversedInit of
+        head :: remainingReversedInit ->
+            appendUsingReversedInit remainingReversedInit (head :: tail)
+
+        [] ->
+            tail
