@@ -2,8 +2,9 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple3)
+import Fuzz exposing (char, list, int, intRange, tuple3)
 import List exposing (map, range)
+import Random
 import Tuple exposing (first)
 import List.Extra exposing (..)
 
@@ -88,6 +89,32 @@ all =
             , test "finds all indices" <|
                 \() ->
                     Expect.equal (findIndices (\x -> x % 2 == 0) [ 1, 2, 4 ]) [ 1, 2 ]
+            ]
+        , describe "insertAt" <|
+            [ fuzz
+                (list char |> Fuzz.andThen (\xs -> tuple3 ( intRange 0 (List.length xs), char, Fuzz.constant xs )))
+                "0 <= index <= length"
+                (\( n, x, xs ) ->
+                    Expect.equal
+                        (List.take n xs ++ (x :: List.drop n xs))
+                        (insertAt n x xs)
+                )
+            , fuzz
+                (tuple3 ( intRange Random.minInt -1, char, list char ))
+                "index < 0"
+                (\( n, x, xs ) ->
+                    Expect.equal
+                        (x :: xs)
+                        (insertAt n x xs)
+                )
+            , fuzz
+                (list char |> Fuzz.andThen (\xs -> tuple3 ( intRange (List.length xs + 1) Random.maxInt, char, Fuzz.constant xs )))
+                "index > length"
+                (\( n, x, xs ) ->
+                    Expect.equal
+                        (xs ++ [ x ])
+                        (insertAt n x xs)
+                )
             ]
         , describe "intercalate" <|
             [ test "computes example" <|
@@ -370,7 +397,8 @@ all =
                 \listA listB ->
                     not (List.Extra.isPrefixOf listA listB)
                         || not (List.Extra.isPrefixOf listB listA)
-                        || listA == listB
+                        || listA
+                        == listB
                         |> Expect.true "Expected exactly one to be prefix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
@@ -392,7 +420,8 @@ all =
                 \listA listB ->
                     not (List.Extra.isSuffixOf listA listB)
                         || not (List.Extra.isSuffixOf listB listA)
-                        || listA == listB
+                        || listA
+                        == listB
                         |> Expect.true "Expected exactly one to be suffix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
