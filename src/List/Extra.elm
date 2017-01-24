@@ -23,7 +23,6 @@ module List.Extra
         , updateIf
         , updateAt
         , updateIfIndex
-        , singleton
         , removeAt
         , filterNot
         , iterate
@@ -81,7 +80,7 @@ module List.Extra
 {-| Convenience functions for working with List
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
 
 # List transformations
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -575,15 +574,6 @@ swapAt index1 index2 l =
                 )
                 (uncons head2)
                 (uncons tail2)
-
-
-{-| Convert a value to a list containing one value.
-
-    singleton 3 == [3]
--}
-singleton : a -> List a
-singleton x =
-    [ x ]
 
 
 {-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
