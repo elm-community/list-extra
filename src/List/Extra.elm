@@ -35,7 +35,7 @@ module List.Extra
         , foldr1
         , indexedFoldl
         , indexedFoldr
-        , compose
+        , composeFunctions
         , scanl1
         , scanr
         , scanr1
@@ -87,7 +87,7 @@ module List.Extra
 @docs intercalate, transpose, subsequences, permutations, interweave
 
 # Folds
-@docs foldl1, foldr1, indexedFoldl, indexedFoldr, compose
+@docs foldl1, foldr1, indexedFoldl, indexedFoldr, composeFunctions
 
 # Building lists
 @docs scanl1, scanr, scanr1, unfoldr, iterate
@@ -783,11 +783,11 @@ indexedFoldr func acc list =
 
 {-| Compose a list of functions.
 
-    compose [(\a -> a + 1), (\a -> a * 2)]   == (\a -> a * 2 + 1)
-    compose []                               == identity
+    composeFunctions [(\a -> a + 1), (\a -> a * 2)]   == (\a -> a * 2 + 1)
+    composeFunctions []                               == identity
 -}
-compose : List (a -> a) -> (a -> a)
-compose =
+composeFunctions : List (a -> a) -> a -> a
+composeFunctions =
     foldr (<<) identity
 
 
