@@ -40,6 +40,7 @@ module List.Extra
         , scanr1
         , unfoldr
         , splitAt
+        , splitWhen
         , takeWhileRight
         , dropWhileRight
         , span
@@ -877,6 +878,17 @@ unfoldr f seed =
 splitAt : Int -> List a -> ( List a, List a )
 splitAt n xs =
     ( take n xs, drop n xs )
+
+
+{-| Attempts to split the list at the first element where the given predicate is true. If the predicate is not true for any elements in the list, return nothing. Otherwise, return the split list.
+
+    splitWhen (\n -> n == 3) [1,2,3,4,5] == Just ([1,2],[3,4,5])
+    splitWhen (\n -> n == 6) [1,2,3,4,5] == Nothing
+-}
+splitWhen : (a -> Bool) -> List a -> Maybe ( List a, List a )
+splitWhen predicate list =
+    findIndex predicate list
+    |> Maybe.map (\i -> splitAt i list)
 
 
 {-| Take elements from the right, while predicate still holds.
