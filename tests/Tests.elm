@@ -2,7 +2,8 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple3)
+import Random
+import Fuzz exposing (list, int, intRange, tuple3)
 import List exposing (map, range)
 import Tuple exposing (first)
 import List.Extra exposing (..)
@@ -196,6 +197,13 @@ all =
                             5
                         )
                         [ 5, 4, 3, 2, 1 ]
+            ]
+        , describe "insertAt" <|
+            [ fuzz3 (intRange 0 Random.maxInt) int (list int) "puts value at given index" <|
+                \index value l ->
+                    (index > List.length l)
+                        || (getAt index (insertAt index value l) == Just value)
+                        |> Expect.true "Expected value to be retrievable from given index"
             ]
         , describe "splitAt" <|
             [ test "" <|
