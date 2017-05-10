@@ -1069,24 +1069,37 @@ groupWhile eq xs_ =
 
 -}
 groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
-groupWhileTransitively cmp xs_ =
-    case xs_ of
+groupWhileTransitively compare list =
+    groupWhileTransitivelyHelp [] [] compare list
+
+
+groupWhileTransitivelyHelp : List (List a) -> List a -> (a -> a -> Bool) -> List a -> List (List a)
+groupWhileTransitivelyHelp result currentGroup compare list =
+    case list of
         [] ->
-            []
+            List.reverse <|
+                if List.isEmpty currentGroup then
+                    result
+                else
+                    List.reverse (currentGroup :: result)
 
         [ x ] ->
-            [ [ x ] ]
+            List.reverse <|
+                (List.reverse (x :: currentGroup) :: result)
 
-        x :: ((x_ :: _) as xs) ->
-            case groupWhileTransitively cmp xs of
-                (y :: ys) as r ->
-                    if cmp x x_ then
-                        (x :: y) :: ys
-                    else
-                        [ x ] :: r
-
-                [] ->
+        first :: ((second :: _) as rest) ->
+            if compare first second then
+                groupWhileTransitivelyHelp
+                    result
+                    (first :: currentGroup)
+                    compare
+                    rest
+            else
+                groupWhileTransitivelyHelp
+                    (List.reverse (first :: currentGroup) :: result)
                     []
+                    compare
+                    rest
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
