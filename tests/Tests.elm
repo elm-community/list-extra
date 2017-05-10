@@ -295,7 +295,17 @@ all =
                         [ [ 1, 2, 3, 2, 4 ], [ 1, 3, 2 ], [ 1 ] ]
             ]
         , describe "groupWhileTransitively" <|
-            [ test "" <|
+            [ test "an empty list" <|
+                \() ->
+                    Expect.equal
+                        (groupWhileTransitively (<) [])
+                        []
+            , test "a single item" <|
+                \() ->
+                    Expect.equal
+                        (groupWhileTransitively (<) [ 1 ])
+                        [ [ 1 ] ]
+            , test "a standard working case" <|
                 \() ->
                     Expect.equal
                         (groupWhileTransitively (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
