@@ -26,6 +26,7 @@ module List.Extra
         , removeAt
         , filterNot
         , iterate
+        , initialize
         , intercalate
         , transpose
         , subsequences
@@ -98,7 +99,8 @@ module List.Extra
 
 # Building lists
 
-@docs scanl1, scanr, scanr1, unfoldr, iterate
+@docs scanl1, scanr, scanr1, unfoldr, iterate, initialize
+
 
 
 # Sublists
@@ -203,6 +205,23 @@ iterate f x =
 
         Nothing ->
             [ x ]
+
+
+{-| Initialize a list of some length with some function.
+
+`initialize n f` creates a list of length `n` with the element at index `i` initialized to the result of `f i`.
+
+-}
+initialize : Int -> (Int -> a) -> List a
+initialize n f =
+    let
+        step i acc =
+            if i < 0 then
+                acc
+            else
+                step (i - 1) (f i :: acc)
+    in
+        step (n - 1) []
 
 
 {-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.

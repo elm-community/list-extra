@@ -197,6 +197,17 @@ all =
                         )
                         [ 5, 4, 3, 2, 1 ]
             ]
+        , describe "initialize" <|
+            [ test "" <|
+                \() ->
+                    Expect.equal (initialize 5 identity) [ 0, 1, 2, 3, 4 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (initialize 5 (\x -> x * 2)) [ 0, 2, 4, 6, 8 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (initialize 1 (always 3)) [ 3 ]
+            ]
         , describe "splitAt" <|
             [ test "" <|
                 \() ->
