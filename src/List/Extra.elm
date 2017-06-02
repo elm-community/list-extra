@@ -23,6 +23,7 @@ module List.Extra
         , updateIf
         , updateAt
         , updateIfIndex
+        , insertAt
         , removeAt
         , filterNot
         , iterate
@@ -83,7 +84,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, insertAt, removeAt, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -610,6 +611,20 @@ swapAt index1 index2 l =
                 )
                 (uncons head2)
                 (uncons tail2)
+
+
+{-| Insert an element at a given position. If the index is out of range, appends the element to the end of the list.
+
+    insertAt 1 10 [ 0, 20, 30 ] == [ 0, 10, 20, 30 ]
+
+    getAt index (insertAt index value list) == Just value -- if index <= List.length list
+-}
+insertAt : Int -> a -> List a -> List a
+insertAt index value l =
+    if index < 0 then
+        l
+    else
+        (List.take index l ++ (value :: List.drop index l))
 
 
 {-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
