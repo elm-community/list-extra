@@ -228,6 +228,14 @@ all =
                 \() ->
                     Expect.equal (splitAt (-1) [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
             ]
+        , describe "splitWhen" <|
+            [ test "returns split list when predicate is true" <| 
+                \() ->
+                    Expect.equal (splitWhen (\n -> n == 3) [ 1, 2, 3, 4, 5]) (Just ([1, 2], [3, 4, 5]))
+            , test "returns nothing when predicate is false" <| 
+                \() ->
+                    Expect.equal (splitWhen (\n -> n == 6) [ 1, 2, 3, 4, 5]) Nothing
+            ]
         , describe "takeWhileRight" <|
             [ test "" <|
                 \() ->

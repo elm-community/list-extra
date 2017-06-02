@@ -23,7 +23,6 @@ module List.Extra
         , updateIf
         , updateAt
         , updateIfIndex
-        , singleton
         , removeAt
         , filterNot
         , iterate
@@ -42,6 +41,7 @@ module List.Extra
         , scanr1
         , unfoldr
         , splitAt
+        , splitWhen
         , takeWhileRight
         , dropWhileRight
         , span
@@ -81,35 +81,57 @@ module List.Extra
 
 {-| Convenience functions for working with List
 
+
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, singleton, removeAt, filterNot, swapAt, stableSortWith
+
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
+
 
 # List transformations
+
 @docs intercalate, transpose, subsequences, permutations, interweave
 
+
 # Folds
+
 @docs foldl1, foldr1, indexedFoldl, indexedFoldr
 
+
 # Building lists
+
 @docs scanl1, scanr, scanr1, unfoldr, iterate, initialize
 
+
+
 # Sublists
-@docs splitAt, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+
 
 # Predicates
+
 @docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
 
+
 # Searching
+
 @docs notMember, find, elemIndex, elemIndices, findIndex, findIndices
 
+
 # Zipping
+
 @docs zip, zip3, zip4, zip5
 
+
 # Lift functions onto multiple lists of arguments
+
 @docs lift2, lift3, lift4
 
+
 # Split to groups of given size
+
 @docs groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+
 -}
 
 import List exposing (..)
@@ -121,6 +143,7 @@ import Tuple exposing (first, second)
 
     last [1,2,3] == Just 3
     last [] == Nothing
+
 -}
 last : List a -> Maybe a
 last =
@@ -131,6 +154,7 @@ last =
 
     init [1,2,3] == Just [1,2]
     init [] == Nothing
+
 -}
 init : List a -> Maybe (List a)
 init =
@@ -163,14 +187,15 @@ getAt idx xs =
 {-| Returns a list of repeated applications of `f`.
 
 If `f` returns `Nothing` the iteration will stop. If it returns `Just y` then `y` will be added to the list and the iteration will continue with `f y`.
-    nextYear : Int -> Maybe Int
-    nextYear year =
-      if year >= 2030 then
-        Nothing
-      else
-        Just (year + 1)
-    -- Will evaluate to [2010, 2011, ..., 2030]
-    iterate nextYear 2010
+nextYear : Int -> Maybe Int
+nextYear year =
+if year >= 2030 then
+Nothing
+else
+Just (year + 1)
+-- Will evaluate to [2010, 2011, ..., 2030]
+iterate nextYear 2010
+
 -}
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
@@ -203,6 +228,7 @@ initialize n f =
 
     uncons [1,2,3] == Just (1, [2,3])
     uncons [] = Nothing
+
 -}
 uncons : List a -> Maybe ( a, List a )
 uncons xs =
@@ -303,6 +329,7 @@ dropWhile predicate list =
 {-| Remove duplicate values, keeping the first instance of each element which appears more than once.
 
     unique [0,1,1,0,1] == [0,1]
+
 -}
 unique : List comparable -> List comparable
 unique list =
@@ -319,6 +346,7 @@ uniqueBy f list =
 {-| Indicate if list has duplicate values.
 
     allDifferent [0,1,1,0,1] == False
+
 -}
 allDifferent : List comparable -> Bool
 allDifferent list =
@@ -356,6 +384,7 @@ uniqueHelp f existing remaining =
         |> andMap [4,5,6]
         |> andMap [2,1,1]
     ) == [9,7,9]
+
 -}
 andMap : List a -> List (a -> b) -> List b
 andMap l fl =
@@ -382,6 +411,7 @@ will give back the list:
     [(1,3),(1,6),(1,4),(1,8),(2,3),(2,6),(2,4),(2,8)]
 
 Advanced functional programmers will recognize this as the implementation of bind operator (>>=) for lists from the `Monad` typeclass.
+
 -}
 andThen : (a -> List b) -> List a -> List b
 andThen =
@@ -392,6 +422,7 @@ andThen =
 
     notMember 1 [1,2,3] == False
     notMember 4 [1,2,3] == True
+
 -}
 notMember : a -> List a -> Bool
 notMember x =
@@ -402,6 +433,7 @@ notMember x =
 Just that element. If none match, return Nothing.
 
     find (\num -> num > 5) [2, 4, 6, 8] == Just 6
+
 -}
 find : (a -> Bool) -> List a -> Maybe a
 find predicate list =
@@ -421,6 +453,7 @@ find predicate list =
     elemIndex 1 [1,2,3] == Just 0
     elemIndex 4 [1,2,3] == Nothing
     elemIndex 1 [1,2,1] == Just 0
+
 -}
 elemIndex : a -> List a -> Maybe Int
 elemIndex x =
@@ -432,6 +465,7 @@ elemIndex x =
     elemIndices 1 [1,2,3] == [0]
     elemIndices 4 [1,2,3] == []
     elemIndices 1 [1,2,1] == [0,2]
+
 -}
 elemIndices : a -> List a -> List Int
 elemIndices x =
@@ -443,6 +477,7 @@ elemIndices x =
     findIndex isEven [1,2,3] == Just 1
     findIndex isEven [1,3,5] == Nothing
     findIndex isEven [1,2,4] == Just 1
+
 -}
 findIndex : (a -> Bool) -> List a -> Maybe Int
 findIndex p =
@@ -454,6 +489,7 @@ findIndex p =
     findIndices isEven [1,2,3] == [1]
     findIndices isEven [1,3,5] == []
     findIndices isEven [1,2,4] == [1,2]
+
 -}
 findIndices : (a -> Bool) -> List a -> List Int
 findIndices p =
@@ -543,8 +579,8 @@ setAt index value l =
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
-    Unlike List.sortWith, this sort is guaranteed to be a stable sort.
-    Note that List.sortWith is faster and is preferred if sort stability is not required.
+Unlike List.sortWith, this sort is guaranteed to be a stable sort.
+Note that List.sortWith is faster and is preferred if sort stability is not required.
 -}
 stableSortWith : (a -> a -> Basics.Order) -> List a -> List a
 stableSortWith pred list =
@@ -595,15 +631,6 @@ swapAt index1 index2 l =
                 (uncons tail2)
 
 
-{-| Convert a value to a list containing one value.
-
-    singleton 3 == [3]
--}
-singleton : a -> List a
-singleton x =
-    [ x ]
-
-
 {-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
 -}
 removeAt : Int -> List a -> List a
@@ -627,9 +654,10 @@ removeAt index l =
 
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
-    This is equivalent to `List.filter (not << predicate) list`.
+This is equivalent to `List.filter (not << predicate) list`.
 
     filterNot isEven [1,2,3,4] == [1,3]
+
 -}
 filterNot : (a -> Bool) -> List a -> List a
 filterNot pred list =
@@ -639,6 +667,7 @@ filterNot pred list =
 {-| Take a list and a list of lists, insert that list between every list in the list of lists, concatenate the result. `intercalate xs xss` is equivalent to `concat (intersperse xs xss)`.
 
     intercalate [0,0] [[1,2],[3,4],[5,6]] == [1,2,0,0,3,4,0,0,5,6]
+
 -}
 intercalate : List a -> List (List a) -> List a
 intercalate xs =
@@ -652,6 +681,7 @@ intercalate xs =
 If some rows are shorter than the following rows, their elements are skipped:
 
     transpose [[10,11],[20],[],[30,31,32]] == [[10,20,30],[11,31],[32]]
+
 -}
 transpose : List (List a) -> List (List a)
 transpose ll =
@@ -676,6 +706,7 @@ transpose ll =
 {-| Return the list of all subsequences of a list.
 
     subsequences [1,2,3] == [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
 -}
 subsequences : List a -> List (List a)
 subsequences xs =
@@ -685,6 +716,7 @@ subsequences xs =
 {-| Return the list of all subsequences of the argument, except for the empty list.
 
     subsequencesNonEmpty [1,2,3] == [[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
 -}
 subsequencesNonEmpty : List a -> List (List a)
 subsequencesNonEmpty xs =
@@ -703,6 +735,7 @@ subsequencesNonEmpty xs =
 {-| Return the list of of all permutations of a list. The result is in lexicographic order.
 
     permutations [1,2,3] == [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+
 -}
 permutations : List a -> List (List a)
 permutations xs_ =
@@ -719,10 +752,11 @@ permutations xs_ =
 
 
 {-| Return a list that contains elements from the two provided, in alternate order.
-    If one list runs out of items, append the items from the remaining list.
+If one list runs out of items, append the items from the remaining list.
 
     interweave [1,3] [2,4] == [1,2,3,4]
     interweave [1,3,5,7] [2,4] == [1,2,3,4,5,7]
+
 -}
 interweave : List a -> List a -> List a
 interweave l1 l2 =
@@ -747,6 +781,7 @@ interweaveHelp l1 l2 acc =
     foldl1 max [1,2,3,2,1] == Just 3
     foldl1 max [] == Nothing
     foldl1 (-) [1,2,3] == Just -4
+
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
 foldl1 f xs =
@@ -769,6 +804,7 @@ foldl1 f xs =
     foldr1 min [1,2,3,2,1] == Just 1
     foldr1 min [] == Nothing
     foldr1 (-) [1,2,3] == Just 2
+
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
 foldr1 f xs =
@@ -820,6 +856,7 @@ Compare:
 
     List.scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
     scanl1 (flip (-)) [1,2,3] == [1,-1,-4]
+
 -}
 scanl1 : (a -> a -> a) -> List a -> List a
 scanl1 f xs_ =
@@ -839,6 +876,7 @@ Examples:
 
     scanr (+) 0 [1,2,3] == [6,5,3,0]
     scanr (-) 0 [1,2,3] == [2,-1,3,0]
+
 -}
 scanr : (a -> b -> b) -> b -> List a -> List b
 scanr f acc xs_ =
@@ -860,6 +898,7 @@ scanr f acc xs_ =
     scanr1 (+) [1,2,3] == [6,5,3]
     scanr1 (-) [1,2,3] == [2,-1,3]
     scanr1 (flip (-)) [1,2,3] == [0,1,3]
+
 -}
 scanr1 : (a -> a -> a) -> List a -> List a
 scanr1 f xs_ =
@@ -882,6 +921,7 @@ scanr1 f xs_ =
 {-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
 
     unfoldr (\b -> if b == 0 then Nothing else Just (b, b-1)) 5 == [5,4,3,2,1]
+
 -}
 unfoldr : (b -> Maybe ( a, b )) -> b -> List a
 unfoldr f seed =
@@ -901,15 +941,29 @@ unfoldr f seed =
     splitAt 4 [1,2,3] == ([1,2,3],[])
     splitAt 0 [1,2,3] == ([],[1,2,3])
     splitAt (-1) [1,2,3] == ([],[1,2,3])
+
 -}
 splitAt : Int -> List a -> ( List a, List a )
 splitAt n xs =
     ( take n xs, drop n xs )
 
 
+{-| Attempts to split the list at the first element where the given predicate is true. If the predicate is not true for any elements in the list, return nothing. Otherwise, return the split list.
+
+    splitWhen (\n -> n == 3) [1,2,3,4,5] == Just ([1,2],[3,4,5])
+    splitWhen (\n -> n == 6) [1,2,3,4,5] == Nothing
+
+-}
+splitWhen : (a -> Bool) -> List a -> Maybe ( List a, List a )
+splitWhen predicate list =
+    findIndex predicate list
+        |> Maybe.map (\i -> splitAt i list)
+
+
 {-| Take elements from the right, while predicate still holds.
 
     takeWhileRight ((<)5) (range 1 10) == [6,7,8,9,10]
+
 -}
 takeWhileRight : (a -> Bool) -> List a -> List a
 takeWhileRight p =
@@ -926,6 +980,7 @@ takeWhileRight p =
 {-| Drop elements from the right, while predicate still holds.
 
     dropWhileRight ((<)5) (range 1 10) == [1,2,3,4,5]
+
 -}
 dropWhileRight : (a -> Bool) -> List a -> List a
 dropWhileRight p =
@@ -944,6 +999,7 @@ dropWhileRight p =
     span ((>) 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
     span ((>) 5) [1,2,3] == ([1,2,3],[])
     span ((>) 0) [1,2,3] == ([],[1,2,3])
+
 -}
 span : (a -> Bool) -> List a -> ( List a, List a )
 span p xs =
@@ -955,6 +1011,7 @@ span p xs =
     break ((<) 3) [1,2,3,4,1,2,3,4] == ([1,2,3],[4,1,2,3,4])
     break ((>) 5) [1,2,3] == ([],[1,2,3])
     break ((<) 5) [1,2,3] == ([1,2,3],[])
+
 -}
 break : (a -> Bool) -> List a -> ( List a, List a )
 break p =
@@ -968,6 +1025,7 @@ break p =
     stripPrefix [1,2,3] [1,2,3] == Just []
     stripPrefix [1,2,3] [1,2] == Nothing
     stripPrefix [3,2,1] [1,2,3,4,5] == Nothing
+
 -}
 stripPrefix : List a -> List a -> Maybe (List a)
 stripPrefix prefix xs =
@@ -992,6 +1050,7 @@ stripPrefix prefix xs =
 {-| Group similar elements together. `group` is equivalent to `groupWhile (==)`.
 
     group [1,2,2,3,3,3,2,2,1] == [[1],[2,2],[3,3,3],[2,2],[1]]
+
 -}
 group : List a -> List (List a)
 group =
@@ -1007,6 +1066,7 @@ The equality test should be an equivalent relationship, i.e. it should have the 
     groupWhile (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3,2,4],[1,3,2],[1]]
 
 For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupWhileTransitively`.
+
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List (List a)
 groupWhile eq xs_ =
@@ -1025,6 +1085,7 @@ groupWhile eq xs_ =
 {-| Group elements together, using a custom comparison test. Start a new group each time the comparison test doesn't hold for two adjacent elements.
 
     groupWhileTransitively (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
+
 -}
 groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
 groupWhileTransitively cmp xs_ =
@@ -1050,6 +1111,7 @@ groupWhileTransitively cmp xs_ =
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
 
     inits [1,2,3] == [[],[1],[1,2],[1,2,3]]
+
 -}
 inits : List a -> List (List a)
 inits =
@@ -1059,6 +1121,7 @@ inits =
 {-| Return all final segments of a list, from longest to shortest, the list itself first, empty list last.
 
     tails [1,2,3] == [[1,2,3],[2,3],[3],[]]
+
 -}
 tails : List a -> List (List a)
 tails =
@@ -1078,6 +1141,7 @@ tailsHelp e list =
 {-| Return all combinations in the form of (element, rest of the list). Read [Haskell Libraries proposal](https://mail.haskell.org/pipermail/libraries/2008-February/009270.html) for further ideas on how to use this function.
 
     select [1,2,3,4] == [(1,[2,3,4]),(2,[1,3,4]),(3,[1,2,4]),(4,[1,2,3])]
+
 -}
 select : List a -> List ( a, List a )
 select xs =
@@ -1092,6 +1156,7 @@ select xs =
 {-| Return all combinations in the form of (elements before, element, elements after).
 
     selectSplit [1,2,3] == [([],1,[2,3]),([1],2,[3]),([1,2],3,[])]
+
 -}
 selectSplit : List a -> List ( List a, a, List a )
 selectSplit xs =
@@ -1175,24 +1240,23 @@ zip5 =
 
 
 {-| Map functions taking multiple arguments over multiple lists, regardless of list length.
-  All possible combinations will be explored.
+All possible combinations will be explored.
 
-  lift2 (+) [1,2,3] [4,5] == [5,6,6,7,7,8]
+lift2 (+) [1,2,3][4,5] == [5,6,6,7,7,8]
+
 -}
 lift2 : (a -> b -> c) -> List a -> List b -> List c
 lift2 f la lb =
     la |> andThen (\a -> lb |> andThen (\b -> [ f a b ]))
 
 
-{-|
--}
+{-| -}
 lift3 : (a -> b -> c -> d) -> List a -> List b -> List c -> List d
 lift3 f la lb lc =
     la |> andThen (\a -> lb |> andThen (\b -> lc |> andThen (\c -> [ f a b c ])))
 
 
-{-|
--}
+{-| -}
 lift4 : (a -> b -> c -> d -> e) -> List a -> List b -> List c -> List d -> List e
 lift4 f la lb lc ld =
     la |> andThen (\a -> lb |> andThen (\b -> lc |> andThen (\c -> ld |> andThen (\d -> [ f a b c d ]))))
@@ -1201,15 +1265,17 @@ lift4 f la lb lc ld =
 {-| Split list into groups of size given by the first argument.
 
     groupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9]]
+
 -}
 groupsOf : Int -> List a -> List (List a)
 groupsOf size xs =
     groupsOfWithStep size size xs
 
 
-{-| Split list into groups of size given by the first argument.  After each group, drop a number of elements given by the second argument before starting the next group.
+{-| Split list into groups of size given by the first argument. After each group, drop a number of elements given by the second argument before starting the next group.
 
     groupsOfWithStep 2 1 (range 1 4) == [[1,2],[2,3],[3,4]]
+
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
@@ -1237,6 +1303,7 @@ groupsOfWithStep size step xs =
     groupsOfVarying [2, 3, 1] ["a", "b", "c", "d", "e", "f"] == [["a", "b"], ["c", "d", "e"], ["f"]]
     groupsOfVarying [2] ["a", "b", "c", "d", "e", "f"] == [["a", "b"]]
     groupsOfVarying [2, 3, 1, 5, 6] ["a", "b", "c", "d", "e"] == [["a", "b"], ["c", "d", "e"]]
+
 -}
 groupsOfVarying : List Int -> List a -> List (List a)
 groupsOfVarying listOflengths list =
@@ -1260,6 +1327,7 @@ groupsOfVarying_ listOflengths list accu =
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
 
     greedyGroupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9],[10]]
+
 -}
 greedyGroupsOf : Int -> List a -> List (List a)
 greedyGroupsOf size xs =
@@ -1269,6 +1337,7 @@ greedyGroupsOf size xs =
 {-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
 
     greedyGroupsOfWithStep 3 2 (range 1 6) == [[1,2,3],[3,4,5],[5,6]]
+
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
