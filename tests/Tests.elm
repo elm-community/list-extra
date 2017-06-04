@@ -420,6 +420,26 @@ all =
                         || List.Extra.isSuffixOf listA listC
                         |> Expect.true "Expected suffix of suffix to be suffix."
             ]
+        , describe "swapAt"
+            [ test "negative index as first argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt -1 0 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "negative index as second argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 0 -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "out of range index as first argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 10 0 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "out of range index as second argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 0 -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "identical indexes returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 1 1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (swapAt 0 1 [ 1, 2, 3 ]) [ 2, 1, 3 ]
+            ]
         , describe "setAt"
             [ test "negative index returns the original list" <|
                 \() ->

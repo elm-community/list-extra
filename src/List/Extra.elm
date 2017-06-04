@@ -610,18 +610,17 @@ stableSortWith pred list =
         List.sortWith predWithIndex listWithIndex |> List.map first
 
 
-{-| Swap two values in a list by index. Returns the updated list if both indices
-are in range, or Nothing if both are out of range. If the same index is
-supplied twice the original list is returned.
+{-| Swap two values in a list by index. Return the original list if the index is out of range.
+If the same index is supplied twice the operation has no effect.
+
+    swapAt 1 2 [ 1, 2, 3 ] == [ 1, 3, 2 ]
 -}
-swapAt : Int -> Int -> List a -> Maybe (List a)
+swapAt : Int -> Int -> List a -> List a
 swapAt index1 index2 l =
-    if index1 == index2 then
-        Just l
+    if index1 == index2 || index1 < 0 then
+        l
     else if index1 > index2 then
         swapAt index2 index1 l
-    else if index1 < 0 then
-        Nothing
     else
         let
             ( part1, tail1 ) =
@@ -630,12 +629,13 @@ swapAt index1 index2 l =
             ( head2, tail2 ) =
                 splitAt (index2 - index1) tail1
         in
-            Maybe.map2
-                (\( value1, part2 ) ( value2, part3 ) ->
+            case ( uncons head2, uncons tail2 ) of
+                ( Just ( value1, part2 ), Just ( value2, part3 ) ) ->
                     List.concat [ part1, value2 :: part2, value1 :: part3 ]
-                )
-                (uncons head2)
-                (uncons tail2)
+
+                _ ->
+                    l
+
 
 {-| Remove the element at an index from a list. Return the original list if the index is out of range.
 
