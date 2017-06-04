@@ -3,8 +3,8 @@ node_js:
   - "5"
 install:
   - npm install -g elm
-  - npm install -g elm-test@0.18.2
+  - npm install -g elm-test
   - elm-package install -y
   - pushd tests && elm-package install -y && popd
 script:
-  - cd tests && elm-test Main.elm
+  - elm-test

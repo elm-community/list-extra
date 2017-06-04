@@ -153,37 +153,37 @@ all =
                     Expect.equal (foldr1 (-) [ 1, 2, 3 ]) (Just 2)
             ]
         , describe "scanl1" <|
-            [ test "" <|
+            [ test "computes left to right iterative sum" <|
                 \() ->
                     Expect.equal (scanl1 (+) [ 1, 2, 3 ]) [ 1, 3, 6 ]
-            , test "" <|
+            , test "computes left to right iterative difference" <|
                 \() ->
                     Expect.equal (scanl1 (-) [ 1, 2, 3 ]) [ 1, 1, 2 ]
-            , test "" <|
+            , test "computes left to right flipped iterative difference" <|
                 \() ->
                     Expect.equal (scanl1 (flip (-)) [ 1, 2, 3 ]) [ 1, -1, -4 ]
             ]
         , describe "scanr" <|
-            [ test "" <|
+            [ test "computes right to left iterative sum" <|
                 \() ->
                     Expect.equal (scanr (+) 0 [ 1, 2, 3 ]) [ 6, 5, 3, 0 ]
-            , test "" <|
+            , test "computes right to left iterative difference" <|
                 \() ->
                     Expect.equal (scanr (-) 0 [ 1, 2, 3 ]) [ 2, -1, 3, 0 ]
             ]
         , describe "scanr1" <|
-            [ test "" <|
+            [ test "computes right to left iterative sum" <|
                 \() ->
                     Expect.equal (scanr1 (+) [ 1, 2, 3 ]) [ 6, 5, 3 ]
-            , test "" <|
+            , test "computes right to left iterative difference" <|
                 \() ->
                     Expect.equal (scanr1 (-) [ 1, 2, 3 ]) [ 2, -1, 3 ]
-            , test "" <|
+            , test "computes right to left flipped iterative difference" <|
                 \() ->
                     Expect.equal (scanr1 (flip (-)) [ 1, 2, 3 ]) [ 0, 1, 3 ]
             ]
         , describe "unfoldr" <|
-            [ test "" <|
+            [ test "builds a decreasing list from a seed" <|
                 \() ->
                     Expect.equal
                         (unfoldr
@@ -198,49 +198,49 @@ all =
                         [ 5, 4, 3, 2, 1 ]
             ]
         , describe "initialize" <|
-            [ test "" <|
+            [ test "creates a list starting from zero" <|
                 \() ->
                     Expect.equal (initialize 5 identity) [ 0, 1, 2, 3, 4 ]
-            , test "" <|
+            , test "creates a list by doubling the index" <|
                 \() ->
                     Expect.equal (initialize 5 (\x -> x * 2)) [ 0, 2, 4, 6, 8 ]
-            , test "" <|
+            , test "creates a list of identical values" <|
                 \() ->
                     Expect.equal (initialize 1 (always 3)) [ 3 ]
             ]
         , describe "splitAt" <|
-            [ test "" <|
+            [ test "splits a list in the middle" <|
                 \() ->
                     Expect.equal (splitAt 3 [ 1, 2, 3, 4, 5 ]) ( [ 1, 2, 3 ], [ 4, 5 ] )
-            , test "" <|
+            , test "splits a list at the first element" <|
                 \() ->
                     Expect.equal (splitAt 1 [ 1, 2, 3 ]) ( [ 1 ], [ 2, 3 ] )
-            , test "" <|
+            , test "splits the entire list correctly" <|
                 \() ->
                     Expect.equal (splitAt 3 [ 1, 2, 3 ]) ( [ 1, 2, 3 ], [] )
-            , test "" <|
+            , test "splits past the length of the list" <|
                 \() ->
                     Expect.equal (splitAt 4 [ 1, 2, 3 ]) ( [ 1, 2, 3 ], [] )
-            , test "" <|
+            , test "handles zero correctly" <|
                 \() ->
                     Expect.equal (splitAt 0 [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
-            , test "" <|
+            , test "handles negative numbers correctly" <|
                 \() ->
                     Expect.equal (splitAt (-1) [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
             ]
         , describe "splitWhen" <|
-            [ test "returns split list when predicate is true" <| 
+            [ test "returns split list when predicate is true" <|
                 \() ->
-                    Expect.equal (splitWhen (\n -> n == 3) [ 1, 2, 3, 4, 5]) (Just ([1, 2], [3, 4, 5]))
-            , test "returns nothing when predicate is false" <| 
+                    Expect.equal (splitWhen (\n -> n == 3) [ 1, 2, 3, 4, 5 ]) (Just ( [ 1, 2 ], [ 3, 4, 5 ] ))
+            , test "returns nothing when predicate is false" <|
                 \() ->
-                    Expect.equal (splitWhen (\n -> n == 6) [ 1, 2, 3, 4, 5]) Nothing
+                    Expect.equal (splitWhen (\n -> n == 6) [ 1, 2, 3, 4, 5 ]) Nothing
             ]
         , describe "takeWhileRight" <|
-            [ test "" <|
+            [ test "keeps the correct items" <|
                 \() ->
                     Expect.equal (takeWhileRight ((<) 5) (range 1 10)) [ 6, 7, 8, 9, 10 ]
-            , test "" <|
+            , test "drops the correct items" <|
                 \() ->
                     Expect.equal (dropWhileRight ((<) 5) (range 1 10)) [ 1, 2, 3, 4, 5 ]
             ]
@@ -250,56 +250,56 @@ all =
                     Expect.equal (takeWhile ((>) 19999) (range 1 20000)) (range 1 19998)
             ]
         , describe "span" <|
-            [ test "" <|
+            [ test "splits in the middle of the list" <|
                 \() ->
                     Expect.equal (span ((>) 3) [ 1, 2, 3, 4, 1, 2, 3, 4 ]) ( [ 1, 2 ], [ 3, 4, 1, 2, 3, 4 ] )
-            , test "" <|
+            , test "every element passes predicate" <|
                 \() ->
                     Expect.equal (span ((>) 5) [ 1, 2, 3 ]) ( [ 1, 2, 3 ], [] )
-            , test "" <|
+            , test "first item doesn't pass predicate" <|
                 \() ->
                     Expect.equal (span ((>) 0) [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
             ]
         , describe "break" <|
-            [ test "" <|
+            [ test "breaks in the middle of the list" <|
                 \() ->
                     Expect.equal (break ((<) 3) [ 1, 2, 3, 4, 1, 2, 3, 4 ]) ( [ 1, 2, 3 ], [ 4, 1, 2, 3, 4 ] )
-            , test "" <|
+            , test "breaks on the first item" <|
                 \() ->
                     Expect.equal (break ((>) 5) [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
-            , test "" <|
+            , test "doesn't break for any element" <|
                 \() ->
                     Expect.equal (break ((<) 5) [ 1, 2, 3 ]) ( [ 1, 2, 3 ], [] )
             ]
         , describe "stripPrefix" <|
-            [ test "" <|
+            [ test "removes a matching prefix" <|
                 \() ->
                     Expect.equal (stripPrefix [ 1, 2 ] [ 1, 2, 3, 4 ]) (Just [ 3, 4 ])
-            , test "" <|
+            , test "removes a matching 3-element prefix" <|
                 \() ->
                     Expect.equal (stripPrefix [ 1, 2, 3 ] [ 1, 2, 3, 4, 5 ]) (Just [ 4, 5 ])
-            , test "" <|
+            , test "can remove the entire list" <|
                 \() ->
                     Expect.equal (stripPrefix [ 1, 2, 3 ] [ 1, 2, 3 ]) (Just [])
-            , test "" <|
+            , test "fails when prefix is longer than list" <|
                 \() ->
                     Expect.equal (stripPrefix [ 1, 2, 3 ] [ 1, 2 ]) Nothing
-            , test "" <|
+            , test "fails when list doesn't contain prefix" <|
                 \() ->
                     Expect.equal (stripPrefix [ 3, 2, 1 ] [ 1, 2, 3, 4, 5 ]) Nothing
             ]
         , describe "group" <|
-            [ test "" <|
+            [ test "groups elements correctly" <|
                 \() ->
                     Expect.equal (group [ 1, 2, 2, 3, 3, 3, 2, 2, 1 ]) [ [ 1 ], [ 2, 2 ], [ 3, 3, 3 ], [ 2, 2 ], [ 1 ] ]
             ]
         , describe "groupWhile" <|
-            [ test "" <|
+            [ test "groups by sub-element equality" <|
                 \() ->
                     Expect.equal
                         (groupWhile (\x y -> first x == first y) [ ( 0, 'a' ), ( 0, 'b' ), ( 1, 'c' ), ( 1, 'd' ) ])
                         [ [ ( 0, 'a' ), ( 0, 'b' ) ], [ ( 1, 'c' ), ( 1, 'd' ) ] ]
-            , test "" <|
+            , test "comparison function is reflexive, symmetric, and transitive" <|
                 \() ->
                     Expect.equal
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
@@ -323,34 +323,34 @@ all =
                         [ [ 1, 2, 3 ], [ 2, 4 ], [ 1, 3 ], [ 2 ], [ 1 ] ]
             ]
         , describe "inits" <|
-            [ test "" <|
+            [ test "returns all initial segments" <|
                 \() ->
                     Expect.equal (inits [ 1, 2, 3 ]) [ [], [ 1 ], [ 1, 2 ], [ 1, 2, 3 ] ]
             ]
         , describe "tails" <|
-            [ test "" <|
+            [ test "returns all final segments" <|
                 \() ->
                     Expect.equal (tails [ 1, 2, 3 ]) [ [ 1, 2, 3 ], [ 2, 3 ], [ 3 ], [] ]
             ]
         , describe "select" <|
-            [ test "" <|
+            [ test "returns all variations with a single item removed" <|
                 \() ->
                     Expect.equal
                         (select [ 1, 2, 3, 4 ])
                         [ ( 1, [ 2, 3, 4 ] ), ( 2, [ 1, 3, 4 ] ), ( 3, [ 1, 2, 4 ] ), ( 4, [ 1, 2, 3 ] ) ]
             ]
         , describe "selectSplit" <|
-            [ test "" <|
+            [ test "returns all splits at a single item" <|
                 \() ->
                     Expect.equal (selectSplit [ 1, 2, 3 ]) [ ( [], 1, [ 2, 3 ] ), ( [ 1 ], 2, [ 3 ] ), ( [ 1, 2 ], 3, [] ) ]
             ]
         , describe "lift2" <|
-            [ test "" <|
+            [ test "produces all combinations of addition" <|
                 \() ->
                     Expect.equal (lift2 (+) [ 1, 2, 3 ] [ 4, 5 ]) [ 5, 6, 6, 7, 7, 8 ]
             ]
         , describe "groupsOf" <|
-            [ test "" <|
+            [ test "groups by the correct number of items" <|
                 \() ->
                     Expect.equal (groupsOf 3 (range 1 10))
                         [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ]
@@ -370,24 +370,24 @@ all =
                         [ [ 1, 2, 3 ], [ 7, 8, 9 ], [ 13, 14, 15 ] ]
             ]
         , describe "groupsOfVarying" <|
-            [ test "" <|
+            [ test "group sizes match passed sizes" <|
                 \() ->
                     Expect.equal
                         (groupsOfVarying [ 2, 3, 1 ] [ "a", "b", "c", "d", "e", "f" ])
                         [ [ "a", "b" ], [ "c", "d", "e" ], [ "f" ] ]
-            , test "" <|
+            , test "groups correctly when passed counts are less than list size" <|
                 \() ->
                     Expect.equal
                         (groupsOfVarying [ 2 ] [ "a", "b", "c", "d", "e", "f" ])
                         [ [ "a", "b" ] ]
-            , test "" <|
+            , test "groups correctly when passed counts are greater than list size" <|
                 \() ->
                     Expect.equal
                         (groupsOfVarying [ 2, 3, 1, 5, 6 ] [ "a", "b", "c", "d", "e" ])
                         [ [ "a", "b" ], [ "c", "d", "e" ] ]
             ]
         , describe "greedyGroupsOf" <|
-            [ test "" <|
+            [ test "groups correctly while keeping trailing group" <|
                 \() ->
                     Expect.equal (greedyGroupsOf 3 (range 1 10))
                         [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ], [ 10 ] ]
@@ -419,7 +419,8 @@ all =
                 \listA listB ->
                     not (List.Extra.isPrefixOf listA listB)
                         || not (List.Extra.isPrefixOf listB listA)
-                        || listA == listB
+                        || listA
+                        == listB
                         |> Expect.true "Expected exactly one to be prefix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
@@ -441,7 +442,8 @@ all =
                 \listA listB ->
                     not (List.Extra.isSuffixOf listA listB)
                         || not (List.Extra.isSuffixOf listB listA)
-                        || listA == listB
+                        || listA
+                        == listB
                         |> Expect.true "Expected exactly one to be suffix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
