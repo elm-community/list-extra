@@ -526,8 +526,11 @@ updateAt index update list =
     else
         Just <| updateIfIndex ((==) index) update list
 
+{-| Replace a value at an index that satisfies a predicate, by calling an update function.
 
-{-| Replace a value at an index that satisfies a predicate.
+    updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ] == [ 1, 2, 4 ]
+
+See also `updateAt`.
 -}
 updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
 updateIfIndex predicate update list =
@@ -630,8 +633,11 @@ swapAt index1 index2 l =
                 (uncons head2)
                 (uncons tail2)
 
+{-| Remove the element at an index from a list. Return the original list if the index is out of range.
 
-{-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
+    removeAt 0 [ 1, 2, 3 ] == [ 2, 3 ]
+
+See also `removeIfIndex`.
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
