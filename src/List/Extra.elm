@@ -561,26 +561,28 @@ remove x xs =
                 y :: remove x ys
 
 
-{-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
+{-| Set a value in a list by index. Return the original list if the index is out of range.
+
+    setAt 0 42 [ 1, 2, 3 ] == [ 42, 2, 3 ]
 -}
-setAt : Int -> a -> List a -> Maybe (List a)
-setAt index value l =
+setAt : Int -> a -> List a -> List a
+setAt index value list =
     if index < 0 then
-        Nothing
+        list
     else
         let
             head =
-                List.take index l
+                List.take index list
 
             tail =
-                List.drop index l |> List.tail
+                list |> List.drop index |> List.tail
         in
             case tail of
                 Nothing ->
-                    Nothing
+                    list
 
-                Just t ->
-                    Just (value :: t |> List.append head)
+                Just tail ->
+                    head ++ value :: tail
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
