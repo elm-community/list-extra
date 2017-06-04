@@ -24,6 +24,7 @@ module List.Extra
         , updateAt
         , updateIfIndex
         , removeAt
+        , removeIfIndex
         , filterNot
         , iterate
         , initialize
@@ -83,8 +84,7 @@ module List.Extra
 
 
 # Basics
-
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -661,6 +661,24 @@ removeAt index l =
 
                 Just t ->
                     List.append head t
+
+
+{-| Remove an element at an index that satisfies a predicate.
+
+    removeIfIndex ((==) 2) [ 1, 2, 3 ] == [ 1, 2 ]
+
+See also `removeAt`.
+-}
+removeIfIndex : (Int -> Bool) -> List a -> List a
+removeIfIndex predicate =
+    indexedFoldr
+        (\index item acc ->
+            if predicate index then
+                acc
+            else
+                item :: acc
+        )
+        []
 
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.

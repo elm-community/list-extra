@@ -493,4 +493,15 @@ all =
                 \() ->
                     Expect.equal (updateIfIndex (\index -> index % 2 == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
             ]
+        , describe "removeIfIndex"
+            [ test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex (always True) [ 1, 2, 3 ]) []
+            , test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex ((==) 2) [ 1, 2, 3 ]) [ 1, 2 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
+            ]
         ]
