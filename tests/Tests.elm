@@ -440,6 +440,20 @@ all =
                 \() ->
                     Expect.equal (swapAt 0 1 [ 1, 2, 3 ]) [ 2, 1, 3 ]
             ]
+        , describe "removeAt"
+            [ test "negative index returns the original list" <|
+                \() ->
+                    Expect.equal (removeAt -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeAt 0 [ 1, 2, 3 ]) [ 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeAt 2 [ 1, 2, 3 ]) [ 1, 2 ]
+            , test "out of range index returns the original list" <|
+                \() ->
+                    Expect.equal (removeAt 4 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
         , describe "setAt"
             [ test "negative index returns the original list" <|
                 \() ->
@@ -467,5 +481,16 @@ all =
             , test "out of range index returns the original list" <|
                 \() ->
                     Expect.equal (updateAt 4 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
+        , describe "updateIfIndex"
+            [ test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex (always True) ((+) 1) [ 1, 2, 3 ]) [ 2, 3, 4 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex (\index -> index % 2 == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
             ]
         ]
