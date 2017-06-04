@@ -517,14 +517,16 @@ updateIf predicate update list =
         list
 
 
-{-| Replace a value at a specific index by calling an update function.
+{-| Replace a value at a specific index by calling an update function. Return the original list if the index is out of range.
+
+    updateAt 0 ((+) 1) [ 1, 2, 3 ] == [ 2, 2, 3 ]
+
+See also `updateIfIndex`.
 -}
-updateAt : Int -> (a -> a) -> List a -> Maybe (List a)
-updateAt index update list =
-    if index < 0 || index >= List.length list then
-        Nothing
-    else
-        Just <| updateIfIndex ((==) index) update list
+updateAt : Int -> (a -> a) -> List a -> List a
+updateAt index =
+    updateIfIndex ((==) index)
+
 
 {-| Replace a value at an index that satisfies a predicate, by calling an update function.
 

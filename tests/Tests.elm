@@ -420,4 +420,18 @@ all =
                         || List.Extra.isSuffixOf listA listC
                         |> Expect.true "Expected suffix of suffix to be suffix."
             ]
+        , describe "updateAt"
+            [ test "negative index returns the original list" <|
+                \() ->
+                    Expect.equal (updateAt -1 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateAt 0 ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateAt 2 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
+            , test "out of range index returns the original list" <|
+                \() ->
+                    Expect.equal (updateAt 4 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
         ]
