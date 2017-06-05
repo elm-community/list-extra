@@ -520,11 +520,12 @@ updateIf predicate update list =
 {-| Replace a value at a specific index by calling an update function.
 -}
 updateAt : Int -> (a -> a) -> List a -> Maybe (List a)
-updateAt index update list =
-    if index < 0 || index >= List.length list then
-        Nothing
-    else
-        Just <| updateIfIndex ((==) index) update list
+updateAt index updateFunc list =
+    atHelper index list
+        |> Maybe.map
+            (\( reversedInit, elem, rest ) ->
+                reverseAppend reversedInit (updateFunc elem :: rest)
+            )
 
 
 {-| Replace a value at an index that satisfies a predicate.
@@ -559,23 +560,8 @@ remove x xs =
 {-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
 -}
 setAt : Int -> a -> List a -> Maybe (List a)
-setAt index value l =
-    if index < 0 then
-        Nothing
-    else
-        let
-            head =
-                List.take index l
-
-            tail =
-                List.drop index l |> List.tail
-        in
-            case tail of
-                Nothing ->
-                    Nothing
-
-                Just t ->
-                    Just (value :: t |> List.append head)
+setAt index value list =
+    updateAt index (always value) list
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
@@ -608,49 +594,39 @@ are in range, or Nothing if both are out of range. If the same index is
 supplied twice the original list is returned.
 -}
 swapAt : Int -> Int -> List a -> Maybe (List a)
-swapAt index1 index2 l =
-    if index1 == index2 then
-        Just l
-    else if index1 > index2 then
-        swapAt index2 index1 l
-    else if index1 < 0 then
-        Nothing
-    else
-        let
-            ( part1, tail1 ) =
-                splitAt index1 l
+swapAt index1 index2 list =
+    let
+        secondBreak ( reversedInit, elem1, bigRest ) =
+            atHelper (index2 - index1 - 1) bigRest
+                |> Maybe.map
+                    (\( reversedMiddle, elem2, rest ) ->
+                        mergeParts reversedInit elem2 reversedMiddle elem1 rest
+                    )
 
-            ( head2, tail2 ) =
-                splitAt (index2 - index1) tail1
-        in
-            Maybe.map2
-                (\( value1, part2 ) ( value2, part3 ) ->
-                    List.concat [ part1, value2 :: part2, value1 :: part3 ]
-                )
-                (uncons head2)
-                (uncons tail2)
+        mergeParts reversedInit elem2 reversedMiddle elem1 rest =
+            reverseAppend reversedInit <|
+                elem2
+                    :: reverseAppend reversedMiddle (elem1 :: rest)
+    in
+        if index1 == index2 then
+            Just list
+        else if index1 > index2 then
+            swapAt index2 index1 list
+        else
+            atHelper index1 list
+                |> Maybe.andThen secondBreak
 
 
 {-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
 -}
 removeAt : Int -> List a -> List a
-removeAt index l =
-    if index < 0 then
-        l
-    else
-        let
-            head =
-                List.take index l
+removeAt index list =
+    case atHelper index list of
+        Nothing ->
+            list
 
-            tail =
-                List.drop index l |> List.tail
-        in
-            case tail of
-                Nothing ->
-                    l
-
-                Just t ->
-                    List.append head t
+        Just ( reversedInit, elem, rest ) ->
+            reverseAppend reversedInit rest
 
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.
@@ -944,8 +920,16 @@ unfoldr f seed =
 
 -}
 splitAt : Int -> List a -> ( List a, List a )
-splitAt n xs =
-    ( take n xs, drop n xs )
+splitAt index list =
+    if index < 0 then
+        ( [], list )
+    else
+        case atHelper index list of
+            Nothing ->
+                ( list, [] )
+
+            Just ( reversedInit, elem, rest ) ->
+                ( List.reverse reversedInit, elem :: rest )
 
 
 {-| Attempts to split the list at the first element where the given predicate is true. If the predicate is not true for any elements in the list, return nothing. Otherwise, return the split list.
@@ -1358,3 +1342,47 @@ greedyGroupsOfWithStep size step xs =
             group :: greedyGroupsOfWithStep size step xs_
         else
             []
+
+
+{-| @private Helper function for the `List.Extra.*At` functions.
+If the index is in range, returns `Just` a tuple of a reversed list of
+the elements up until `index`, the element at `index`, and a list of
+the elements after `index`. Otherwise returns Nothing. It is tail recursive
+and makes only a single pass over min(`index`, `List.length list`) elements.
+
+    atHelper 3 [1, 2, 3, 4, 5, 6] == Just ( [3, 2, 1], 4, [5, 6] )
+    atHelper 0 [4, 1] == Just ( [], 4, [1] )
+    atHelper -1 [1] == Nothing
+    atHelper 3 [4, 5, 6] == Nothing
+
+-}
+atHelper : Int -> List a -> Maybe ( List a, a, List a )
+atHelper index list =
+    let
+        inner index list acc =
+            case list of
+                [] ->
+                    Nothing
+
+                x :: xs ->
+                    if index > 0 then
+                        inner (index - 1) xs (x :: acc)
+                    else
+                        Just ( acc, x, xs )
+    in
+        if index < 0 then
+            Nothing
+        else
+            inner index list []
+
+
+{-| @private Reverses `list1` and appends it to `list2`.
+This is equivalent to `(List.reverse list1) ++ list2`,
+but `reverseAppend` is tail-recursive and more efficient.
+
+    reverseAppend [3, 2, 1] [4, 5] == [1, 2, 3, 4, 5]
+
+-}
+reverseAppend : List a -> List a -> List a
+reverseAppend =
+    flip <| List.foldl (::)
