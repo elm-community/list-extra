@@ -352,12 +352,22 @@ all =
         , describe "groupsOf" <|
             [ test "" <|
                 \() ->
-                    Expect.equal (groupsOf 3 (range 1 10)) [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ]
+                    Expect.equal (groupsOf 3 (range 1 10))
+                        [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ]
             ]
         , describe "groupsOfWithStep" <|
-            [ test "" <|
+            [ test "step == size" <|
                 \() ->
-                    Expect.equal (groupsOfWithStep 2 1 (range 1 4)) [ [ 1, 2 ], [ 2, 3 ], [ 3, 4 ] ]
+                    Expect.equal (groupsOfWithStep 4 4 (range 1 10))
+                        [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ]
+            , test "step < size" <|
+                \() ->
+                    Expect.equal (groupsOfWithStep 3 1 (range 1 5))
+                        [ [ 1, 2, 3 ], [ 2, 3, 4 ], [ 3, 4, 5 ] ]
+            , test "step > size" <|
+                \() ->
+                    Expect.equal (groupsOfWithStep 3 6 (range 1 20))
+                        [ [ 1, 2, 3 ], [ 7, 8, 9 ], [ 13, 14, 15 ] ]
             ]
         , describe "groupsOfVarying" <|
             [ test "" <|
@@ -379,12 +389,22 @@ all =
         , describe "greedyGroupsOf" <|
             [ test "" <|
                 \() ->
-                    Expect.equal (greedyGroupsOf 3 (range 1 10)) [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ], [ 10 ] ]
+                    Expect.equal (greedyGroupsOf 3 (range 1 10))
+                        [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ], [ 10 ] ]
             ]
         , describe "greedyGroupsOfWithStep" <|
-            [ test "" <|
+            [ test "step == size" <|
                 \() ->
-                    Expect.equal (greedyGroupsOfWithStep 3 2 (range 1 6)) [ [ 1, 2, 3 ], [ 3, 4, 5 ], [ 5, 6 ] ]
+                    Expect.equal (greedyGroupsOfWithStep 4 4 (range 1 10))
+                        [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ], [ 9, 10 ] ]
+            , test "step < size" <|
+                \() ->
+                    Expect.equal (greedyGroupsOfWithStep 3 2 (range 1 6))
+                        [ [ 1, 2, 3 ], [ 3, 4, 5 ], [ 5, 6 ] ]
+            , test "step > size" <|
+                \() ->
+                    Expect.equal (greedyGroupsOfWithStep 3 6 (range 1 20))
+                        [ [ 1, 2, 3 ], [ 7, 8, 9 ], [ 13, 14, 15 ], [ 19, 20 ] ]
             ]
         , describe "isPrefixOf"
             [ fuzz (list int) "[] is prefix to anything" <|
