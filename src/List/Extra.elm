@@ -9,6 +9,7 @@ module List.Extra
         , maximumBy
         , andMap
         , andThen
+        , reverseMap
         , takeWhile
         , dropWhile
         , unique
@@ -84,7 +85,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -416,6 +417,17 @@ Advanced functional programmers will recognize this as the implementation of bin
 andThen : (a -> List b) -> List a -> List b
 andThen =
     concatMap
+
+
+{-| `reverseMap f xs` gives the same result as `List.reverse (List.map f xs)`,
+but is tail-recursive and slightly more efficient.
+
+    reverseMap sqrt [1,4,9] == [3,2,1]
+
+-}
+reverseMap : (a -> b) -> List a -> List b
+reverseMap f xs =
+    foldl (\x acc -> f x :: acc) [] xs
 
 
 {-| Negation of `member`.

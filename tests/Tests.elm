@@ -32,6 +32,11 @@ all =
                         )
                         [ 9, 7, 9 ]
             ]
+        , describe "reverseMap" <|
+            [ test "maps and reverses" <|
+                \() ->
+                    Expect.equal (reverseMap sqrt [ 1, 4, 9 ]) [ 3, 2, 1 ]
+            ]
         , describe "notMember" <|
             [ test "disconfirms member" <|
                 \() ->
