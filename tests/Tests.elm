@@ -473,7 +473,7 @@ all =
             , test "identical indexes returns the original list" <|
                 \() ->
                     Expect.equal (swapAt 1 1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
-            , test "" <|
+            , test "swap the elements at indices 0 and 1" <|
                 \() ->
                     Expect.equal (swapAt 0 1 [ 1, 2, 3 ]) [ 2, 1, 3 ]
             ]
@@ -481,10 +481,10 @@ all =
             [ test "negative index returns the original list" <|
                 \() ->
                     Expect.equal (removeAt -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
-            , test "" <|
+            , test "remove the element at index 0" <|
                 \() ->
                     Expect.equal (removeAt 0 [ 1, 2, 3 ]) [ 2, 3 ]
-            , test "" <|
+            , test "remove the element at index 2" <|
                 \() ->
                     Expect.equal (removeAt 2 [ 1, 2, 3 ]) [ 1, 2 ]
             , test "out of range index returns the original list" <|
@@ -495,10 +495,10 @@ all =
             [ test "negative index returns the original list" <|
                 \() ->
                     Expect.equal (setAt -1 9 [ 1, 2, 3 ]) [ 1, 2, 3 ]
-            , test "" <|
+            , test "set index 0 to 9" <|
                 \() ->
                     Expect.equal (setAt 0 9 [ 1, 2, 3 ]) [ 9, 2, 3 ]
-            , test "" <|
+            , test "set index 2 to 9" <|
                 \() ->
                     Expect.equal (setAt 2 9 [ 1, 2, 3 ]) [ 1, 2, 9 ]
             , test "out of range index returns the original list" <|
@@ -509,10 +509,10 @@ all =
             [ test "negative index returns the original list" <|
                 \() ->
                     Expect.equal (updateAt -1 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
-            , test "" <|
+            , test "increment the element at index 0" <|
                 \() ->
                     Expect.equal (updateAt 0 ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 3 ]
-            , test "" <|
+            , test "increment the element at index 2" <|
                 \() ->
                     Expect.equal (updateAt 2 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
             , test "out of range index returns the original list" <|
@@ -520,24 +520,24 @@ all =
                     Expect.equal (updateAt 4 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
             ]
         , describe "updateIfIndex"
-            [ test "" <|
+            [ test "increments first element" <|
                 \() ->
                     Expect.equal (updateIfIndex (always True) ((+) 1) [ 1, 2, 3 ]) [ 2, 3, 4 ]
-            , test "" <|
+            , test "if the index is 2, then increment the element" <|
                 \() ->
                     Expect.equal (updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
-            , test "" <|
+            , test "if the index is even, increment the element" <|
                 \() ->
                     Expect.equal (updateIfIndex (\index -> index % 2 == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
             ]
         , describe "removeIfIndex"
-            [ test "" <|
+            [ test "remove all the elements" <|
                 \() ->
                     Expect.equal (removeIfIndex (always True) [ 1, 2, 3 ]) []
-            , test "" <|
+            , test "remove the element at index 2" <|
                 \() ->
                     Expect.equal (removeIfIndex ((==) 2) [ 1, 2, 3 ]) [ 1, 2 ]
-            , test "" <|
+            , test "remove all elements at even indices" <|
                 \() ->
                     Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
