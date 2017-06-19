@@ -25,6 +25,7 @@ module List.Extra
         , updateAt
         , updateIfIndex
         , removeAt
+        , removeIfIndex
         , filterNot
         , iterate
         , initialize
@@ -85,8 +86,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, filterNot, swapAt, stableSortWith
-
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 # List transformations
 
@@ -529,17 +529,22 @@ updateIf predicate update list =
         list
 
 
-{-| Replace a value at a specific index by calling an update function.
+{-| Replace a value at a specific index by calling an update function. Return the original list if the index is out of range.
+
+    updateAt 0 ((+) 1) [ 1, 2, 3 ] == [ 2, 2, 3 ]
+
+See also `updateIfIndex`.
 -}
-updateAt : Int -> (a -> a) -> List a -> Maybe (List a)
-updateAt index update list =
-    if index < 0 || index >= List.length list then
-        Nothing
-    else
-        Just <| updateIfIndex ((==) index) update list
+updateAt : Int -> (a -> a) -> List a -> List a
+updateAt index =
+    updateIfIndex ((==) index)
 
 
-{-| Replace a value at an index that satisfies a predicate.
+{-| Replace a value at an index that satisfies a predicate, by calling an update function.
+
+    updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ] == [ 1, 2, 4 ]
+
+See also `updateAt`.
 -}
 updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
 updateIfIndex predicate update list =
@@ -568,26 +573,28 @@ remove x xs =
                 y :: remove x ys
 
 
-{-| Set a value in a list by index. Returns the updated list if the index is in range, or Nothing if it is out of range.
+{-| Set a value in a list by index. Return the original list if the index is out of range.
+
+    setAt 0 42 [ 1, 2, 3 ] == [ 42, 2, 3 ]
 -}
-setAt : Int -> a -> List a -> Maybe (List a)
-setAt index value l =
+setAt : Int -> a -> List a -> List a
+setAt index value list =
     if index < 0 then
-        Nothing
+        list
     else
         let
             head =
-                List.take index l
+                List.take index list
 
             tail =
-                List.drop index l |> List.tail
+                list |> List.drop index |> List.tail
         in
             case tail of
                 Nothing ->
-                    Nothing
+                    list
 
-                Just t ->
-                    Just (value :: t |> List.append head)
+                Just tail ->
+                    head ++ value :: tail
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
@@ -615,18 +622,17 @@ stableSortWith pred list =
         List.sortWith predWithIndex listWithIndex |> List.map first
 
 
-{-| Swap two values in a list by index. Returns the updated list if both indices
-are in range, or Nothing if both are out of range. If the same index is
-supplied twice the original list is returned.
+{-| Swap two values in a list by index. Return the original list if the index is out of range.
+If the same index is supplied twice the operation has no effect.
+
+    swapAt 1 2 [ 1, 2, 3 ] == [ 1, 3, 2 ]
 -}
-swapAt : Int -> Int -> List a -> Maybe (List a)
+swapAt : Int -> Int -> List a -> List a
 swapAt index1 index2 l =
-    if index1 == index2 then
-        Just l
+    if index1 == index2 || index1 < 0 then
+        l
     else if index1 > index2 then
         swapAt index2 index1 l
-    else if index1 < 0 then
-        Nothing
     else
         let
             ( part1, tail1 ) =
@@ -635,15 +641,20 @@ swapAt index1 index2 l =
             ( head2, tail2 ) =
                 splitAt (index2 - index1) tail1
         in
-            Maybe.map2
-                (\( value1, part2 ) ( value2, part3 ) ->
+            case ( uncons head2, uncons tail2 ) of
+                ( Just ( value1, part2 ), Just ( value2, part3 ) ) ->
                     List.concat [ part1, value2 :: part2, value1 :: part3 ]
-                )
-                (uncons head2)
-                (uncons tail2)
+
+                _ ->
+                    l
 
 
-{-| Remove the element at an index from a list. If the index is out of range, this returns the original list unchanged. Otherwise, it returns the updated list.
+{-| Remove the element at an index from a list. Return the original list if the index is out of range.
+
+    removeAt 0 [ 1, 2, 3 ] == [ 2, 3 ]
+
+See also `
+`.
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
@@ -663,6 +674,24 @@ removeAt index l =
 
                 Just t ->
                     List.append head t
+
+
+{-| Remove an element at an index that satisfies a predicate.
+
+    removeIfIndex ((==) 2) [ 1, 2, 3 ] == [ 1, 2 ]
+
+See also `removeAt`.
+-}
+removeIfIndex : (Int -> Bool) -> List a -> List a
+removeIfIndex predicate =
+    indexedFoldr
+        (\index item acc ->
+            if predicate index then
+                acc
+            else
+                item :: acc
+        )
+        []
 
 
 {-| Take a predicate and a list, and return a list that contains elements which fails to satisfy the predicate.

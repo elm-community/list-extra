@@ -457,4 +457,88 @@ all =
                         || List.Extra.isSuffixOf listA listC
                         |> Expect.true "Expected suffix of suffix to be suffix."
             ]
+        , describe "swapAt"
+            [ test "negative index as first argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt -1 0 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "negative index as second argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 0 -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "out of range index as first argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 10 0 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "out of range index as second argument returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 0 -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "identical indexes returns the original list" <|
+                \() ->
+                    Expect.equal (swapAt 1 1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (swapAt 0 1 [ 1, 2, 3 ]) [ 2, 1, 3 ]
+            ]
+        , describe "removeAt"
+            [ test "negative index returns the original list" <|
+                \() ->
+                    Expect.equal (removeAt -1 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeAt 0 [ 1, 2, 3 ]) [ 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeAt 2 [ 1, 2, 3 ]) [ 1, 2 ]
+            , test "out of range index returns the original list" <|
+                \() ->
+                    Expect.equal (removeAt 4 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
+        , describe "setAt"
+            [ test "negative index returns the original list" <|
+                \() ->
+                    Expect.equal (setAt -1 9 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (setAt 0 9 [ 1, 2, 3 ]) [ 9, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (setAt 2 9 [ 1, 2, 3 ]) [ 1, 2, 9 ]
+            , test "out of range index returns the original list" <|
+                \() ->
+                    Expect.equal (setAt 4 9 [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
+        , describe "updateAt"
+            [ test "negative index returns the original list" <|
+                \() ->
+                    Expect.equal (updateAt -1 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateAt 0 ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 3 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateAt 2 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
+            , test "out of range index returns the original list" <|
+                \() ->
+                    Expect.equal (updateAt 4 ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 3 ]
+            ]
+        , describe "updateIfIndex"
+            [ test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex (always True) ((+) 1) [ 1, 2, 3 ]) [ 2, 3, 4 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (updateIfIndex (\index -> index % 2 == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
+            ]
+        , describe "removeIfIndex"
+            [ test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex (always True) [ 1, 2, 3 ]) []
+            , test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex ((==) 2) [ 1, 2, 3 ]) [ 1, 2 ]
+            , test "" <|
+                \() ->
+                    Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
+            ]
         ]
