@@ -9,6 +9,7 @@ module List.Extra
         , maximumBy
         , andMap
         , andThen
+        , reverseMap
         , takeWhile
         , dropWhile
         , unique
@@ -84,8 +85,8 @@ module List.Extra
 
 
 # Basics
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 # List transformations
 
@@ -418,6 +419,17 @@ andThen =
     concatMap
 
 
+{-| `reverseMap f xs` gives the same result as `List.reverse (List.map f xs)`,
+but is tail-recursive and slightly more efficient.
+
+    reverseMap sqrt [1,4,9] == [3,2,1]
+
+-}
+reverseMap : (a -> b) -> List a -> List b
+reverseMap f xs =
+    foldl (\x acc -> f x :: acc) [] xs
+
+
 {-| Negation of `member`.
 
     notMember 1 [1,2,3] == False
@@ -641,7 +653,8 @@ swapAt index1 index2 l =
 
     removeAt 0 [ 1, 2, 3 ] == [ 2, 3 ]
 
-See also `removeIfIndex`.
+See also `
+`.
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
@@ -1116,24 +1129,37 @@ groupWhile eq xs_ =
 
 -}
 groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
-groupWhileTransitively cmp xs_ =
-    case xs_ of
+groupWhileTransitively compare list =
+    groupWhileTransitivelyHelp [] [] compare list
+
+
+groupWhileTransitivelyHelp : List (List a) -> List a -> (a -> a -> Bool) -> List a -> List (List a)
+groupWhileTransitivelyHelp result currentGroup compare list =
+    case list of
         [] ->
-            []
+            List.reverse <|
+                if List.isEmpty currentGroup then
+                    result
+                else
+                    List.reverse (currentGroup :: result)
 
         [ x ] ->
-            [ [ x ] ]
+            List.reverse <|
+                (List.reverse (x :: currentGroup) :: result)
 
-        x :: ((x_ :: _) as xs) ->
-            case groupWhileTransitively cmp xs of
-                (y :: ys) as r ->
-                    if cmp x x_ then
-                        (x :: y) :: ys
-                    else
-                        [ x ] :: r
-
-                [] ->
+        first :: ((second :: _) as rest) ->
+            if compare first second then
+                groupWhileTransitivelyHelp
+                    result
+                    (first :: currentGroup)
+                    compare
+                    rest
+            else
+                groupWhileTransitivelyHelp
+                    (List.reverse (first :: currentGroup) :: result)
                     []
+                    compare
+                    rest
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
@@ -1290,7 +1316,9 @@ lift4 f la lb lc ld =
     la |> andThen (\a -> lb |> andThen (\b -> lc |> andThen (\c -> ld |> andThen (\d -> [ f a b c d ]))))
 
 
-{-| Split list into groups of size given by the first argument.
+{-| Split list into groups of length `size`. If there are not enough elements
+to completely fill the last group, it will not be included. This is equivalent
+to calling `groupsOfWithStep` with the same `size` and `step`.
 
     groupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9]]
 
@@ -1300,10 +1328,19 @@ groupsOf size xs =
     groupsOfWithStep size size xs
 
 
-{-| Split list into groups of size given by the first argument. After each group, drop a number of elements given by the second argument before starting the next group.
+{-| Split list into groups of length `size` at offsets `step` apart. If there
+are not enough elements to completely fill the last group, it will not be
+included. (See `greedyGroupsOfWithStep` if you would like the last group to be
+included regardless.)
 
-    groupsOfWithStep 2 1 (range 1 4) == [[1,2],[2,3],[3,4]]
+    groupsOfWithStep 4 4 (range 1 10) == [[1,2,3,4],[5,6,7,8]]
+    groupsOfWithStep 3 1 (range 1 5) == [[1,2,3],[2,3,4],[3,4,5]]
+    groupsOfWithStep 3 6 (range 1 20) == [[1,2,3],[7,8,9],[13,14,15]]
 
+If `step == size`, every element (except for perhaps the last few due to the
+non-greedy behavior) will appear in exactly one group. If `step < size`, there
+will be an overlap between groups. If `step > size`, some elements will be
+skipped and not appear in any groups.
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
@@ -1352,7 +1389,10 @@ groupsOfVarying_ listOflengths list accu =
             List.reverse accu
 
 
-{-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough).
+{-| Greedily split list into groups of length `size`. The last group of
+elements will be included regardless of whether there are enough elements in
+the list to completely fill it. This is equivalent to calling
+`greedyGroupsOfWithStep` with the same `size` and `step`.
 
     greedyGroupsOf 3 (range 1 10) == [[1,2,3],[4,5,6],[7,8,9],[10]]
 
@@ -1362,10 +1402,18 @@ greedyGroupsOf size xs =
     greedyGroupsOfWithStep size size xs
 
 
-{-| Split list into groups of size given by the first argument "greedily" (don't throw the group away if not long enough). After each group, drop a number of elements given by the second argumet before starting the next group.
+{-| Greedily split list into groups of length `size` at offsets `step` apart.
+The last group of elements will be included regardless of whether there are
+enough elements in the list to completely fill it. (See `groupsOfWithStep`
+for the non-greedy version of this function).
 
+    greedyGroupsOfWithStep 4 4 (range 1 10) == [[1,2,3,4],[5,6,7,8],[9,10]]
     greedyGroupsOfWithStep 3 2 (range 1 6) == [[1,2,3],[3,4,5],[5,6]]
+    greedyGroupsOfWithStep 3 6 (range 1 20) == [[1,2,3],[7,8,9],[13,14,15],[19,20]]
 
+If `step == size`, every element will appear in exactly one group. If
+`step < size`, there will be an overlap between groups. If `step > size`, some
+elements will be skipped and not appear in any groups.
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
