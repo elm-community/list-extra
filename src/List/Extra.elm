@@ -1244,7 +1244,13 @@ isSuffixOf suffix xs =
     isPrefixOf (reverse suffix) (reverse xs)
 
 
-{-| Take 2 lists and return True, if the first list is an infix of the second list.
+{-| Return True if all the elements of the first list occur in-order and
+consecutively anywhere within the second.
+
+    isInfixOf [5, 7, 11] [2, 3, 5, 7, 11, 13] == True
+    isInfixOf [5, 7, 13] [2, 3, 5, 7, 11, 13] == False
+    isInfixOf [3, 5, 2] [2, 3, 5, 7, 11, 13] == False
+
 -}
 isInfixOf : List a -> List a -> Bool
 isInfixOf infixList list =
