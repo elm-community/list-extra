@@ -457,6 +457,17 @@ all =
                         || List.Extra.isSuffixOf listA listC
                         |> Expect.true "Expected suffix of suffix to be suffix."
             ]
+        , describe "isInfixOf"
+            [ test "success" <|
+                \() ->
+                    Expect.true "5, 7, 11 is infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 5, 7, 11 ] [ 2, 3, 5, 7, 11, 13 ])
+            , test "not consecutive" <|
+                \() ->
+                    Expect.false "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 5, 7, 13 ] [ 2, 3, 5, 7, 11, 13 ])
+            , test "not in-order" <|
+                \() ->
+                    Expect.false "3, 5, 2 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 3, 5, 2 ] [ 2, 3, 5, 7, 11, 13 ])
+            ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
                 \() ->
