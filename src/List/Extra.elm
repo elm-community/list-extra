@@ -1254,8 +1254,19 @@ isInfixOf infix xs =
 {-| Take 2 lists and return True, if the first list is a subsequence of the second list.
 -}
 isSubsequenceOf : List a -> List a -> Bool
-isSubsequenceOf subseq xs =
-    member subseq (subsequences xs)
+isSubsequenceOf subseq list =
+    case ( subseq, list ) of
+        ( [], _ ) ->
+            True
+
+        ( _, [] ) ->
+            False
+
+        ( x :: xs, y :: ys ) ->
+            if x == y then
+                isSubsequenceOf xs ys
+            else
+                isSubsequenceOf subseq ys
 
 
 {-| Take 2 lists and return True, if the first list is a permutation of the second list.
