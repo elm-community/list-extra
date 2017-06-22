@@ -1251,11 +1251,27 @@ isInfixOf infix xs =
     any (isPrefixOf infix) (tails xs)
 
 
-{-| Take 2 lists and return True, if the first list is a subsequence of the second list.
+{-| Return True if all the elements of the first list occur, in order, in the
+second. The elements do not have to occur consecutively.
+
+    isSubsequenceOf ["E", "l", "m"] ["E", "a", "t", " ", "l", "i", "m", "e", "s"] == True
+    isSubsequenceOf ["E", "l", "m"] ["E", "m", "a", "i", "l"] == False
+
 -}
 isSubsequenceOf : List a -> List a -> Bool
-isSubsequenceOf subseq xs =
-    member subseq (subsequences xs)
+isSubsequenceOf subseq list =
+    case ( subseq, list ) of
+        ( [], _ ) ->
+            True
+
+        ( _, [] ) ->
+            False
+
+        ( x :: xs, y :: ys ) ->
+            if x == y then
+                isSubsequenceOf xs ys
+            else
+                isSubsequenceOf subseq ys
 
 
 {-| Take 2 lists and return True, if the first list is a permutation of the second list.
