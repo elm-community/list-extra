@@ -1247,8 +1247,26 @@ isSuffixOf suffix xs =
 {-| Take 2 lists and return True, if the first list is an infix of the second list.
 -}
 isInfixOf : List a -> List a -> Bool
-isInfixOf infix xs =
-    any (isPrefixOf infix) (tails xs)
+isInfixOf infixList list =
+    case infixList of
+        [] ->
+            True
+
+        x :: xs ->
+            isInfixOfHelp x xs list
+
+
+isInfixOfHelp : a -> List a -> List a -> Bool
+isInfixOfHelp infixHead infixTail list =
+    case list of
+        [] ->
+            False
+
+        x :: xs ->
+            if x == infixHead then
+                isPrefixOf infixTail xs
+            else
+                isInfixOfHelp infixHead infixTail xs
 
 
 {-| Take 2 lists and return True, if the first list is a subsequence of the second list.
