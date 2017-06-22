@@ -349,6 +349,17 @@ all =
                 \() ->
                     Expect.equal (selectSplit [ 1, 2, 3 ]) [ ( [], 1, [ 2, 3 ] ), ( [ 1 ], 2, [ 3 ] ), ( [ 1, 2 ], 3, [] ) ]
             ]
+        , describe "isSubsequenceOf" <|
+            [ test "success" <|
+                \() ->
+                    Expect.true "Elm is a subsequence of Eat lime" (isSubsequenceOf [ "E", "l", "m" ] [ "E", "a", "t", " ", "l", "i", "m", "e", "s" ])
+            , test "failure" <|
+                \() ->
+                    Expect.false "Elm is not a subsequence of Email" (isSubsequenceOf [ "E", "l", "m" ] [ "E", "m", "a", "i", "l" ])
+            , test "success at last element" <|
+                \() ->
+                    Expect.true "[] should be a subsequence of []" (isSubsequenceOf [ 1, 3 ] [ 1, 2, 3 ])
+            ]
         , describe "lift2" <|
             [ test "produces all combinations of addition" <|
                 \() ->
