@@ -492,8 +492,21 @@ elemIndices x =
 
 -}
 findIndex : (a -> Bool) -> List a -> Maybe Int
-findIndex p =
-    head << findIndices p
+findIndex =
+    findIndexHelp 0
+
+
+findIndexHelp : Int -> (a -> Bool) -> List a -> Maybe Int
+findIndexHelp index predicate list =
+    case list of
+        [] ->
+            Nothing
+
+        x :: xs ->
+            if predicate x then
+                Just index
+            else
+                findIndexHelp (index + 1) predicate xs
 
 
 {-| Take a predicate and a list, return indices of all elements satisfying the predicate. Otherwise, return empty list. Indexing starts from 0.
