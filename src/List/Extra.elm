@@ -517,8 +517,15 @@ findIndexHelp index predicate list =
 
 -}
 findIndices : (a -> Bool) -> List a -> List Int
-findIndices p =
-    map first << filter (\( i, x ) -> p x) << indexedMap (,)
+findIndices predicate =
+    let
+        consIndexIf index x acc =
+            if predicate x then
+                index :: acc
+            else
+                acc
+    in
+        indexedFoldr consIndexIf []
 
 
 {-| Replace all values that satisfy a predicate with a replacement value.
