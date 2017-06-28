@@ -131,9 +131,12 @@ all =
             [ test "interweaves lists of equal length" <|
                 \() ->
                     Expect.equal (interweave [ 1, 3 ] [ 2, 4 ]) [ 1, 2, 3, 4 ]
-            , test "appends remaining members of longer list" <|
+            , test "appends remaining members of first list, if longer" <|
                 \() ->
                     Expect.equal (interweave [ 1, 3, 5, 7 ] [ 2, 4 ]) [ 1, 2, 3, 4, 5, 7 ]
+            , test "appends remaining members of second list, if longer" <|
+                \() ->
+                    Expect.equal (interweave [ 4, 9, 16 ] [ 2, 3, 5, 7 ]) [ 4, 2, 9, 3, 16, 5, 7 ]
             ]
         , describe "foldl1" <|
             [ test "computes maximum" <|
