@@ -820,21 +820,26 @@ If one list runs out of items, append the items from the remaining list.
 
 -}
 interweave : List a -> List a -> List a
-interweave l1 l2 =
-    interweaveHelp l1 l2 []
+interweave =
+    interweaveHelp []
 
 
 interweaveHelp : List a -> List a -> List a -> List a
-interweaveHelp l1 l2 acc =
-    case ( l1, l2 ) of
+interweaveHelp acc list1 list2 =
+    case ( list1, list2 ) of
         ( x :: xs, y :: ys ) ->
-            interweaveHelp xs ys <| acc ++ [ x, y ]
+            interweaveHelp (y :: x :: acc) xs ys
 
-        ( x, [] ) ->
-            acc ++ x
+        ( [], _ ) ->
+            reverseAppend acc list2
 
-        ( [], y ) ->
-            acc ++ y
+        ( _, [] ) ->
+            reverseAppend acc list1
+
+
+reverseAppend : List a -> List a -> List a
+reverseAppend list1 list2 =
+    List.foldl (::) list2 list1
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
