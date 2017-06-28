@@ -817,6 +817,7 @@ If one list runs out of items, append the items from the remaining list.
 
     interweave [1,3] [2,4] == [1,2,3,4]
     interweave [1,3,5,7] [2,4] == [1,2,3,4,5,7]
+    interweave [4,9,16] [2,3,5,7] == [4,2,9,3,16,5,7]
 
 -}
 interweave : List a -> List a -> List a
