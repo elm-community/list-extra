@@ -612,25 +612,11 @@ remove x xs =
 {-| Set a value in a list by index. Return the original list if the index is out of range.
 
     setAt 0 42 [ 1, 2, 3 ] == [ 42, 2, 3 ]
+
 -}
 setAt : Int -> a -> List a -> List a
-setAt index value list =
-    if index < 0 then
-        list
-    else
-        let
-            head =
-                List.take index list
-
-            tail =
-                list |> List.drop index |> List.tail
-        in
-            case tail of
-                Nothing ->
-                    list
-
-                Just tail ->
-                    head ++ value :: tail
+setAt index value =
+    updateAt index (always value)
 
 
 {-| Similar to List.sortWith, this sorts values with a custom comparison function.
