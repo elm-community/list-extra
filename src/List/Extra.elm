@@ -554,10 +554,26 @@ updateIf predicate update list =
     updateAt 0 ((+) 1) [ 1, 2, 3 ] == [ 2, 2, 3 ]
 
 See also `updateIfIndex`.
+
 -}
 updateAt : Int -> (a -> a) -> List a -> List a
-updateAt index =
-    updateIfIndex ((==) index)
+updateAt index fn list =
+    if index < 0 then
+        list
+    else
+        let
+            head =
+                List.take index list
+
+            tail =
+                List.drop index list
+        in
+            case tail of
+                x :: xs ->
+                    head ++ fn x :: xs
+
+                _ ->
+                    list
 
 
 {-| Replace a value at an index that satisfies a predicate, by calling an update function.
