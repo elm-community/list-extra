@@ -205,6 +205,22 @@ all =
                         )
                         [ 5, 4, 3, 2, 1 ]
             ]
+        , describe "iterate" <|
+            [ test "collatz 13" <|
+                \() ->
+                    let
+                        collatz n =
+                            if n == 1 then
+                                Nothing
+                            else
+                                Just <|
+                                    if n % 2 == 0 then
+                                        n / 2
+                                    else
+                                        3 * n + 1
+                    in
+                        Expect.equal (iterate collatz 13) [13,40,20,10,5,16,8,4,2,1]
+            ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
                 \() ->

@@ -185,17 +185,21 @@ getAt idx xs =
     flip getAt
 
 
-{-| Returns a list of repeated applications of `f`.
+{-| Returns a list of repeated applications of `f`. If `f` returns `Nothing`
+the iteration will stop. If it returns `Just y` then `y` will be added to the
+list and the iteration will continue with `f y`.
 
-If `f` returns `Nothing` the iteration will stop. If it returns `Just y` then `y` will be added to the list and the iteration will continue with `f y`.
-nextYear : Int -> Maybe Int
-nextYear year =
-if year >= 2030 then
-Nothing
-else
-Just (year + 1)
--- Will evaluate to [2010, 2011, ..., 2030]
-iterate nextYear 2010
+    collatz n =
+        if n == 1 then
+            Nothing
+        else
+            Just <|
+                if n % 2 == 0 then
+                    n / 2
+                else
+                    3 * n + 1
+
+    iterate collatz 13 == [13,40,20,10,5,16,8,4,2,1]
 
 -}
 iterate : (a -> Maybe a) -> a -> List a
