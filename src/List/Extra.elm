@@ -88,6 +88,7 @@ module List.Extra
 
 @docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
+
 # List transformations
 
 @docs intercalate, transpose, subsequences, permutations, interweave
@@ -101,7 +102,6 @@ module List.Extra
 # Building lists
 
 @docs scanl1, scanr, scanr1, unfoldr, iterate, initialize
-
 
 
 # Sublists
@@ -554,6 +554,7 @@ updateIf predicate update list =
     updateAt 0 ((+) 1) [ 1, 2, 3 ] == [ 2, 2, 3 ]
 
 See also `updateIfIndex`.
+
 -}
 updateAt : Int -> (a -> a) -> List a -> List a
 updateAt index =
@@ -565,6 +566,7 @@ updateAt index =
     updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ] == [ 1, 2, 4 ]
 
 See also `updateAt`.
+
 -}
 updateIfIndex : (Int -> Bool) -> (a -> a) -> List a -> List a
 updateIfIndex predicate update list =
@@ -596,6 +598,7 @@ remove x xs =
 {-| Set a value in a list by index. Return the original list if the index is out of range.
 
     setAt 0 42 [ 1, 2, 3 ] == [ 42, 2, 3 ]
+
 -}
 setAt : Int -> a -> List a -> List a
 setAt index value list =
@@ -646,6 +649,7 @@ stableSortWith pred list =
 If the same index is supplied twice the operation has no effect.
 
     swapAt 1 2 [ 1, 2, 3 ] == [ 1, 3, 2 ]
+
 -}
 swapAt : Int -> Int -> List a -> List a
 swapAt index1 index2 l =
@@ -673,8 +677,8 @@ swapAt index1 index2 l =
 
     removeAt 0 [ 1, 2, 3 ] == [ 2, 3 ]
 
-See also `
-`.
+See also `removeIfIndex`.
+
 -}
 removeAt : Int -> List a -> List a
 removeAt index l =
@@ -701,6 +705,7 @@ removeAt index l =
     removeIfIndex ((==) 2) [ 1, 2, 3 ] == [ 1, 2 ]
 
 See also `removeAt`.
+
 -}
 removeIfIndex : (Int -> Bool) -> List a -> List a
 removeIfIndex predicate =
@@ -1407,6 +1412,7 @@ If `step == size`, every element (except for perhaps the last few due to the
 non-greedy behavior) will appear in exactly one group. If `step < size`, there
 will be an overlap between groups. If `step > size`, some elements will be
 skipped and not appear in any groups.
+
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
@@ -1480,6 +1486,7 @@ for the non-greedy version of this function).
 If `step == size`, every element will appear in exactly one group. If
 `step < size`, there will be an overlap between groups. If `step > size`, some
 elements will be skipped and not appear in any groups.
+
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
 greedyGroupsOfWithStep size step xs =
