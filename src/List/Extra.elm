@@ -1502,3 +1502,28 @@ greedyGroupsOfWithStep size step xs =
             group :: greedyGroupsOfWithStep size step xs_
         else
             []
+
+
+{-| Repeats the elements of the list until its length
+be the of the size as the first parameter
+    cycle 10 [1, 2, 3]
+      == [1,2,3,1,2,3,1,2,3,1]
+-}
+cycle : Int -> List a -> List a
+cycle len xs =
+    if List.length xs > len then
+        xs
+    else
+        cycle len (xs ++ xs)
+
+
+{-| Zips the first list with the second and repeats the
+elements of the second until it gets the size of the first
+    zipWithCycle [1, 2, 3, 4] [0, -1]
+      == [(1, 0), (2, -1), (3, 0), (4, -1)]
+-}
+zipWithCycle : List a -> List b -> List ( a, b )
+zipWithCycle xs ys =
+    ys
+        |> cycle (List.length xs)
+        |> ListExtra.zip xs
