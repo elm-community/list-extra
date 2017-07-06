@@ -79,6 +79,8 @@ module List.Extra
         , greedyGroupsOf
         , greedyGroupsOfWithStep
         , groupsOfVarying
+        , cycle
+        , zipWithCycle
         )
 
 {-| Convenience functions for working with List
@@ -1505,9 +1507,9 @@ greedyGroupsOfWithStep size step xs =
 
 
 {-| Repeats the elements of the list until its length
-be the of the size as the first parameter
+be greater than the number of the first parameter
     cycle 10 [1, 2, 3]
-      == [1,2,3,1,2,3,1,2,3,1]
+      == [1,2,3,1,2,3,1,2,3,1,2,3]
 -}
 cycle : Int -> List a -> List a
 cycle len xs =
@@ -1518,7 +1520,7 @@ cycle len xs =
 
 
 {-| Zips the first list with the second and repeats the
-elements of the second until it gets the size of the first
+elements of the second until it be greater than the size of the first
     zipWithCycle [1, 2, 3, 4] [0, -1]
       == [(1, 0), (2, -1), (3, 0), (4, -1)]
 -}
@@ -1526,4 +1528,4 @@ zipWithCycle : List a -> List b -> List ( a, b )
 zipWithCycle xs ys =
     ys
         |> cycle (List.length xs)
-        |> ListExtra.zip xs
+        |> zip xs
