@@ -92,7 +92,7 @@ module List.Extra
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave
+@docs intercalate, transpose, subsequences, permutations, interweave, cycle
 
 
 # Folds
@@ -123,7 +123,7 @@ module List.Extra
 
 # Zipping
 
-@docs zip, zip3, zip4, zip5
+@docs zip, zip3, zip4, zip5, zipWithCycle
 
 
 # Lift functions onto multiple lists of arguments
