@@ -189,6 +189,7 @@ getAt idx xs =
 the iteration will stop. If it returns `Just y` then `y` will be added to the
 list and the iteration will continue with `f y`.
 
+    collatz : Int -> Maybe Int
     collatz n =
         if n == 1 then
             Nothing
