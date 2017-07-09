@@ -79,8 +79,8 @@ module List.Extra
         , greedyGroupsOf
         , greedyGroupsOfWithStep
         , groupsOfVarying
-        , cycle
-        , zipWithCycle
+        , repeat
+        , greedyZip
         )
 
 {-| Convenience functions for working with List
@@ -92,7 +92,7 @@ module List.Extra
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cycle
+@docs intercalate, transpose, subsequences, permutations, interweave, repeat
 
 
 # Folds
@@ -123,7 +123,7 @@ module List.Extra
 
 # Zipping
 
-@docs zip, zip3, zip4, zip5, zipWithCycle
+@docs zip, zip3, zip4, zip5, greedyZip
 
 
 # Lift functions onto multiple lists of arguments
@@ -1508,15 +1508,12 @@ greedyGroupsOfWithStep size step xs =
 
 {-| Repeats the elements of the list until its length
 be greater than the number of the first parameter
-    cycle 10 [1, 2, 3]
-      == [1,2,3,1,2,3,1,2,3,1,2,3]
+    repeat 10 [1, 2, 3]
+      == [1,2,3,1,2,3,1,2,3]
 -}
-cycle : Int -> List a -> List a
-cycle len xs =
-    if List.length xs > len then
-        xs
-    else
-        cycle len (xs ++ xs)
+repeat : Int -> List a -> List a
+repeat times xs =
+    foldr (\_ b -> b ++ xs) [] (range 1 times)
 
 
 {-| Zips the first list with the second and repeats the
@@ -1524,8 +1521,8 @@ elements of the second until it be greater than the size of the first
     zipWithCycle [1, 2, 3, 4] [0, -1]
       == [(1, 0), (2, -1), (3, 0), (4, -1)]
 -}
-zipWithCycle : List a -> List b -> List ( a, b )
-zipWithCycle xs ys =
+greedyZip : List a -> List b -> List ( a, b )
+greedyZip xs ys =
     ys
-        |> cycle (List.length xs)
+        |> repeat ((List.length xs) // (List.length ys))
         |> zip xs

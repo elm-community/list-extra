@@ -566,14 +566,14 @@ all =
                 \() ->
                     Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
-        , describe "cycle"
-            [ test "repeats the elements until it be greater than 5" <|
+        , describe "repeat"
+            [ test "repeats the elements 3 times" <|
                 \() ->
-                    Expect.equal (cycle 5 [ 1, 2, 3 ]) [ 1, 2, 3, 1, 2, 3 ]
+                    Expect.equal (repeat 3 [ 1, 2, 3 ]) [ 1, 2, 3, 1, 2, 3, 1, 2, 3 ]
             ]
-        , describe "zipWithCycle"
+        , describe "greedyZip"
             [ test "repats the elements until it be greater than the length of the first list" <|
                 \() ->
-                    Expect.equal (zipWithCycle [ 1, 2, 3, 4 ] [ 0, -1 ]) [ ( 1, 0 ), ( 2, -1 ), ( 3, 0 ), ( 4, -1 ) ]
+                    Expect.equal (greedyZip [ 1, 2, 3, 4 ] [ 0, -1 ]) [ ( 1, 0 ), ( 2, -1 ), ( 3, 0 ), ( 4, -1 ) ]
             ]
         ]
