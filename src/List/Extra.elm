@@ -1518,7 +1518,7 @@ repeat times xs =
 
 {-| Zips the first list with the second and repeats the
 elements of the second until it be greater than the size of the first
-    zipWithCycle [1, 2, 3, 4] [0, -1]
+    greedyZip [1, 2, 3, 4] [0, -1]
       == [(1, 0), (2, -1), (3, 0), (4, -1)]
 -}
 greedyZip : List a -> List b -> List ( a, b )
