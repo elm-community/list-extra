@@ -1254,7 +1254,7 @@ selectSplit xs =
             ( [], x, xs ) :: map (\( lys, y, rys ) -> ( x :: lys, y, rys )) (selectSplit xs)
 
 
-{-| Take 2 lists and return True, if the first list is the prefix of the second list.
+{-| Take two lists and return `True`, if the first list is the prefix of the second list.
 -}
 isPrefixOf : List a -> List a -> Bool
 isPrefixOf prefix xs =
@@ -1269,7 +1269,7 @@ isPrefixOf prefix xs =
             p == x && isPrefixOf ps xs
 
 
-{-| Take 2 lists and return True, if the first list is the suffix of the second list.
+{-| Take two lists and return `True`, if the first list is the suffix of the second list.
 -}
 isSuffixOf : List a -> List a -> Bool
 isSuffixOf suffix xs =
@@ -1330,7 +1330,7 @@ isSubsequenceOf subseq list =
                 isSubsequenceOf subseq ys
 
 
-{-| Take 2 lists and return True, if the first list is a permutation of the second list.
+{-| Take two lists and return `True`, if the first list is a permutation of the second list.
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
