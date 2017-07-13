@@ -1130,11 +1130,15 @@ group =
 
     groupWhile (\x y -> first x == first y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
 
-The equality test should be an equivalent relationship, i.e. it should have the properties of reflexivity, symmetry, and transitivity. For non-equivalent relations it gives non-intuitive behavior:
+The equality test should be an [equivalence relation](https://en.wikipedia.org/wiki/Equivalence_relation), i.e. it should have the properties:
 
-    groupWhile (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3,2,4],[1,3,2],[1]]
+  - Reflexivity - Testing an object against itself returns `True`.
+  - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
+  - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
 
-For grouping elements with a comparison test, which must only hold the property of transitivity, see `groupWhileTransitively`.
+For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+
+For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List (List a)
