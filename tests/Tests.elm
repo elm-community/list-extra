@@ -15,6 +15,9 @@ all =
             [ test "removes duplicates" <|
                 \() ->
                     Expect.equal (List.Extra.unique [ 0, 1, 1, 0, 1 ]) [ 0, 1 ]
+            , test "preserves list order" <|
+                \() ->
+                    Expect.equal (List.Extra.unique [ 3, 3, 2, 1, 1, 0 ]) [ 3, 2, 1, 0 ]
             ]
         , describe "allDifferent" <|
             [ test "detects duplicates" <|
@@ -219,7 +222,7 @@ all =
                                     else
                                         3 * n + 1
                     in
-                        Expect.equal (iterate collatz 13) [13,40,20,10,5,16,8,4,2,1]
+                        Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
