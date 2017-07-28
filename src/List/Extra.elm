@@ -67,6 +67,7 @@ module List.Extra
         , elemIndices
         , findIndex
         , findIndices
+        , count
         , zip
         , zip3
         , zip4
@@ -116,7 +117,7 @@ module List.Extra
 
 # Searching
 
-@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices
+@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
 
 
 # Zipping
@@ -531,6 +532,25 @@ findIndices predicate =
                 acc
     in
         indexedFoldr consIndexIf []
+
+
+{-| Returns the number of elements in a list that satisfy a given predicate.
+Equivalent to `List.length (List.filter pred list)` but more efficient.
+
+    count (\n -> n % 2 == 1) [1,2,3,4,5,6,7] == 4
+    count ((==) "yeah") ["She","loves","you","yeah","yeah","yeah"] == 3
+
+-}
+count : (a -> Bool) -> List a -> Int
+count predicate =
+    List.foldl
+        (\x acc ->
+            if predicate x then
+                acc + 1
+            else
+                acc
+        )
+        0
 
 
 {-| Replace all values that satisfy a predicate with a replacement value.

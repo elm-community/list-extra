@@ -94,6 +94,14 @@ all =
                 \() ->
                     Expect.equal (findIndices (\x -> x % 2 == 0) [ 1, 2, 4 ]) [ 1, 2 ]
             ]
+        , describe "count" <|
+            [ test "isOdd predicate" <|
+                \() ->
+                    Expect.equal (count (\n -> n % 2 == 1) [ 1, 2, 3, 4, 5, 6, 7 ]) 4
+            , test "equal predicate" <|
+                \() ->
+                    Expect.equal (count ((==) "yeah") [ "She", "loves", "you", "yeah", "yeah", "yeah" ]) 3
+            ]
         , describe "intercalate" <|
             [ test "computes example" <|
                 \() ->
