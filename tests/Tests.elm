@@ -227,7 +227,7 @@ all =
                                     else
                                         3 * n + 1
                     in
-                        Expect.equal (iterate collatz 13) [13,40,20,10,5,16,8,4,2,1]
+                        Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
@@ -505,6 +505,31 @@ all =
             , test "not in-order" <|
                 \() ->
                     Expect.false "3, 5, 2 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 3, 5, 2 ] [ 2, 3, 5, 7, 11, 13 ])
+            ]
+        , describe "allPass"
+            [ test "all predicates are satisfied by the value" <|
+                \() ->
+                    Expect.true "11 is greater than 10 and less than 20" (allPass [ (>) 20, (<) 10 ] 11)
+            , test "without any predicates" <|
+                \() ->
+                    Expect.true "no predicate is not satisfied" (allPass [] 21)
+            , test "the first predicate is not satisfied by the value" <|
+                \() ->
+                    Expect.false "21 is greater than 20" (allPass [ (>) 20, (<) 10 ] 21)
+            , test "the second predicate is not satisfied by the value" <|
+                \() ->
+                    Expect.false "4 is less than 10" (allPass [ (>) 20, (<) 10 ] 4)
+            ]
+        , describe "anyPass"
+            [ test "at least one predicate is satisfied by the value" <|
+                \() ->
+                    Expect.true "100 is greater than 10" (anyPass [ (>) 20, (<) 10 ] 100)
+            , test "none of the predicates are satisfied by the value" <|
+                \() ->
+                    Expect.false "21 is not less than 20 and not equals 10 " (anyPass [ (>) 20, (==) 10 ] 21)
+            , test "without any predicates" <|
+                \() ->
+                    Expect.false "no predicate is satisfied" (anyPass [] 21)
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|

@@ -61,6 +61,8 @@ module List.Extra
         , isInfixOf
         , isSubsequenceOf
         , isPermutationOf
+        , allPass
+        , anyPass
         , notMember
         , find
         , elemIndex
@@ -112,7 +114,7 @@ module List.Extra
 
 # Predicates
 
-@docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
+@docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf, allPass, anyPass
 
 
 # Searching
@@ -1164,7 +1166,7 @@ The equality test should be an [equivalence relation](https://en.wikipedia.org/w
   - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
   - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
 
-For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do *not* write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
 
 For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
@@ -1363,6 +1365,31 @@ isSubsequenceOf subseq list =
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
     member permut (permutations xs)
+
+
+{-| Determine if all predicates are satisfied by the value.
+
+    allPass [(>) 20, (<) 10] 11 == True
+    allPass [(>) 20, (<) 10] 21 == False
+    allPass [(>) 20, (<) 10] 4 == False
+    allPass [] 21 == True
+
+-}
+allPass : List (a -> Bool) -> a -> Bool
+allPass ps x =
+    List.foldl (\p acc -> acc && p x) True ps
+
+
+{-| Determine if any predicate is satisfied by the value.
+
+    anyPass [(>) 20, (<) 10] 100 == True
+    anyPass [(>) 20, (==) 10] 21 == False
+    anyPass [] 21 == False
+
+-}
+anyPass : List (a -> Bool) -> a -> Bool
+anyPass ps x =
+    List.foldl (\p acc -> acc || p x) False ps
 
 
 {-| Take two lists and returns a list of corresponding pairs
