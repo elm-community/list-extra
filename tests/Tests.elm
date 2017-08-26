@@ -593,4 +593,14 @@ all =
                 \() ->
                     Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
+        , describe "repeat"
+            [ test "repeats the elements 3 times" <|
+                \() ->
+                    Expect.equal (repeat 3 [ 1, 2, 3 ]) [ 1, 2, 3, 1, 2, 3, 1, 2, 3 ]
+            ]
+        , describe "greedyZip"
+            [ test "repats the elements until it be greater than the length of the first list" <|
+                \() ->
+                    Expect.equal (greedyZip [ 1, 2, 3, 4 ] [ 0, -1 ]) [ ( 1, 0 ), ( 2, -1 ), ( 3, 0 ), ( 4, -1 ) ]
+            ]
         ]
