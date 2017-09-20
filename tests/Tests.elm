@@ -53,6 +53,34 @@ all =
                 \() ->
                     Expect.equal (find (\num -> num > 5) [ 2, 4, 6, 8 ]) (Just 6)
             ]
+        , describe "findMap" <|
+            [ test "behaves as documented" <|
+                \() ->
+                    Expect.equal
+                        (findMap
+                            (\num ->
+                                if num > 5 then
+                                    Just (num * 2)
+                                else
+                                    Nothing
+                            )
+                            [ 2, 4, 6, 8 ]
+                        )
+                        (Just 12)
+            , test "return with Nothing" <|
+                \() ->
+                    Expect.equal
+                        (findMap
+                            (\num ->
+                                if num > 10 then
+                                    Just (num * 2)
+                                else
+                                    Nothing
+                            )
+                            [ 2, 4, 6, 8 ]
+                        )
+                        (Nothing)
+            ]
         , describe "elemIndex" <|
             [ test "finds index of value" <|
                 \() ->

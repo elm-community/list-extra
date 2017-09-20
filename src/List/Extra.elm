@@ -63,6 +63,7 @@ module List.Extra
         , isPermutationOf
         , notMember
         , find
+        , findMap
         , elemIndex
         , elemIndices
         , findIndex
@@ -117,7 +118,7 @@ module List.Extra
 
 # Searching
 
-@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
+@docs notMember, find, findMap, elemIndex, elemIndices, findIndex, findIndices, count
 
 
 # Zipping
@@ -464,6 +465,28 @@ find predicate list =
                 Just first
             else
                 find predicate rest
+
+
+{-| Apply a function that may succeed to values in the list and return
+the result of the first successful match.
+If none match, then return Nothing.
+
+    findMap (\num -> if num > 5 then Just (num * 2) else Nothing) [2, 4, 6, 8,] == Just 12
+
+-}
+findMap : (a -> Maybe b) -> List a -> Maybe b
+findMap f list =
+    case list of
+        [] ->
+            Nothing
+
+        a :: tail ->
+            case f a of
+                Just b ->
+                    Just b
+
+                Nothing ->
+                    findMap f tail
 
 
 {-| Return the index of the first occurrence of the element. Otherwise, return `Nothing`. Indexing starts from 0.
@@ -1164,7 +1187,7 @@ The equality test should be an [equivalence relation](https://en.wikipedia.org/w
   - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
   - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
 
-For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do *not* write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
 
 For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
