@@ -123,6 +123,11 @@ all =
                     Expect.equal
                         (transpose [ [ 10, 11 ], [ 20 ], [], [ 30, 31, 32 ] ])
                         [ [ 10, 20, 30 ], [ 11, 31 ], [ 32 ] ]
+            , test "transposes large lists" <|
+                \() ->
+                    Expect.equal
+                        (transpose [ List.repeat 10000 1 ])
+                        (List.repeat 10000 [ 1 ])
             ]
         , describe "subsequences" <|
             [ test "computes subsequences" <|

@@ -813,13 +813,18 @@ If some rows are shorter than the following rows, their elements are skipped:
 
 -}
 transpose : List (List a) -> List (List a)
-transpose ll =
+transpose =
+    transposeHelp []
+
+
+transposeHelp : List (List a) -> List (List a) -> List (List a)
+transposeHelp acc ll =
     case ll of
         [] ->
-            []
+            acc
 
         [] :: xss ->
-            transpose xss
+            transposeHelp acc xss
 
         (x :: xs) :: xss ->
             let
@@ -829,7 +834,7 @@ transpose ll =
                 tails =
                     filterMap tail xss
             in
-                (x :: heads) :: transpose (xs :: tails)
+                transposeHelp (acc ++ [ x :: heads ]) (xs :: tails)
 
 
 {-| Return the list of all subsequences of a list.
