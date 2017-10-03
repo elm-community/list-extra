@@ -149,6 +149,20 @@ all =
                 \() ->
                     Expect.equal (interweave [ 4, 9, 16 ] [ 2, 3, 5, 7 ]) [ 4, 2, 9, 3, 16, 5, 7 ]
             ]
+        , describe "cartesianProduct" <|
+            [ test "computes the cartesian product of lists of different length" <|
+                \() ->
+                    Expect.equal (cartesianProduct [ [ 1, 2 ], [ 3, 4, 5 ], [ 6 ] ]) [ [ 1, 3, 6 ], [ 1, 4, 6 ], [ 1, 5, 6 ], [ 2, 3, 6 ], [ 2, 4, 6 ], [ 2, 5, 6 ] ]
+            , test "computes the cartesian product of a single list" <|
+                \() ->
+                    Expect.equal (cartesianProduct [ [ 1, 2 ] ]) [ [ 1 ], [ 2 ] ]
+            , test "computes the cartesian product of lists including an empty one" <|
+                \() ->
+                    Expect.equal (cartesianProduct [ [ 1, 2 ], [], [ 6 ] ]) []
+            , test "computes the nullary cartesian product" <|
+                \() ->
+                    Expect.equal (cartesianProduct []) [ [] ]
+            ]
         , describe "foldl1" <|
             [ test "computes maximum" <|
                 \() ->
