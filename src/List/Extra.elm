@@ -34,6 +34,7 @@ module List.Extra
         , subsequences
         , permutations
         , interweave
+        , cartesianProduct
         , foldl1
         , foldr1
         , indexedFoldl
@@ -92,7 +93,7 @@ module List.Extra
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
 
 
 # Folds
@@ -866,6 +867,27 @@ interweaveHelp acc list1 list2 =
 
         ( _, [] ) ->
             reverseAppend acc list1
+
+
+{-| Return the cartesian product of a list of lists.
+If one list is empty, the result is an empty list.
+If the list of lists is empty, the result is an empty singleton.
+
+    cartesianProduct [[1,2],[3,4,5],[6]] == [[1,3,6],[1,4,6],[1,5,6],[2,3,6],[2,4,6],[2,5,6]]
+    cartesianProduct [[1,2]] == [[1],[2]]
+    cartesianProduct [[1,2],[],[6]] == []
+    cartesianProduct [[]] == []
+    cartesianProduct [] == [[]]
+
+-}
+cartesianProduct : List (List a) -> List (List a)
+cartesianProduct ll =
+    case ll of
+        [] ->
+            [ [] ]
+
+        xs :: xss ->
+            lift2 (::) xs (cartesianProduct xss)
 
 
 reverseAppend : List a -> List a -> List a
