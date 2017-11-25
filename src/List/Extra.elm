@@ -29,6 +29,7 @@ module List.Extra
         , filterNot
         , iterate
         , initialize
+        , cycle
         , intercalate
         , transpose
         , subsequences
@@ -103,7 +104,7 @@ module List.Extra
 
 # Building lists
 
-@docs scanl1, scanr, scanr1, unfoldr, iterate, initialize
+@docs scanl1, scanr, scanr1, unfoldr, iterate, initialize, cycle
 
 
 # Sublists
@@ -230,6 +231,42 @@ initialize n f =
                 step (i - 1) (f i :: acc)
     in
         step (n - 1) []
+
+
+{-| Creates a list of the given length whose elements are obtained by cycling
+through the elements of the given list. If the given list is empty, the
+resulting list will be empty.
+
+    cycle 6 [ 4, 7, 8 ] == [ 4, 7, 8, 4, 7, 8 ]
+    cycle 4 [ 'a', 'b', 'c' ] == [ 'a', 'b', 'c', 'a' ]
+    cycle 9001 [] == []
+    cycle 2 [ 1, 2, 3, 4, 5 ] == [ 1, 2 ]
+
+-}
+cycle : Int -> List a -> List a
+cycle len list =
+    let
+        cycleLength =
+            List.length list
+    in
+        if cycleLength == 0 || cycleLength == len then
+            list
+        else if cycleLength < len then
+            List.reverse
+                (reverseAppend
+                    (List.take (rem len cycleLength) list)
+                    (cycleHelp [] (len // cycleLength) list)
+                )
+        else
+            List.take len list
+
+
+cycleHelp : List a -> Int -> List a -> List a
+cycleHelp acc n list =
+    if n > 0 then
+        cycleHelp (reverseAppend list acc) (n - 1) list
+    else
+        acc
 
 
 {-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.

@@ -257,6 +257,23 @@ all =
                 \() ->
                     Expect.equal (initialize 1 (always 3)) [ 3 ]
             ]
+        , describe "cycle" <|
+            [ test "same length" <|
+                \() ->
+                    Expect.equal (cycle 3 [ 4, 7, 8 ]) [ 4, 7, 8 ]
+            , test "multiple of length" <|
+                \() ->
+                    Expect.equal (cycle 6 [ 4, 7, 8 ]) [ 4, 7, 8, 4, 7, 8 ]
+            , test "partial cycle" <|
+                \() ->
+                    Expect.equal (cycle 4 [ 'a', 'b', 'c' ]) [ 'a', 'b', 'c', 'a' ]
+            , test "empty list" <|
+                \() ->
+                    Expect.equal (cycle 9001 []) []
+            , test "resulting length smaller than cycle length" <|
+                \() ->
+                    Expect.equal (cycle 2 [ 1, 2, 3, 4, 5 ]) [ 1, 2 ]
+            ]
         , describe "splitAt" <|
             [ test "splits a list in the middle" <|
                 \() ->
