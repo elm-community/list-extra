@@ -813,28 +813,18 @@ If some rows are shorter than the following rows, their elements are skipped:
 
 -}
 transpose : List (List a) -> List (List a)
-transpose =
-    transposeHelp []
+transpose listOfLists =
+    List.foldr (List.map2 (::)) (List.repeat (rowsLength listOfLists) []) listOfLists
 
 
-transposeHelp : List (List a) -> List (List a) -> List (List a)
-transposeHelp acc ll =
-    case ll of
+rowsLength : List (List a) -> Int
+rowsLength listOfLists =
+    case listOfLists of
         [] ->
-            acc
+            0
 
-        [] :: xss ->
-            transposeHelp acc xss
-
-        (x :: xs) :: xss ->
-            let
-                heads =
-                    filterMap head xss
-
-                tails =
-                    filterMap tail xss
-            in
-                transposeHelp (acc ++ [ x :: heads ]) (xs :: tails)
+        x :: _ ->
+            List.length x
 
 
 {-| Return the list of all subsequences of a list.

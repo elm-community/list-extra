@@ -118,11 +118,11 @@ all =
                     Expect.equal
                         (transpose [ [ 1, 2, 3 ], [ 4, 5, 6 ] ])
                         [ [ 1, 4 ], [ 2, 5 ], [ 3, 6 ] ]
-            , test "short rows are skipped" <|
+            , test "truncate the matrix to the shortest row size" <|
                 \() ->
                     Expect.equal
-                        (transpose [ [ 10, 11 ], [ 20 ], [], [ 30, 31, 32 ] ])
-                        [ [ 10, 20, 30 ], [ 11, 31 ], [ 32 ] ]
+                        (transpose [ [ 10, 11 ], [ 20 ], [ 30, 31, 32 ] ])
+                        [ [ 10, 20, 30 ] ]
             , test "transposes large lists" <|
                 \() ->
                     Expect.equal
