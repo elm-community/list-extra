@@ -168,6 +168,26 @@ all =
                 \() ->
                     Expect.equal (cartesianProduct []) [ [] ]
             ]
+        , describe "sliding" <|
+            [ test "return empty list on empty input" <|
+                \() ->
+                    Expect.equal (sliding 1 1 []) []
+            , test "prevent error on invalid size" <|
+                \() ->
+                    Expect.equal (sliding -1 1 [1, 2, 3]) [[1], [2], [3]]
+            , test "prevent stack overflow on invalid step" <|
+                \() ->
+                    Expect.equal (sliding 1 -1 [1, 2, 3]) [[1], [2], [3]]
+            , test "behaviour of size" <|
+                \() ->
+                    Expect.equal (sliding 3 1 [1, 2, 3, 4, 5]) [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+            , test "behaviour of step" <|
+                \() ->
+                    Expect.equal (sliding 2 3 [1, 2, 3, 4, 5]) [[1, 2], [4, 5]]
+            , test "stop when all values are used" <|
+                \() ->
+                    Expect.equal (sliding 3 3 [1, 2, 3, 4, 5]) [[1, 2, 3], [4, 5]]
+            ]
         , describe "foldl1" <|
             [ test "computes maximum" <|
                 \() ->
