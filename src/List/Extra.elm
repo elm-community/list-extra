@@ -106,7 +106,7 @@ module List.Extra
 
 # Building lists
 
-@docs scanl1, scanr, scanr1, unfoldr, iterate, initialize, cycle
+@docs scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
 
 
 # Sublists
