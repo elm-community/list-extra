@@ -220,6 +220,45 @@ all =
                 \() ->
                     Expect.equal (scanr1 (flip (-)) [ 1, 2, 3 ]) [ 0, 1, 3 ]
             ]
+        , describe "mapAccuml" <|
+            [ test "on empty list" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\x y -> ( x + y, x * y )) 5 [])
+                        ( 5, [] )
+            , test "accumulate sum and map product" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ])
+                        ( 19, [ 10, 28, 88 ] )
+            , test "works for very long list (i.e. is call stack size safe)" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\x y -> ( x + y, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        5000050000
+            , test "add running total" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\x y -> ( x + y, ( y, x ) )) 1 [ 3, 2, 3 ])
+                        ( 9, [ ( 3, 1 ), ( 2, 4 ), ( 3, 6 ) ] )
+            ]
+        , describe "mapAccumr" <|
+            [ test "on empty list" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\x y -> ( x + y, x * y )) 5 [])
+                        ( 5, [] )
+            , test "accumulate sum and map product" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ])
+                        ( 19, [ 34, 52, 40 ] )
+            , test "works for very long list (i.e. is call stack size safe)" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\x y -> ( x + y, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        5000050000
+            ]
         , describe "unfoldr" <|
             [ test "builds a decreasing list from a seed" <|
                 \() ->

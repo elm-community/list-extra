@@ -43,6 +43,8 @@ module List.Extra
         , scanl1
         , scanr
         , scanr1
+        , mapAccuml
+        , mapAccumr
         , unfoldr
         , splitAt
         , splitWhen
@@ -1067,6 +1069,52 @@ scanr1 f xs_ =
 
                 [] ->
                     []
+
+
+{-| The mapAccuml function behaves like a combination of map and foldl; it applies a
+function to each element of a list, passing an accumulating parameter from left to right,
+and returning a final value of this accumulator together with the new list.
+
+    mapAccuml (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ] == ( 19, [ 10, 28, 88 ] )
+
+-}
+mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
+mapAccuml f accu0 list =
+    let
+        ( accuFinal, generatedList ) =
+            List.foldl
+                (\x ( accu1, ys ) ->
+                    let
+                        ( accu2, y ) =
+                            f accu1 x
+                    in
+                        ( accu2, y :: ys )
+                )
+                ( accu0, [] )
+                list
+    in
+        ( accuFinal, List.reverse generatedList )
+
+
+{-| The mapAccumr function behaves like a combination of map and foldl; it applies a
+function to each element of a list, passing an accumulating parameter from right to left,
+and returning a final value of this accumulator together with the new list.
+
+    mapAccumr (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ] == ( 19, [ 34, 52, 40 ] )
+
+-}
+mapAccumr : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
+mapAccumr f accu0 list =
+    List.foldr
+        (\x ( accu1, ys ) ->
+            let
+                ( accu2, y ) =
+                    f accu1 x
+            in
+                ( accu2, y :: ys )
+        )
+        ( accu0, [] )
+        list
 
 
 {-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
