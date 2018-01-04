@@ -374,8 +374,12 @@ dropWhile predicate list =
 {-| Reduce a list from the left while result is valid.
 The function can be used in two possible scenarios:
 
-* More optimazed replacement for list |> takeWhile f |> foldl g starter
-* Reduction while accomulation value satisfies certain criteria
+ * Reduction while accumulation value satisfies certain criteria 
+ * More optimized replacement for 
+    list 
+        |> takeWhile someFunction1
+        |> foldl someFunction2 someInitialValue
+
 
     accomulateColor colorSum pixelColor =
         let
