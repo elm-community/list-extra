@@ -375,7 +375,7 @@ dropWhile predicate list =
 The function can be used in two possible scenarios:
 
  * Reduction while accumulation value satisfies certain criteria 
- * More optimized replacement for 
+ * More optimized solution for a situation, when a reduction is needed only until the first unacceptable value in the list.
     list 
         |> takeWhile someFunction1
         |> foldl someFunction2 someInitialValue
