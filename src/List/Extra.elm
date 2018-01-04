@@ -12,6 +12,7 @@ module List.Extra
         , reverseMap
         , takeWhile
         , dropWhile
+        , foldlWhile
         , unique
         , uniqueBy
         , allDifferent
@@ -370,6 +371,38 @@ dropWhile predicate list =
             else
                 list
 
+{-| Reduce a list from the left while result is valid.
+The function can be used in two possible scenarios:
+
+* More optimazed replacement for list |> takeWhile f |> foldl g starter
+* Reduction while accomulation value satisfies certain criteria
+
+    accomulateColor colorSum pixelColor =
+        let
+            newColorSum = colorSum + pixelColor
+        in
+            if newColorSum > 255 the
+                Nothing
+            else 
+                Just newColorSum
+
+    [10, 55, 63, 78]
+        |> foldlWhile accomulateColor 0
+-}
+foldlWhile : (a -> b -> Maybe b) -> b -> List a -> b
+foldlWhile func acc list =
+  case list of
+    [] ->
+      acc
+
+    x :: xs ->
+        case func x acc of
+            Just nextValue ->
+                foldlWhile func nextValue xs
+
+            Nothing ->
+                acc
+      
 
 {-| Remove duplicate values, keeping the first instance of each element which appears more than once.
 
