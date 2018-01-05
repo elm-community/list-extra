@@ -150,8 +150,16 @@ import Tuple exposing (first, second)
 
 -}
 last : List a -> Maybe a
-last =
-    foldl1 (flip always)
+last items =
+    case items of
+        [] ->
+            Nothing
+
+        [ x ] ->
+            Just x
+
+        _ :: rest ->
+            last rest
 
 
 {-| Return all elements of the list except the last one.
