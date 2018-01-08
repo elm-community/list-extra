@@ -177,7 +177,7 @@ all =
                     Expect.equal (foldl1 max []) Nothing
             , test "computes left to right difference" <|
                 \() ->
-                    Expect.equal (foldl1 (-) [ 1, 2, 3 ]) (Just -4)
+                    Expect.equal (foldl1 (-) [ 1, 2, 3 ]) (Just 2)
             ]
         , describe "foldr1" <|
             [ test "computes minimum" <|

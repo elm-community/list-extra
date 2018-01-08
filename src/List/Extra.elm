@@ -151,7 +151,7 @@ import Tuple exposing (first, second)
 -}
 last : List a -> Maybe a
 last =
-    foldl1 (flip always)
+    foldl1 always
 
 
 {-| Return all elements of the list except the last one.
@@ -931,23 +931,17 @@ reverseAppend list1 list2 =
 
     foldl1 max [1,2,3,2,1] == Just 3
     foldl1 max [] == Nothing
-    foldl1 (-) [1,2,3] == Just -4
+    foldl1 (-) [1,2,3] == Just 2
 
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
-foldl1 f xs =
-    let
-        mf x m =
-            Just
-                (case m of
-                    Nothing ->
-                        x
+foldl1 func list =
+    case list of
+        [] ->
+            Nothing
 
-                    Just y ->
-                        f y x
-                )
-    in
-        List.foldl mf Nothing xs
+        x :: xs ->
+            Just (List.foldl func x xs)
 
 
 {-| Variant of `foldr` that has no starting value argument and treats the last element of the list as its starting value. If the list is empty, return `Nothing`.
