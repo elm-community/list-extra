@@ -952,19 +952,8 @@ foldl1 func list =
 
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
-foldr1 f xs =
-    let
-        mf x m =
-            Just
-                (case m of
-                    Nothing ->
-                        x
-
-                    Just y ->
-                        f x y
-                )
-    in
-        List.foldr mf Nothing xs
+foldr1 func list =
+    foldl1 func (List.reverse list)
 
 
 {-| Variant of `foldl` that passes the index of the current element to the step function. `indexedFoldl` is to `List.foldl` as `List.indexedMap` is to `List.map`.
