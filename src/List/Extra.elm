@@ -929,9 +929,9 @@ reverseAppend list1 list2 =
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
 
-    foldl1 max [1,2,3,2,1] == Just 3
-    foldl1 max [] == Nothing
-    foldl1 (-) [1,2,3] == Just 2
+    foldl1 (-) [1,2,3,4] == Just 2
+    foldl1 (++) ["a","b","c"] == Just "cba"
+    foldl1 min [] == Nothing
 
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
@@ -946,9 +946,9 @@ foldl1 func list =
 
 {-| Variant of `foldr` that has no starting value argument and treats the last element of the list as its starting value. If the list is empty, return `Nothing`.
 
-    foldr1 min [1,2,3,2,1] == Just 1
+    foldr1 (-) [1,2,3,4] == Just -2
+    foldr1 (++) ["a","b","c"] == Just "abc"
     foldr1 min [] == Nothing
-    foldr1 (-) [1,2,3] == Just 2
 
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
