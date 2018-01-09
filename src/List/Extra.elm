@@ -169,13 +169,11 @@ last items =
 
 -}
 init : List a -> Maybe (List a)
-init =
-    let
-        maybe : b -> (List a -> b) -> Maybe (List a) -> b
-        maybe d f =
-            Maybe.withDefault d << Maybe.map f
-    in
-        foldr (\x -> maybe [] ((::) x) >> Just) Nothing
+init items =
+    items
+        |> List.reverse
+        |> List.tail
+        |> Maybe.map List.reverse
 
 
 {-| Returns `Just` the element at the given index in the list,
