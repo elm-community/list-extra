@@ -189,7 +189,7 @@ all =
             , test "computes right to left difference" <|
                 \() ->
                     Expect.equal (foldr1 (-) [ 1, 2, 3, 4 ]) (Just -2)
-            , test "falls back to Nothing" <|
+            , test "concats properly" <|
                 \() ->
                     Expect.equal (foldr1 (++) [ "a", "b", "c" ]) (Just "abc")
             , test "falls back to Nothing" <|
