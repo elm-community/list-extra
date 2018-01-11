@@ -150,8 +150,16 @@ import Tuple exposing (first, second)
 
 -}
 last : List a -> Maybe a
-last =
-    foldl1 always
+last items =
+    case items of
+        [] ->
+            Nothing
+
+        [ x ] ->
+            Just x
+
+        _ :: rest ->
+            last rest
 
 
 {-| Return all elements of the list except the last one.
@@ -161,13 +169,11 @@ last =
 
 -}
 init : List a -> Maybe (List a)
-init =
-    let
-        maybe : b -> (List a -> b) -> Maybe (List a) -> b
-        maybe d f =
-            Maybe.withDefault d << Maybe.map f
-    in
-        foldr (\x -> maybe [] ((::) x) >> Just) Nothing
+init items =
+    items
+        |> List.reverse
+        |> List.tail
+        |> Maybe.map List.reverse
 
 
 {-| Returns `Just` the element at the given index in the list,
