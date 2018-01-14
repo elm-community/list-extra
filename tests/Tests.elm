@@ -234,7 +234,7 @@ all =
             , test "running total" <|
                 \() ->
                     Expect.equal
-                        (mapAccuml (\a x -> ( a + x, ( x, a + x ))) 0 [ 2, 4, 8 ])
+                        (mapAccuml (\a x -> ( a + x, ( x, a + x ) )) 0 [ 2, 4, 8 ])
                         ( 14, [ ( 2, 2 ), ( 4, 6 ), ( 8, 14 ) ] )
             , test "works for very long list (i.e. is call stack size safe)" <|
                 \() ->
@@ -256,8 +256,8 @@ all =
             , test "add count down" <|
                 \() ->
                     Expect.equal
-                        (mapAccumr (\a x -> ( a + 1, ( x, a ))) 0 [ 2, 4, 8 ])
-                        ( 3, [ ( 2, 2 ), ( 4, 1), ( 8, 0 ) ] )
+                        (mapAccumr (\a x -> ( a + 1, ( x, a ) )) 0 [ 2, 4, 8 ])
+                        ( 3, [ ( 2, 2 ), ( 4, 1 ), ( 8, 0 ) ] )
             , test "works for very long list (i.e. is call stack size safe)" <|
                 \() ->
                     Expect.equal

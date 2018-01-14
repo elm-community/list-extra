@@ -1085,12 +1085,13 @@ and returning a final value of this accumulator together with the new list.
 
 Add a running total to a list of numbers:
 
-    mapAccuml (\a x -> ( a + x, ( x, a + x ))) 0 [ 2, 4, 8 ] == ( 14, [ ( 2, 2 ), ( 4, 6), (8, 14) ] )
+    mapAccuml (\a x -> ( a + x, ( x, a + x ) )) 0 [ 2, 4, 8 ]
+        == ( 14, [ ( 2, 2 ), ( 4, 6 ), ( 8, 14 ) ] )
 
 Map number by multiplying with accumulated sum:
 
-    mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ] == ( 19, [ 10, 28, 88 ] )
-
+    mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ]
+        == ( 19, [ 10, 28, 88 ] )
 
 -}
 mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
@@ -1125,11 +1126,13 @@ and returning a final value of this accumulator together with the new list.
 
 Add a count of remaining elements:
 
-    mapAccumr (\a x -> ( a + 1, ( x, a ))) 0 [ 2, 4, 8 ] == ( 3, [ ( 2, 2 ), ( 4, 1), ( 8, 0 ) ] )
+    mapAccumr (\a x -> ( a + 1, ( x, a ) )) 0 [ 2, 4, 8 ]
+        == ( 3, [ ( 2, 2 ), ( 4, 1 ), ( 8, 0 ) ] )
 
 Map number by multiplying with right-to-left accumulated sum:
 
-    mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ] == ( 19, [ 34, 52, 40 ] )
+    mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ]
+        == ( 19, [ 34, 52, 40 ] )
 
 -}
 mapAccumr : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
@@ -1295,7 +1298,7 @@ The equality test should be an [equivalence relation](https://en.wikipedia.org/w
   - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
   - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
 
-For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do *not* write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
 
 For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
