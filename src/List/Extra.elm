@@ -1075,7 +1075,22 @@ scanr1 f xs_ =
 function to each element of a list, passing an accumulating parameter from left to right,
 and returning a final value of this accumulator together with the new list.
 
-    mapAccuml (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ] == ( 19, [ 10, 28, 88 ] )
+    mapAccuml f a0 [ x1, x2, x3 ] == ( a3, [ y1, y2, y3 ] )
+
+    --        x1    x2    x3
+    --        |     |     |
+    --  a0 -- f --- f --- f -> a3
+    --        |     |     |
+    --        y1    y2    y3
+
+Add a running total to a list of numbers:
+
+    mapAccuml (\a x -> ( a + x, ( x, a + x ))) 0 [ 2, 4, 8 ] == ( 14, [ ( 2, 2 ), ( 4, 6), (8, 14) ] )
+
+Map number by multiplying with accumulated sum:
+
+    mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ] == ( 19, [ 10, 28, 88 ] )
+
 
 -}
 mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
@@ -1096,11 +1111,25 @@ mapAccuml f acc0 list =
         ( accFinal, List.reverse generatedList )
 
 
-{-| The mapAccumr function behaves like a combination of map and foldl; it applies a
+{-| The mapAccumr function behaves like a combination of map and foldr; it applies a
 function to each element of a list, passing an accumulating parameter from right to left,
 and returning a final value of this accumulator together with the new list.
 
-    mapAccumr (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ] == ( 19, [ 34, 52, 40 ] )
+    mapAccumr f a0 [ x1, x2, x3 ] == ( a3, [ y1, y2, y3 ] )
+
+    --        x1    x2    x3
+    --        |     |     |
+    --  a3 <- f --- f --- f -- a0
+    --        |     |     |
+    --        y1    y2    y3
+
+Add a count of remaining elements:
+
+    mapAccumr (\a x -> ( a + 1, ( x, a ))) 0 [ 2, 4, 8 ] == ( 3, [ ( 2, 2 ), ( 4, 1), ( 8, 0 ) ] )
+
+Map number by multiplying with right-to-left accumulated sum:
+
+    mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ] == ( 19, [ 34, 52, 40 ] )
 
 -}
 mapAccumr : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )

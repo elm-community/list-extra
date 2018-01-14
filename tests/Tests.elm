@@ -224,39 +224,44 @@ all =
             [ test "on empty list" <|
                 \() ->
                     Expect.equal
-                        (mapAccuml (\x y -> ( x + y, x * y )) 5 [])
+                        (mapAccuml (\a x -> ( a + x, a * x )) 5 [])
                         ( 5, [] )
             , test "accumulate sum and map product" <|
                 \() ->
                     Expect.equal
-                        (mapAccuml (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ])
+                        (mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ])
                         ( 19, [ 10, 28, 88 ] )
+            , test "running total" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\a x -> ( a + x, ( x, a + x ))) 0 [ 2, 4, 8 ])
+                        ( 14, [ ( 2, 2 ), ( 4, 6 ), ( 8, 14 ) ] )
             , test "works for very long list (i.e. is call stack size safe)" <|
                 \() ->
                     Expect.equal
-                        (mapAccuml (\x y -> ( x + y, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        (mapAccuml (\a x -> ( a + x, () )) 0 (List.range 1 100000) |> Tuple.first)
                         5000050000
-            , test "add running total" <|
-                \() ->
-                    Expect.equal
-                        (mapAccuml (\x y -> ( x + y, ( y, x ) )) 1 [ 3, 2, 3 ])
-                        ( 9, [ ( 3, 1 ), ( 2, 4 ), ( 3, 6 ) ] )
             ]
         , describe "mapAccumr" <|
             [ test "on empty list" <|
                 \() ->
                     Expect.equal
-                        (mapAccumr (\x y -> ( x + y, x * y )) 5 [])
+                        (mapAccumr (\a x -> ( a + x, a * x )) 5 [])
                         ( 5, [] )
             , test "accumulate sum and map product" <|
                 \() ->
                     Expect.equal
-                        (mapAccumr (\x y -> ( x + y, x * y )) 5 [ 2, 4, 8 ])
+                        (mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ])
                         ( 19, [ 34, 52, 40 ] )
+            , test "add count down" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\a x -> ( a + 1, ( x, a ))) 0 [ 2, 4, 8 ])
+                        ( 3, [ ( 2, 2 ), ( 4, 1), ( 8, 0 ) ] )
             , test "works for very long list (i.e. is call stack size safe)" <|
                 \() ->
                     Expect.equal
-                        (mapAccumr (\x y -> ( x + y, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        (mapAccumr (\a x -> ( a + x, () )) 0 (List.range 1 100000) |> Tuple.first)
                         5000050000
             ]
         , describe "unfoldr" <|
