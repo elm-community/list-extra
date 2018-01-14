@@ -1079,21 +1079,21 @@ and returning a final value of this accumulator together with the new list.
 
 -}
 mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
-mapAccuml f accu0 list =
+mapAccuml f acc0 list =
     let
-        ( accuFinal, generatedList ) =
+        ( accFinal, generatedList ) =
             List.foldl
-                (\x ( accu1, ys ) ->
+                (\x ( acc1, ys ) ->
                     let
-                        ( accu2, y ) =
-                            f accu1 x
+                        ( acc2, y ) =
+                            f acc1 x
                     in
-                        ( accu2, y :: ys )
+                        ( acc2, y :: ys )
                 )
-                ( accu0, [] )
+                ( acc0, [] )
                 list
     in
-        ( accuFinal, List.reverse generatedList )
+        ( accFinal, List.reverse generatedList )
 
 
 {-| The mapAccumr function behaves like a combination of map and foldl; it applies a
@@ -1104,16 +1104,16 @@ and returning a final value of this accumulator together with the new list.
 
 -}
 mapAccumr : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
-mapAccumr f accu0 list =
+mapAccumr f acc0 list =
     List.foldr
-        (\x ( accu1, ys ) ->
+        (\x ( acc1, ys ) ->
             let
-                ( accu2, y ) =
-                    f accu1 x
+                ( acc2, y ) =
+                    f acc1 x
             in
-                ( accu2, y :: ys )
+                ( acc2, y :: ys )
         )
-        ( accu0, [] )
+        ( acc0, [] )
         list
 
 
