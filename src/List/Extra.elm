@@ -43,6 +43,8 @@ module List.Extra
         , scanl1
         , scanr
         , scanr1
+        , mapAccuml
+        , mapAccumr
         , unfoldr
         , splitAt
         , splitWhen
@@ -104,7 +106,7 @@ module List.Extra
 
 # Building lists
 
-@docs scanl1, scanr, scanr1, unfoldr, iterate, initialize, cycle
+@docs scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
 
 
 # Sublists
@@ -1080,6 +1082,84 @@ scanr1 f xs_ =
                     []
 
 
+{-| The mapAccuml function behaves like a combination of map and foldl; it applies a
+function to each element of a list, passing an accumulating parameter from left to right,
+and returning a final value of this accumulator together with the new list.
+
+    mapAccuml f a0 [ x1, x2, x3 ] == ( a3, [ y1, y2, y3 ] )
+
+    --        x1    x2    x3
+    --        |     |     |
+    --  a0 -- f --- f --- f -> a3
+    --        |     |     |
+    --        y1    y2    y3
+
+Add a running total to a list of numbers:
+
+    mapAccuml (\a x -> ( a + x, ( x, a + x ) )) 0 [ 2, 4, 8 ]
+        == ( 14, [ ( 2, 2 ), ( 4, 6 ), ( 8, 14 ) ] )
+
+Map number by multiplying with accumulated sum:
+
+    mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ]
+        == ( 19, [ 10, 28, 88 ] )
+
+-}
+mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
+mapAccuml f acc0 list =
+    let
+        ( accFinal, generatedList ) =
+            List.foldl
+                (\x ( acc1, ys ) ->
+                    let
+                        ( acc2, y ) =
+                            f acc1 x
+                    in
+                        ( acc2, y :: ys )
+                )
+                ( acc0, [] )
+                list
+    in
+        ( accFinal, List.reverse generatedList )
+
+
+{-| The mapAccumr function behaves like a combination of map and foldr; it applies a
+function to each element of a list, passing an accumulating parameter from right to left,
+and returning a final value of this accumulator together with the new list.
+
+    mapAccumr f a0 [ x1, x2, x3 ] == ( a3, [ y1, y2, y3 ] )
+
+    --        x1    x2    x3
+    --        |     |     |
+    --  a3 <- f --- f --- f -- a0
+    --        |     |     |
+    --        y1    y2    y3
+
+Add a count of remaining elements:
+
+    mapAccumr (\a x -> ( a + 1, ( x, a ) )) 0 [ 2, 4, 8 ]
+        == ( 3, [ ( 2, 2 ), ( 4, 1 ), ( 8, 0 ) ] )
+
+Map number by multiplying with right-to-left accumulated sum:
+
+    mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ]
+        == ( 19, [ 34, 52, 40 ] )
+
+-}
+mapAccumr : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
+mapAccumr f acc0 list =
+    List.foldr
+        (\x ( acc1, ys ) ->
+            let
+                ( acc2, y ) =
+                    f acc1 x
+            in
+                ( acc2, y :: ys )
+        )
+        ( acc0, [] )
+        list
+
+
 {-| The `unfoldr` function is "dual" to `foldr`. `foldr` reduces a list to a summary value, `unfoldr` builds a list from a seed. The function takes a function and a starting element. It applies the function to the element. If the result is `Just (a, b)`, `a` is accumulated and the function is applied to `b`. If the result is `Nothing`, the list accumulated so far is returned.
 
     unfoldr (\b -> if b == 0 then Nothing else Just (b, b-1)) 5 == [5,4,3,2,1]
@@ -1229,7 +1309,7 @@ The equality test should be an [equivalence relation](https://en.wikipedia.org/w
   - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
   - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
 
-For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do *not* write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
 
 For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
