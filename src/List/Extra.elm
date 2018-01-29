@@ -170,10 +170,15 @@ last items =
 -}
 init : List a -> Maybe (List a)
 init items =
-    items
-        |> List.reverse
-        |> List.tail
-        |> Maybe.map List.reverse
+    case items of
+        [] ->
+            Nothing
+
+        nonEmptyList ->
+            nonEmptyList
+                |> List.reverse
+                |> List.tail
+                |> Maybe.map List.reverse
 
 
 {-| Returns `Just` the element at the given index in the list,
