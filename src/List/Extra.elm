@@ -946,6 +946,7 @@ reverseAppend list1 list2 =
     foldl1 max [] == Nothing
     foldl1 (-) [1,2,3] == Just -4
 
+    ** PLEASE NOTE ** the type signature of `foldl1` is inconsistent with the elm core implementation with `List.foldl`. Sorry. `List.foldl` takes `a -> b -> b`, where the `b`s are the accumulated value. `List.Extra.foldl1` treats the first parameter as the accumulated value not the second. `b -> a -> b`.
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
 foldl1 f xs =
@@ -968,7 +969,6 @@ foldl1 f xs =
     foldr1 min [1,2,3,2,1] == Just 1
     foldr1 min [] == Nothing
     foldr1 (-) [1,2,3] == Just 2
-
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
 foldr1 f xs =
