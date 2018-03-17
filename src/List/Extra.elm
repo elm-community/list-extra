@@ -36,6 +36,7 @@ module List.Extra
         , permutations
         , interweave
         , cartesianProduct
+        , cartesianProduct2
         , foldl1
         , foldr1
         , indexedFoldl
@@ -96,7 +97,7 @@ module List.Extra
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, cartesianProduct2
 
 
 # Folds
@@ -933,6 +934,24 @@ cartesianProduct ll =
 
         xs :: xss ->
             lift2 (::) xs (cartesianProduct xss)
+
+
+{-| Return the cartesian product of two lists as a list of pairs (not a list of lists).
+This provides additional type safety when you know you are dealing with exactly two lists.
+If one list is empty, the result is an empty list.
+
+    cartesianProduct2 [1, 2] ["a", "b"] == [(1, "a"), (1, "b"), (2, "a"), (2, "b")]
+    cartesianProduct2 [1, 2] [] == []
+
+-}
+cartesianProduct2 : List a -> List b -> List ( a, b )
+cartesianProduct2 xs ys =
+    case xs of
+        x :: xs ->
+            List.map (\y -> ( x, y )) ys ++ cartesianProduct2 xs ys
+
+        [] ->
+            []
 
 
 reverseAppend : List a -> List a -> List a
