@@ -168,6 +168,17 @@ all =
                 \() ->
                     Expect.equal (cartesianProduct []) [ [] ]
             ]
+        , describe "cartesianProduct2" <|
+            [ test "computes the cartesian product of lists of different length" <|
+                \() ->
+                    Expect.equal (cartesianProduct2 [1, 2, 3] ["a", "b"]) [(1,"a"),(1,"b"),(2,"a"),(2,"b"),(3,"a"),(3,"b")]
+            , test "computes the cartesian product of lists f different length" <|
+                \() ->
+                    Expect.equal (cartesianProduct2 [1, 2] ["a", "b"]) [(1, "a"), (1, "b"), (2, "a"), (2, "b")]
+            , test "computes the cartesian product of an empty list" <|
+                \() ->
+                    Expect.equal (cartesianProduct2 [ 1, 2 ] []) []
+            ]
         , describe "foldl1" <|
             [ test "computes maximum" <|
                 \() ->
