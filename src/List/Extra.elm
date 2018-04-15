@@ -84,6 +84,7 @@ module List.Extra
         , greedyGroupsOf
         , greedyGroupsOfWithStep
         , groupsOfVarying
+        , removeSubsequentDuplicates
         )
 
 {-| Convenience functions for working with List
@@ -91,7 +92,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, removeSubsequentDuplicates, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -684,6 +685,19 @@ remove x xs =
                 ys
             else
                 y :: remove x ys
+
+
+{-| Remove Adjacent Duplicates.
+
+    removeSubsequentDuplicates [ 1, 2, 2, 3, 2, 3, 3, 3, 1 ] == [ 1, 2, 3, 2, 3, 1 ]
+
+-}
+removeSubsequentDuplicates : List a -> List a
+removeSubsequentDuplicates items =
+    List.Extra.group items
+        |> List.map (\x -> List.take 1 x)
+        |> List.concat
+
 
 
 {-| Set a value in a list by index. Return the original list if the index is out of range.
