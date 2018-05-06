@@ -673,4 +673,12 @@ all =
                 \() ->
                     Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
+        , describe "unconsLast"
+            [ test "removes last element of list" <|
+                \() ->
+                    Expect.equal (unconsLast [1,2,3]) (Just (3, [1,2]))
+            , test "returns Nothing if the list is empty" <|
+                \() ->
+                    Expect.equal (unconsLast []) Nothing
+            ]
         ]
