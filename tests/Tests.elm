@@ -226,6 +226,50 @@ all =
                 \() ->
                     Expect.equal (scanr1 (flip (-)) [ 1, 2, 3 ]) [ 0, 1, 3 ]
             ]
+        , describe "mapAccuml" <|
+            [ test "on empty list" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\a x -> ( a + x, a * x )) 5 [])
+                        ( 5, [] )
+            , test "accumulate sum and map product" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ])
+                        ( 19, [ 10, 28, 88 ] )
+            , test "running total" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\a x -> ( a + x, ( x, a + x ) )) 0 [ 2, 4, 8 ])
+                        ( 14, [ ( 2, 2 ), ( 4, 6 ), ( 8, 14 ) ] )
+            , test "works for very long list (i.e. is call stack size safe)" <|
+                \() ->
+                    Expect.equal
+                        (mapAccuml (\a x -> ( a + x, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        5000050000
+            ]
+        , describe "mapAccumr" <|
+            [ test "on empty list" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\a x -> ( a + x, a * x )) 5 [])
+                        ( 5, [] )
+            , test "accumulate sum and map product" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\a x -> ( a + x, a * x )) 5 [ 2, 4, 8 ])
+                        ( 19, [ 34, 52, 40 ] )
+            , test "add count down" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\a x -> ( a + 1, ( x, a ) )) 0 [ 2, 4, 8 ])
+                        ( 3, [ ( 2, 2 ), ( 4, 1 ), ( 8, 0 ) ] )
+            , test "works for very long list (i.e. is call stack size safe)" <|
+                \() ->
+                    Expect.equal
+                        (mapAccumr (\a x -> ( a + x, () )) 0 (List.range 1 100000) |> Tuple.first)
+                        5000050000
+            ]
         , describe "unfoldr" <|
             [ test "builds a decreasing list from a seed" <|
                 \() ->
