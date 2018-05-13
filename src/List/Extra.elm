@@ -16,7 +16,7 @@ module List.Extra
         , uniqueBy
         , allDifferent
         , allDifferentBy
-        , replaceIf
+        , setIf
         , setAt
         , swapAt
         , stableSortWith
@@ -91,7 +91,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -606,8 +606,8 @@ count predicate =
 
 {-| Replace all values that satisfy a predicate with a replacement value.
 -}
-replaceIf : (a -> Bool) -> a -> List a -> List a
-replaceIf predicate replacement list =
+setIf : (a -> Bool) -> a -> List a -> List a
+setIf predicate replacement list =
     updateIf predicate (always replacement) list
 
 
