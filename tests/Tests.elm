@@ -679,4 +679,15 @@ all =
                 \() ->
                     Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
+        , describe "setIf"
+            [ test "empty list" <|
+                \() ->
+                    Expect.equal (setIf ((==) 1) 0 []) []
+            , test "set all" <|
+                \() ->
+                    Expect.equal (setIf (always True) 2 [ 1, 2, 3, 4 ]) [ 2, 2, 2, 2 ]
+            , test "set only evens" <|
+                \() ->
+                    Expect.equal (setIf (\x -> x % 2 == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
+            ]
         ]
