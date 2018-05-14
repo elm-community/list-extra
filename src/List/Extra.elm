@@ -12,6 +12,7 @@ module List.Extra
         , reverseMap
         , takeWhile
         , dropWhile
+        , foldlWhile
         , unique
         , uniqueBy
         , allDifferent
@@ -91,7 +92,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, foldlWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -383,6 +384,42 @@ dropWhile predicate list =
             else
                 list
 
+{-| Reduce a list from the left while result is valid.
+The function can be used in two possible scenarios:
+
+ * Reduction while accumulation value satisfies certain criteria 
+ * More optimized solution for a situation, when a reduction is needed only until the first unacceptable value in the list.
+    list 
+        |> takeWhile someFunction1
+        |> foldl someFunction2 someInitialValue
+
+
+    accomulateColor colorSum pixelColor =
+        let
+            newColorSum = colorSum + pixelColor
+        in
+            if newColorSum > 255 the
+                Nothing
+            else 
+                Just newColorSum
+
+    [10, 55, 63, 78]
+        |> foldlWhile accomulateColor 0
+-}
+foldlWhile : (a -> b -> Maybe b) -> b -> List a -> b
+foldlWhile func acc list =
+  case list of
+    [] ->
+      acc
+
+    x :: xs ->
+        case func x acc of
+            Just nextValue ->
+                foldlWhile func nextValue xs
+
+            Nothing ->
+                acc
+      
 
 {-| Remove duplicate values, keeping the first instance of each element which appears more than once.
 

@@ -370,6 +370,34 @@ all =
                 \() ->
                     Expect.equal (takeWhile ((>) 19999) (range 1 20000)) (range 1 19998)
             ]
+        , describe "foldlWhile" <|
+            [ test "empty list" <|
+                \() ->
+                    Expect.equal ([] |> foldlWhile (\ v sum -> Just v) 0 ) 0
+            , test "normaly fold" <|
+                \() ->
+                    Expect.equal ([1, 2, 3] |> foldlWhile (\ v sum -> Just (v + sum)) 0 ) 6
+            , test "fold while value is valid" <|
+                \() ->
+                    let
+                        sumLessThan3 a b =
+                            if a < 3 then 
+                                Just <| a + b
+                            else 
+                                Nothing
+                    in
+                        Expect.equal ([1, 2, 3] |> foldlWhile sumLessThan3 0 ) 3
+            , test "fold while result is valid" <|
+                \() ->
+                    let
+                        sumIfLessThan3 a b =
+                            if b < 3 then 
+                                Just <| a + b
+                            else 
+                                Nothing
+                    in
+                        Expect.equal ([1, 2, 3] |> foldlWhile sumIfLessThan3 0 ) 3
+            ]
         , describe "span" <|
             [ test "splits in the middle of the list" <|
                 \() ->
