@@ -53,7 +53,6 @@ module List.Extra
         , remove
         , removeAt
         , removeIfIndex
-        , replaceIf
         , reverseMap
         , scanl
         , scanl1
@@ -259,11 +258,11 @@ cycle len list =
     else if cycleLength < len then
         List.reverse
             (reverseAppend
-                (List.keep (remainderBy cycleLength len) list)
+                (List.take (remainderBy cycleLength len) list)
                 (cycleHelp [] (len // cycleLength) list)
             )
     else
-        List.keep len list
+        List.take len list
 
 
 cycleHelp : List a -> Int -> List a -> List a
@@ -631,7 +630,7 @@ updateAt index fn list =
     else
         let
             head =
-                List.keep index list
+                List.take index list
 
             tail =
                 List.drop index list
@@ -755,7 +754,7 @@ removeAt index l =
     else
         let
             head =
-                List.keep index l
+                List.take index l
 
             tail =
                 List.drop index l |> List.tail
@@ -1185,7 +1184,7 @@ unfoldr f seed =
 -}
 splitAt : Int -> List a -> ( List a, List a )
 splitAt n xs =
-    ( keep n xs, drop n xs )
+    ( take n xs, drop n xs )
 
 
 {-| Attempts to split the list at the first element where the given predicate is true. If the predicate is not true for any elements in the list, return nothing. Otherwise, return the split list.
@@ -1581,7 +1580,7 @@ groupsOfWithStep : Int -> Int -> List a -> List (List a)
 groupsOfWithStep size step xs =
     let
         thisGroup =
-            List.keep size xs
+            List.take size xs
 
         xs_ =
             List.drop step xs
@@ -1664,6 +1663,6 @@ greedyGroupsOfWithStep size step xs =
             List.length xs > 0
     in
     if okayArgs && okayXs then
-        List.keep size xs :: greedyGroupsOfWithStep size step xs_
+        List.take size xs :: greedyGroupsOfWithStep size step xs_
     else
         []
