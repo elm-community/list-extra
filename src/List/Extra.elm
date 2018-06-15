@@ -17,7 +17,7 @@ module List.Extra
         , uniqueBy
         , allDifferent
         , allDifferentBy
-        , replaceIf
+        , setIf
         , setAt
         , swapAt
         , stableSortWith
@@ -92,7 +92,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, (!!), uncons, unconsLast, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, replaceIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, (!!), uncons, unconsLast, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -620,8 +620,8 @@ count predicate =
 
 {-| Replace all values that satisfy a predicate with a replacement value.
 -}
-replaceIf : (a -> Bool) -> a -> List a -> List a
-replaceIf predicate replacement list =
+setIf : (a -> Bool) -> a -> List a -> List a
+setIf predicate replacement list =
     updateIf predicate (always replacement) list
 
 
@@ -956,48 +956,31 @@ reverseAppend list1 list2 =
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
 
-    foldl1 max [1,2,3,2,1] == Just 3
-    foldl1 max [] == Nothing
-    foldl1 (-) [1,2,3] == Just -4
+    foldl1 (-) [1,2,3,4] == Just 2
+    foldl1 (++) ["a","b","c"] == Just "cba"
+    foldl1 min [] == Nothing
 
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
-foldl1 f xs =
-    let
-        mf x m =
-            Just
-                (case m of
-                    Nothing ->
-                        x
+foldl1 func list =
+    case list of
+        [] ->
+            Nothing
 
-                    Just y ->
-                        f y x
-                )
-    in
-        List.foldl mf Nothing xs
+        x :: xs ->
+            Just (List.foldl func x xs)
 
 
 {-| Variant of `foldr` that has no starting value argument and treats the last element of the list as its starting value. If the list is empty, return `Nothing`.
 
-    foldr1 min [1,2,3,2,1] == Just 1
+    foldr1 (-) [1,2,3,4] == Just -2
+    foldr1 (++) ["a","b","c"] == Just "abc"
     foldr1 min [] == Nothing
-    foldr1 (-) [1,2,3] == Just 2
 
 -}
 foldr1 : (a -> a -> a) -> List a -> Maybe a
-foldr1 f xs =
-    let
-        mf x m =
-            Just
-                (case m of
-                    Nothing ->
-                        x
-
-                    Just y ->
-                        f x y
-                )
-    in
-        List.foldr mf Nothing xs
+foldr1 func list =
+    foldl1 func (List.reverse list)
 
 
 {-| Variant of `foldl` that passes the index of the current element to the step function. `indexedFoldl` is to `List.foldl` as `List.indexedMap` is to `List.map`.

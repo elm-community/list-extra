@@ -169,26 +169,32 @@ all =
                     Expect.equal (cartesianProduct []) [ [] ]
             ]
         , describe "foldl1" <|
-            [ test "computes maximum" <|
+            [ test "computes minimum" <|
                 \() ->
-                    Expect.equal (foldl1 max [ 1, 2, 3, 2, 1 ]) (Just 3)
-            , test "falls back to Nothing" <|
-                \() ->
-                    Expect.equal (foldl1 max []) Nothing
+                    Expect.equal (foldl1 min [ 1, 2, 3, 2, 1 ]) (Just 1)
             , test "computes left to right difference" <|
                 \() ->
-                    Expect.equal (foldl1 (-) [ 1, 2, 3 ]) (Just -4)
+                    Expect.equal (foldl1 (-) [ 1, 2, 3, 4 ]) (Just 2)
+            , test "concats in reverse" <|
+                \() ->
+                    Expect.equal (foldl1 (++) [ "a", "b", "c" ]) (Just "cba")
+            , test "falls back to Nothing" <|
+                \() ->
+                    Expect.equal (foldl1 min []) Nothing
             ]
         , describe "foldr1" <|
             [ test "computes minimum" <|
                 \() ->
                     Expect.equal (foldr1 min [ 1, 2, 3, 2, 1 ]) (Just 1)
+            , test "computes right to left difference" <|
+                \() ->
+                    Expect.equal (foldr1 (-) [ 1, 2, 3, 4 ]) (Just -2)
+            , test "concats properly" <|
+                \() ->
+                    Expect.equal (foldr1 (++) [ "a", "b", "c" ]) (Just "abc")
             , test "falls back to Nothing" <|
                 \() ->
                     Expect.equal (foldr1 min []) Nothing
-            , test "computes right to left difference" <|
-                \() ->
-                    Expect.equal (foldr1 (-) [ 1, 2, 3 ]) (Just 2)
             ]
         , describe "scanl1" <|
             [ test "computes left to right iterative sum" <|
@@ -680,5 +686,16 @@ all =
             , test "returns Nothing if the list is empty" <|
                 \() ->
                     Expect.equal (unconsLast []) Nothing
+            ]
+        , describe "setIf"
+            [ test "empty list" <|
+                \() ->
+                    Expect.equal (setIf ((==) 1) 0 []) []
+            , test "set all" <|
+                \() ->
+                    Expect.equal (setIf (always True) 2 [ 1, 2, 3, 4 ]) [ 2, 2, 2, 2 ]
+            , test "set only evens" <|
+                \() ->
+                    Expect.equal (setIf (\x -> x % 2 == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
             ]
         ]
