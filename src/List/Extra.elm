@@ -306,10 +306,14 @@ uncons xs =
 
 -}
 unconsLast : List a -> Maybe ( a, List a )
-unconsLast =
-    List.reverse
-        >> uncons
-        >> Maybe.andThen (\( lastElem, reversedList ) -> Just ( lastElem, (List.reverse reversedList) ))
+unconsLast list =
+    case List.reverse list of
+        [] ->
+            Nothing
+            
+        last :: rest ->
+            (last, List.reverse rest)
+                |> Just
 
 
 {-| Find the first maximum element in a list using a comparable transformation
