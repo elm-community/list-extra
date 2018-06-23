@@ -74,6 +74,7 @@ module List.Extra
         , takeWhileRight
         , transpose
         , uncons
+        , unconsLast
         , unfoldr
         , unique
         , uniqueBy
@@ -89,7 +90,7 @@ module List.Extra
 
 # Basics
 
-@docs last, init, getAt, uncons, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconstLast, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -287,6 +288,23 @@ uncons list =
 
         first :: rest ->
             Just ( first, rest )
+
+
+{-| Decompose a list into its body and last element. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is the last element and `xs` is the body.
+
+    unconsLast [1,2,3] == Just (3, [1,2])
+    unconsLast [] = Nothing
+
+-}
+unconsLast : List a -> Maybe ( a, List a )
+unconsLast list =
+    case List.reverse list of
+        [] ->
+            Nothing
+
+        last_ :: rest ->
+            ( last_, List.reverse rest )
+                |> Just
 
 
 {-| Find the first maximum element in a list using a comparable transformation
