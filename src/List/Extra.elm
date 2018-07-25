@@ -1295,7 +1295,7 @@ stripPrefix prefix xs =
     group [1,2,2,3,3,3,2,2,1] == [[1],[2,2],[3,3,3],[2,2],[1]]
 
 -}
-group : List a -> List (List a)
+group : List a -> List (a, List a)
 group =
     groupWhile (==)
 
@@ -1315,7 +1315,7 @@ For non-equivalent relations `groupWhile` has non-intuitive behavior. For exampl
 For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
 
 -}
-groupWhile : (a -> a -> Bool) -> List a -> List (List a)
+groupWhile : (a -> a -> Bool) -> List a -> List (a, List a)
 groupWhile eq xs_ =
     case xs_ of
         [] ->
@@ -1326,7 +1326,7 @@ groupWhile eq xs_ =
                 ( ys, zs ) =
                     span (eq x) xs
             in
-                (x :: ys) :: groupWhile eq zs
+                (x , ys) :: groupWhile eq zs
 
 
 {-| Group elements together, using a custom comparison test. Start a new group each time the comparison test doesn't hold for two adjacent elements.

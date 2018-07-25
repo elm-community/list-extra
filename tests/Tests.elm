@@ -412,19 +412,20 @@ all =
         , describe "group" <|
             [ test "groups elements correctly" <|
                 \() ->
-                    Expect.equal (group [ 1, 2, 2, 3, 3, 3, 2, 2, 1 ]) [ [ 1 ], [ 2, 2 ], [ 3, 3, 3 ], [ 2, 2 ], [ 1 ] ]
+                    Expect.equal (group [ 1, 2, 2, 3, 3, 3, 2, 2, 1 ])
+                        [ ( 1, [] ), ( 2, [ 2 ] ), ( 3, [ 3, 3 ] ), ( 2, [ 2 ] ), ( 1, [] ) ]
             ]
         , describe "groupWhile" <|
             [ test "groups by sub-element equality" <|
                 \() ->
                     Expect.equal
                         (groupWhile (\x y -> first x == first y) [ ( 0, 'a' ), ( 0, 'b' ), ( 1, 'c' ), ( 1, 'd' ) ])
-                        [ [ ( 0, 'a' ), ( 0, 'b' ) ], [ ( 1, 'c' ), ( 1, 'd' ) ] ]
+                        [ ( ( 0, 'a' ), [ ( 0, 'b' ) ] ), ( ( 1, 'c' ), [ ( 1, 'd' ) ] ) ]
             , test "comparison function is reflexive, symmetric, and transitive" <|
                 \() ->
                     Expect.equal
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
-                        [ [ 1, 2, 3, 2, 4 ], [ 1, 3, 2 ], [ 1 ] ]
+                        [ ( 1, [ 2, 3, 2, 4 ] ), ( 1, [ 3, 2 ] ), ( 1, [] ) ]
             ]
         , describe "groupWhileTransitively" <|
             [ test "an empty list" <|
