@@ -37,6 +37,7 @@ module List.Extra
         , permutations
         , interweave
         , cartesianProduct
+        , sliding
         , foldl1
         , foldr1
         , indexedFoldl
@@ -97,7 +98,7 @@ module List.Extra
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, sliding
 
 
 # Folds
@@ -956,6 +957,42 @@ cartesianProduct ll =
 reverseAppend : List a -> List a -> List a
 reverseAppend list1 list2 =
     List.foldl (::) list2 list1
+
+
+{-| Groups elements in fixed size blocks by passing a "sliding windows" over them.
+
+    sliding 1 1 [] = []
+    sliding 1 1 [1, 2, 3, 4, 5] = [[1], [2], [3], [4], [5]]
+    sliding 2 1 [1, 2, 3, 4, 5] = [[1, 2], [2, 3], [3, 4], [4, 5]]
+    sliding 1 2 [1, 2, 3, 4, 5] = [[1], [3], [5]]
+    sliding 3 1 [1, 2, 3, 4, 5] = [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+    sliding 3 3 [1, 2, 3, 4, 5] = [[1, 2, 3], [4, 5]]
+
+-}
+
+sliding : Int -> Int -> List a -> List (List a)
+sliding size step list =
+    case list of
+        [] ->
+            []
+
+        _ ->
+            slidingHelp [] (max 1 size) (max 1 step) list
+
+
+slidingHelp : List (List a) -> Int -> Int -> List a -> List (List a)
+slidingHelp acc size step list =
+    let
+        newAcc =
+            List.append acc [ List.take size list ]
+
+        remainingList =
+            List.drop step list
+    in
+        if List.length list <= size || List.length remainingList == 0 then
+            newAcc
+        else
+            slidingHelp newAcc size step remainingList
 
 
 {-| Variant of `foldl` that has no starting value argument and treats the head of the list as its starting value. If the list is empty, return `Nothing`.
