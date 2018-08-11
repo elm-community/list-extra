@@ -1361,10 +1361,10 @@ oneGroupWhileHelper condition first list =
         second :: rest ->
             if condition first second then
                 let
-                    ( group, ungroupedRest ) =
+                    ( thisGroup, ungroupedRest ) =
                         oneGroupWhileHelper condition second rest
                 in
-                ( second :: group, ungroupedRest )
+                ( second :: thisGroup, ungroupedRest )
             else
                 ( [], list )
 
