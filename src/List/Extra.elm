@@ -23,7 +23,6 @@ module List.Extra
         , greedyGroupsOfWithStep
         , group
         , groupWhile
-        , groupWhileTransitively
         , groupsOf
         , groupsOfVarying
         , groupsOfWithStep
@@ -110,7 +109,7 @@ module List.Extra
 
 # Sublists
 
-@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, groupWhileTransitively, inits, tails, select, selectSplit
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit
 
 
 # Predicates
