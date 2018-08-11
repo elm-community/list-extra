@@ -1309,77 +1309,64 @@ stripPrefix prefix xs =
     group [1,2,2,3,3,3,2,2,1] == [[1],[2,2],[3,3,3],[2,2],[1]]
 
 -}
-group : List a -> List (List a)
+group : List a -> List ( a, List a )
 group =
     groupWhile (==)
 
 
-{-| Group elements together, using a custom equality test.
+{-| Group elements together, using a custom comparison test (`a -> a -> Bool`). Start a new group each time the comparison test doesn't hold for two adjacent elements.
 
-    groupWhile (\x y -> first x == first y) [(0,'a'),(0,'b'),(1,'c'),(1,'d')] == [[(0,'a'),(0,'b')],[(1,'c'),(1,'d')]]
+`groupWhile` uses a non-empty list type `(a, List a)` since groups necessarily must have at least one member since they are determined by comparing two members.
 
-The equality test should be an [equivalence relation](https://en.wikipedia.org/wiki/Equivalence_relation), i.e. it should have the properties:
+    groupWhile (==) [1, 2, 3] == [ (1, [] ), ( 2, [] ), ( 3, [] )]
 
-  - Reflexivity - Testing an object against itself returns `True`.
-  - Symmetry - Testing two objects should give the same result regardless of the order they are passed.
-  - Transitivity - If the test on a first object and a second object results in `True`, and further if the test on that second object and a third also results in `True`, then the test should result in `True` when the first and third objects are passed.
+    groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ]
+        == [ ( 1, [ 2, 3 ] ), ( 2, [ 4 ] ), ( 1, [ 3 ] ), ( 2, [] ), ( 1, [] ) ]
 
-For non-equivalent relations `groupWhile` has non-intuitive behavior. For example, inequality comparisons like `(<)` are not equivalence relations, so do _not_ write `groupWhile (<) [1,3,5,2,4]`, as it will give an unexpected answer.
+    groupWhile (\a b -> a.id == b.id) [ { value = 4, id = 9 }, { value = 7, id = 2 }, { value = 1, id = 12 } ]
+        == [ ( { value = 4, id = 9 }, [] ),( { value = 7, id = 2 }, [ { value = 1, id = 2 } ] ) ]
 
-For grouping elements with a comparison test which is merely transitive, such as `(<)` or `(<=)`, see `groupWhileTransitively`.
-
--}
-groupWhile : (a -> a -> Bool) -> List a -> List (List a)
-groupWhile eq xs_ =
-    case xs_ of
-        [] ->
-            []
-
-        x :: xs ->
-            let
-                ( ys, zs ) =
-                    span (eq x) xs
-            in
-            (x :: ys) :: groupWhile eq zs
-
-
-{-| Group elements together, using a custom comparison test. Start a new group each time the comparison test doesn't hold for two adjacent elements.
-
-    groupWhileTransitively (<) [1,2,3,2,4,1,3,2,1] == [[1,2,3],[2,4],[1,3],[2],[1]]
+**Note:**
+The behavior of this function has changed between major versions 7 and 8. In version 7 there was `groupWhile` and `groupWhileTransitively`. The behavior of the two was almost identical, however the transitive function was closer to what users found intuitive about grouping. `groupWhileTransively` has been deleted, and `groupWhile` has been replaced with the version 7s `groupWhileTransitively` behavior. Furthermore the group type was changed from `List a` to the non-empty list type `(a, List a)`. Sorry for any inconvenience this may cause.
 
 -}
-groupWhileTransitively : (a -> a -> Bool) -> List a -> List (List a)
-groupWhileTransitively compare list =
-    groupWhileTransitivelyHelp [] [] compare list
+groupWhile : (a -> a -> Bool) -> List a -> List ( a, List a )
+groupWhile condition list =
+    accumulateGroupWhile condition list []
 
 
-groupWhileTransitivelyHelp : List (List a) -> List a -> (a -> a -> Bool) -> List a -> List (List a)
-groupWhileTransitivelyHelp result currentGroup compare list =
+accumulateGroupWhile : (a -> a -> Bool) -> List a -> List ( a, List a ) -> List ( a, List a )
+accumulateGroupWhile condition list accum =
     case list of
         [] ->
-            List.reverse <|
-                if List.isEmpty currentGroup then
-                    result
-                else
-                    List.reverse (currentGroup :: result)
+            List.reverse accum
 
-        [ x ] ->
-            List.reverse <|
-                (List.reverse (x :: currentGroup) :: result)
+        first :: rest ->
+            let
+                ( thisGroup, ungroupedRest ) =
+                    oneGroupWhileHelper condition first rest
+            in
+            accumulateGroupWhile
+                condition
+                ungroupedRest
+                (( first, thisGroup ) :: accum)
 
-        first :: ((second :: _) as rest) ->
-            if compare first second then
-                groupWhileTransitivelyHelp
-                    result
-                    (first :: currentGroup)
-                    compare
-                    rest
+
+oneGroupWhileHelper : (a -> a -> Bool) -> a -> List a -> ( List a, List a )
+oneGroupWhileHelper condition first list =
+    case list of
+        [] ->
+            ( [], [] )
+
+        second :: rest ->
+            if condition first second then
+                let
+                    ( group, ungroupedRest ) =
+                        oneGroupWhileHelper condition second rest
+                in
+                ( second :: group, ungroupedRest )
             else
-                groupWhileTransitivelyHelp
-                    (List.reverse (first :: currentGroup) :: result)
-                    []
-                    compare
-                    rest
+                ( [], list )
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.

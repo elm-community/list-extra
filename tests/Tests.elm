@@ -1,11 +1,11 @@
 module Tests exposing (..)
 
-import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple3)
+import Fuzz exposing (int, list, tuple3)
 import List exposing (map, range)
-import Tuple exposing (first)
 import List.Extra exposing (..)
+import Test exposing (..)
+import Tuple exposing (first)
 
 
 all : Test
@@ -299,7 +299,7 @@ all =
                                     else
                                         3 * n + 1
                     in
-                        Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
+                    Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
@@ -347,7 +347,7 @@ all =
                     Expect.equal (splitAt 0 [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
             , test "handles negative numbers correctly" <|
                 \() ->
-                    Expect.equal (splitAt (-1) [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
+                    Expect.equal (splitAt -1 [ 1, 2, 3 ]) ( [], [ 1, 2, 3 ] )
             ]
         , describe "splitWhen" <|
             [ test "returns split list when predicate is true" <|
@@ -412,36 +412,20 @@ all =
         , describe "group" <|
             [ test "groups elements correctly" <|
                 \() ->
-                    Expect.equal (group [ 1, 2, 2, 3, 3, 3, 2, 2, 1 ]) [ [ 1 ], [ 2, 2 ], [ 3, 3, 3 ], [ 2, 2 ], [ 1 ] ]
+                    Expect.equal (group [ 1, 2, 2, 3, 3, 3, 2, 2, 1 ])
+                        [ ( 1, [] ), ( 2, [ 2 ] ), ( 3, [ 3, 3 ] ), ( 2, [ 2 ] ), ( 1, [] ) ]
             ]
         , describe "groupWhile" <|
             [ test "groups by sub-element equality" <|
                 \() ->
                     Expect.equal
                         (groupWhile (\x y -> first x == first y) [ ( 0, 'a' ), ( 0, 'b' ), ( 1, 'c' ), ( 1, 'd' ) ])
-                        [ [ ( 0, 'a' ), ( 0, 'b' ) ], [ ( 1, 'c' ), ( 1, 'd' ) ] ]
+                        [ ( ( 0, 'a' ), [ ( 0, 'b' ) ] ), ( ( 1, 'c' ), [ ( 1, 'd' ) ] ) ]
             , test "comparison function is reflexive, symmetric, and transitive" <|
                 \() ->
                     Expect.equal
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
-                        [ [ 1, 2, 3, 2, 4 ], [ 1, 3, 2 ], [ 1 ] ]
-            ]
-        , describe "groupWhileTransitively" <|
-            [ test "an empty list" <|
-                \() ->
-                    Expect.equal
-                        (groupWhileTransitively (<) [])
-                        []
-            , test "a single item" <|
-                \() ->
-                    Expect.equal
-                        (groupWhileTransitively (<) [ 1 ])
-                        [ [ 1 ] ]
-            , test "a standard working case" <|
-                \() ->
-                    Expect.equal
-                        (groupWhileTransitively (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
-                        [ [ 1, 2, 3 ], [ 2, 4 ], [ 1, 3 ], [ 2 ], [ 1 ] ]
+                        [ ( 1, [ 2, 3, 2, 4 ] ), ( 1, [ 3, 2 ] ), ( 1, [] ) ]
             ]
         , describe "inits" <|
             [ test "returns all initial segments" <|
@@ -682,7 +666,7 @@ all =
         , describe "unconsLast"
             [ test "removes last element of list" <|
                 \() ->
-                    Expect.equal (unconsLast [1,2,3]) (Just (3, [1,2]))
+                    Expect.equal (unconsLast [ 1, 2, 3 ]) (Just ( 3, [ 1, 2 ] ))
             , test "returns Nothing if the list is empty" <|
                 \() ->
                     Expect.equal (unconsLast []) Nothing
