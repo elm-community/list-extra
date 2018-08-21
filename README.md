@@ -11,6 +11,15 @@ Feedback and contributions are very welcome.
 
 This package uses [elm-test](https://github.com/elm-community/elm-test), please read its documentation to know how to run tests.
 
+## Breaking Changes
+
+**Please Note** that between versions 7.1.0 and 8.0.0 of list `List.Extra` the following breaking changes occured:
+
+1. `replaceIf` was renamed to `setIf`
+2. `unzip4` and `unzip5` were removed
+3. The type signature of `foldl1` did not change, but the arguments did. `foldl1` takes a `a -> a -> a`, and befor version 8.0.0 it was `b -> a -> b` and now it is `a -> b -> b`
+4. The `(!!)` operator was removed, as Elm 0.19 no longer permits custom infix operators 
+
 ## Contributing
 
 Pull requests are welcome. You can expect some kind of response within 5 days.
