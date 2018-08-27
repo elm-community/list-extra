@@ -1004,7 +1004,9 @@ indexedFoldr func acc list =
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
-scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
+
+    scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
+
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl f b xs =
@@ -1026,13 +1028,13 @@ scanl f b xs =
 
 Compare:
 
-    List.scanl (+) 0 [1,2,3] == [0,1,3,6]
+    scanl (+) 0 [1,2,3] == [0,1,3,6]
     scanl1 (+) [1,2,3] == [1,3,6]
 
-    List.scanl (-) 0 [1,2,3] == [0,1,1,2]
+    scanl (-) 0 [1,2,3] == [0,1,1,2]
     scanl1 (-) [1,2,3] == [1,1,2]
 
-    List.scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
+    scanl (flip (-)) 0 [1,2,3] == [0,-1,-3,-6]
     scanl1 (flip (-)) [1,2,3] == [1,-1,-4]
 
 -}
