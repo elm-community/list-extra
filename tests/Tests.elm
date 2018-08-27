@@ -671,6 +671,26 @@ all =
                 \() ->
                     Expect.equal (unconsLast []) Nothing
             ]
+        , describe "maximumWith"
+            [ test "maximum of empty list" <|
+                \() ->
+                    Expect.equal (maximumWith compare []) Nothing
+            , test "first maximum of records list" <|
+                \() ->
+                    Expect.equal
+                        (maximumWith (\x y -> compare x.val y.val) [ { id = 1, val = 1 }, { id = 2, val = 2 }, { id = 3, val = 2 } ])
+                        (Just { id = 2, val = 2 })
+            ]
+        , describe "minimumWith"
+            [ test "minimum of empty list" <|
+                \() ->
+                    Expect.equal (minimumWith compare []) Nothing
+            , test "first minimum of records list" <|
+                \() ->
+                    Expect.equal
+                        (minimumWith (\x y -> compare x.val y.val) [ { id = 1, val = 2 }, { id = 2, val = 1 }, { id = 3, val = 1 } ])
+                        (Just { id = 2, val = 1 })
+            ]
         , describe "setIf"
             [ test "empty list" <|
                 \() ->

@@ -46,7 +46,9 @@ module List.Extra
         , mapAccuml
         , mapAccumr
         , maximumBy
+        , maximumWith
         , minimumBy
+        , minimumWith
         , notMember
         , permutations
         , remove
@@ -332,6 +334,26 @@ maximumBy f ls =
             Nothing
 
 
+{-| Find the first maximum element in a list using a comparison function
+
+    maximumWith compare [] == Nothing
+    maximumWith (\x y -> compare x.val y.val) [{id=1, val=1}, {id=2, val=2}, {id=3,val=2}] == Just { id = 2, val = 2 }
+
+-}
+maximumWith : (a -> a -> Order) -> List a -> Maybe a
+maximumWith comparator list =
+    foldl1
+        (\x y ->
+            case comparator x y of
+                GT ->
+                    x
+
+                _ ->
+                    y
+        )
+        list
+
+
 {-| Find the first minimum element in a list using a comparable transformation
 -}
 minimumBy : (a -> comparable) -> List a -> Maybe a
@@ -356,6 +378,26 @@ minimumBy f ls =
 
         _ ->
             Nothing
+
+
+{-| Find the first minimum element in a list using a comparison function
+
+    minimumWith compare [] == Nothing
+    minimumWith (\x y -> compare x.val y.val) [{id=1, val=2}, {id=2, val=1}, {id=3,val=1}] == Just { id = 2, val = 1 }
+
+-}
+minimumWith : (a -> a -> Order) -> List a -> Maybe a
+minimumWith comparator list =
+    foldl1
+        (\x y ->
+            case comparator x y of
+                LT ->
+                    x
+
+                _ ->
+                    y
+        )
+        list
 
 
 {-| Take elements in order as long as the predicate evaluates to `True`
