@@ -428,7 +428,7 @@ all =
                 \() ->
                     Expect.equal
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
-                        [ ( 1, [ 2, 3, 2, 4 ] ), ( 1, [ 3, 2 ] ), ( 1, [] ) ]
+                        [ ( 1, [ 2, 3 ] ), ( 2, [ 4 ] ), ( 1, [ 3 ] ), ( 2, [] ), ( 1, [] ) ]
             ]
         , describe "inits" <|
             [ test "returns all initial segments" <|
