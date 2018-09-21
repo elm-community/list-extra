@@ -1324,7 +1324,7 @@ group =
     groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ]
         == [ ( 1, [ 2, 3 ] ), ( 2, [ 4 ] ), ( 1, [ 3 ] ), ( 2, [] ), ( 1, [] ) ]
 
-    groupWhile (\a b -> a.id == b.id) [ { value = 4, id = 9 }, { value = 7, id = 2 }, { value = 1, id = 12 } ]
+    groupWhile (\a b -> a.id == b.id) [ { value = 4, id = 9 }, { value = 7, id = 2 }, { value = 1, id = 2 } ]
         == [ ( { value = 4, id = 9 }, [] ),( { value = 7, id = 2 }, [ { value = 1, id = 2 } ] ) ]
 
 **Note:**
