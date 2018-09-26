@@ -685,4 +685,23 @@ all =
                 \() ->
                     Expect.equal (setIf (\x -> modBy 2 x == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
             ]
+        , describe "gatherEquals"
+            [ test "empty list" <|
+                \() ->
+                    gatherEquals []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEquals [ 1 ]
+                        |> Expect.equal [ [ 1 ] ]
+            , test "proper test" <|
+                \() ->
+                    gatherEquals [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ [ 1, 1, 1 ]
+                            , [ 2, 2 ]
+                            , [ 3 ]
+                            , [ 4 ]
+                            ]
+            ]
         ]

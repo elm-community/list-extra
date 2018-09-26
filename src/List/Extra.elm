@@ -18,6 +18,7 @@ module List.Extra
         , findIndices
         , foldl1
         , foldr1
+        , gatherEquals
         , getAt
         , greedyGroupsOf
         , greedyGroupsOfWithStep
@@ -109,7 +110,7 @@ module List.Extra
 
 # Sublists
 
-@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals
 
 
 # Predicates
@@ -1672,3 +1673,26 @@ greedyGroupsOfWithStep size step xs =
         List.take size xs :: greedyGroupsOfWithStep size step xs_
     else
         []
+
+{-| Group equal elements together. This is different from `group` as each sublist
+will contain *all* equal elements of the original list.
+
+    gatherEquals [1,2,1,3,2] == [[1,1],[2,2],[3]]
+-}
+gatherEquals : List a -> List (List a)
+gatherEquals list =
+    let
+        helper : List a -> List (List a) -> List (List a)
+        helper scattered gathered =
+            case scattered of
+                [] ->
+                    List.reverse gathered
+
+                toGather :: population ->
+                    let
+                        ( gathering, remaining ) =
+                            List.partition (\e -> e == toGather) population
+                    in
+                    helper remaining <| (toGather :: gathering) :: gathered
+    in
+    helper list []
