@@ -19,6 +19,8 @@ module List.Extra
         , foldl1
         , foldr1
         , gatherEquals
+        , gatherEqualsBy
+        , gatherEqualsWith
         , getAt
         , greedyGroupsOf
         , greedyGroupsOfWithStep
@@ -1681,6 +1683,25 @@ will contain *all* equal elements of the original list.
 -}
 gatherEquals : List a -> List (List a)
 gatherEquals list =
+    gatherEqualsWith (==) list
+
+
+{-| Group equal elements together. A function is applied to each element of the list
+and then the equality check is performed against the results of that function evaluation.
+
+    gatherEqualsBy .name [{age=25},{age=23},{age=25}] == [[{age=25},{age=25}],[{age=23}]]
+-}
+gatherEqualsBy : (a -> b) -> List a -> List (List a)
+gatherEqualsBy extract list =
+    gatherEqualsWith (\a b -> (extract a) == (extract b)) list
+
+
+{-| Group equal elements together using a custom equality function.
+
+    gatherEquals (==) [1,2,1,3,2] == [[1,1],[2,2],[3]]
+-}
+gatherEqualsWith : (a -> a -> Bool) -> List a -> List (List a)
+gatherEqualsWith testFn list =
     let
         helper : List a -> List (List a) -> List (List a)
         helper scattered gathered =
@@ -1691,7 +1712,7 @@ gatherEquals list =
                 toGather :: population ->
                     let
                         ( gathering, remaining ) =
-                            List.partition (\e -> e == toGather) population
+                            List.partition (testFn toGather) population
                     in
                     helper remaining <| (toGather :: gathering) :: gathered
     in

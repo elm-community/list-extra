@@ -704,4 +704,42 @@ all =
                             , [ 4 ]
                             ]
             ]
+        , describe "gatherEqualsBy"
+            [ test "empty list" <|
+                \() ->
+                    gatherEqualsBy identity []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEqualsBy identity [ 1 ]
+                        |> Expect.equal [ [ 1 ] ]
+            , test "proper test" <|
+                \() ->
+                    gatherEqualsBy identity [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ [ 1, 1, 1 ]
+                            , [ 2, 2 ]
+                            , [ 3 ]
+                            , [ 4 ]
+                            ]
+            ]
+        , describe "gatherEqualsWith"
+            [ test "empty list" <|
+                \() ->
+                    gatherEqualsWith (==) []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEqualsWith (==) [ 1 ]
+                        |> Expect.equal [ [ 1 ] ]
+            , test "proper test" <|
+                \() ->
+                    gatherEqualsWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ [ 1, 1, 1 ]
+                            , [ 2, 2 ]
+                            , [ 3 ]
+                            , [ 4 ]
+                            ]
+            ]
         ]
