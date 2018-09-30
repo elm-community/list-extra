@@ -693,15 +693,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherEquals [ 1 ]
-                        |> Expect.equal [ [ 1 ] ]
+                        |> Expect.equal [ (1, []) ]
             , test "proper test" <|
                 \() ->
                     gatherEquals [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ [ 1, 1, 1 ]
-                            , [ 2, 2 ]
-                            , [ 3 ]
-                            , [ 4 ]
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
                             ]
             ]
         , describe "gatherEqualsBy"
@@ -712,15 +712,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherEqualsBy identity [ 1 ]
-                        |> Expect.equal [ [ 1 ] ]
+                        |> Expect.equal [ (1, []) ]
             , test "proper test" <|
                 \() ->
                     gatherEqualsBy identity [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ [ 1, 1, 1 ]
-                            , [ 2, 2 ]
-                            , [ 3 ]
-                            , [ 4 ]
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
                             ]
             ]
         , describe "gatherEqualsWith"
@@ -731,15 +731,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherEqualsWith (==) [ 1 ]
-                        |> Expect.equal [ [ 1 ] ]
+                        |> Expect.equal [ (1, []) ]
             , test "proper test" <|
                 \() ->
                     gatherEqualsWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ [ 1, 1, 1 ]
-                            , [ 2, 2 ]
-                            , [ 3 ]
-                            , [ 4 ]
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
                             ]
             ]
         ]

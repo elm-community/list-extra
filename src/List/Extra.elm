@@ -1679,9 +1679,9 @@ greedyGroupsOfWithStep size step xs =
 {-| Group equal elements together. This is different from `group` as each sublist
 will contain *all* equal elements of the original list.
 
-    gatherEquals [1,2,1,3,2] == [[1,1],[2,2],[3]]
+    gatherEquals [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
 -}
-gatherEquals : List a -> List (List a)
+gatherEquals : List a -> List (a, List a)
 gatherEquals list =
     gatherEqualsWith (==) list
 
@@ -1689,21 +1689,21 @@ gatherEquals list =
 {-| Group equal elements together. A function is applied to each element of the list
 and then the equality check is performed against the results of that function evaluation.
 
-    gatherEqualsBy .name [{age=25},{age=23},{age=25}] == [[{age=25},{age=25}],[{age=23}]]
+    gatherEqualsBy .name [{age=25},{age=23},{age=25}] == [({age=25},[{age=25}]),({age=23},[])]
 -}
-gatherEqualsBy : (a -> b) -> List a -> List (List a)
+gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
 gatherEqualsBy extract list =
     gatherEqualsWith (\a b -> (extract a) == (extract b)) list
 
 
 {-| Group equal elements together using a custom equality function.
 
-    gatherEquals (==) [1,2,1,3,2] == [[1,1],[2,2],[3]]
+    gatherEquals (==) [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
 -}
-gatherEqualsWith : (a -> a -> Bool) -> List a -> List (List a)
+gatherEqualsWith : (a -> a -> Bool) -> List a -> List (a, List a)
 gatherEqualsWith testFn list =
     let
-        helper : List a -> List (List a) -> List (List a)
+        helper : List a -> List (a,List a) -> List (a, List a)
         helper scattered gathered =
             case scattered of
                 [] ->
@@ -1714,6 +1714,6 @@ gatherEqualsWith testFn list =
                         ( gathering, remaining ) =
                             List.partition (testFn toGather) population
                     in
-                    helper remaining <| (toGather :: gathering) :: gathered
+                    helper remaining <| (toGather, gathering) :: gathered
     in
     helper list []
