@@ -1689,7 +1689,7 @@ gatherEquals list =
 {-| Group equal elements together. A function is applied to each element of the list
 and then the equality check is performed against the results of that function evaluation.
 
-    gatherEqualsBy .name [{age=25},{age=23},{age=25}] == [({age=25},[{age=25}]),({age=23},[])]
+    gatherEqualsBy .age [{age=25},{age=23},{age=25}] == [({age=25},[{age=25}]),({age=23},[])]
 -}
 gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
 gatherEqualsBy extract list =
