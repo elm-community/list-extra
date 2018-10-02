@@ -723,18 +723,18 @@ all =
                             , ( 4, [])
                             ]
             ]
-        , describe "gatherEqualsWith"
+        , describe "gatherWith"
             [ test "empty list" <|
                 \() ->
-                    gatherEqualsWith (==) []
+                    gatherWith (==) []
                         |> Expect.equal []
             , test "single element" <|
                 \() ->
-                    gatherEqualsWith (==) [ 1 ]
+                    gatherWith (==) [ 1 ]
                         |> Expect.equal [ (1, []) ]
             , test "proper test" <|
                 \() ->
-                    gatherEqualsWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
+                    gatherWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
                             [ ( 1, [ 1, 1 ])
                             , ( 2, [ 2 ])

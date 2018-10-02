@@ -20,7 +20,7 @@ module List.Extra
         , foldr1
         , gatherEquals
         , gatherEqualsBy
-        , gatherEqualsWith
+        , gatherWith
         , getAt
         , greedyGroupsOf
         , greedyGroupsOfWithStep
@@ -1683,7 +1683,7 @@ will contain *all* equal elements of the original list.
 -}
 gatherEquals : List a -> List (a, List a)
 gatherEquals list =
-    gatherEqualsWith (==) list
+    gatherWith (==) list
 
 
 {-| Group equal elements together. A function is applied to each element of the list
@@ -1693,15 +1693,15 @@ and then the equality check is performed against the results of that function ev
 -}
 gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
 gatherEqualsBy extract list =
-    gatherEqualsWith (\a b -> (extract a) == (extract b)) list
+    gatherWith (\a b -> (extract a) == (extract b)) list
 
 
 {-| Group equal elements together using a custom equality function.
 
-    gatherEquals (==) [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
+    gatherWith (==) [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
 -}
-gatherEqualsWith : (a -> a -> Bool) -> List a -> List (a, List a)
-gatherEqualsWith testFn list =
+gatherWith : (a -> a -> Bool) -> List a -> List (a, List a)
+gatherWith testFn list =
     let
         helper : List a -> List (a,List a) -> List (a, List a)
         helper scattered gathered =
