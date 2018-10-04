@@ -112,7 +112,7 @@ module List.Extra
 
 # Sublists
 
-@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
 
 
 # Predicates
