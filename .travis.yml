@@ -19,4 +19,4 @@ install:
   - npm install -g elm elm-test
 
 script:
-  - elm-test
+  - pwd && ls && elm-test
