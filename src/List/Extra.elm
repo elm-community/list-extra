@@ -1827,7 +1827,7 @@ enough elements in the list to completely fill it. (See `groupsOfWithStep`
 for the non-greedy version of this function).
 
     greedyGroupsOfWithStep 4 4 (List.range 1 10)
-    --> [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ], [ 9, 10 ] ]
+    --> [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ], [ 10 ] ]
 
     greedyGroupsOfWithStep 3 2 (List.range 1 6)
     --> [ [ 1, 2, 3 ], [ 3, 4, 5 ], [ 5, 6 ] ]
