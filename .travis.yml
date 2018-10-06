@@ -16,7 +16,7 @@ before_install:
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 install:
-  - npm install -g elm elm-test
+  - npm install -g elm elm-test@beta
 
 script:
-  - pwd && ls && elm-test
+  - elm-test
