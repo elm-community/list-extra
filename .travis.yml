@@ -17,7 +17,6 @@ before_install:
 
 install:
   - npm install -g elm elm-test
-  - elm install --yes
   - |
     if [ ! -d "$TRAVIS_BUILD_DIR/sysconfcpus/bin" ];
     then
