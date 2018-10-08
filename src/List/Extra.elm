@@ -1863,7 +1863,8 @@ will contain *all* equal elements of the original list. Elements will be grouped
 in the same order as they appear in the original list. The same applies to elements
 within each group.
 
-    gatherEquals [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
+    gatherEquals [1,2,1,3,2] 
+    --> [(1,[1]),(2,[2]),(3,[])]
 -}
 gatherEquals : List a -> List (a, List a)
 gatherEquals list =
@@ -1875,7 +1876,8 @@ and then the equality check is performed against the results of that function ev
 Elements will be grouped in the same order as they appear in the original list. The
 same applies to elements within each group.
 
-    gatherEqualsBy .age [{age=25},{age=23},{age=25}] == [({age=25},[{age=25}]),({age=23},[])]
+    gatherEqualsBy .age [{age=25},{age=23},{age=25}] 
+    --> [({age=25},[{age=25}]),({age=23},[])]
 -}
 gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
 gatherEqualsBy extract list =
@@ -1886,7 +1888,8 @@ gatherEqualsBy extract list =
 grouped in the same order as they appear in the original list. The same applies to
 elements within each group.
 
-    gatherWith (==) [1,2,1,3,2] == [(1,[1]),(2,[2]),(3,[])]
+    gatherWith (==) [1,2,1,3,2] 
+    --> [(1,[1]),(2,[2]),(3,[])]
 -}
 gatherWith : (a -> a -> Bool) -> List a -> List (a, List a)
 gatherWith testFn list =
