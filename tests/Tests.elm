@@ -1,4 +1,4 @@
-module Tests exposing (..)
+module Tests exposing (all)
 
 import Expect
 import Fuzz exposing (int, list, tuple3)
@@ -78,29 +78,29 @@ all =
         , describe "findIndex" <|
             [ test "finds index of value" <|
                 \() ->
-                    Expect.equal (findIndex (\x -> x % 2 == 0) [ 1, 2, 3 ]) (Just 1)
+                    Expect.equal (findIndex (\x -> modBy 2 x == 0) [ 1, 2, 3 ]) (Just 1)
             , test "doesn't find index of non-present" <|
                 \() ->
-                    Expect.equal (findIndex (\x -> x % 2 == 0) [ 1, 3, 5 ]) Nothing
+                    Expect.equal (findIndex (\x -> modBy 2 x == 0) [ 1, 3, 5 ]) Nothing
             , test "finds index of first match" <|
                 \() ->
-                    Expect.equal (findIndex (\x -> x % 2 == 0) [ 1, 2, 4 ]) (Just 1)
+                    Expect.equal (findIndex (\x -> modBy 2 x == 0) [ 1, 2, 4 ]) (Just 1)
             ]
         , describe "findIndices" <|
             [ test "finds singleton index" <|
                 \() ->
-                    Expect.equal (findIndices (\x -> x % 2 == 0) [ 1, 2, 3 ]) [ 1 ]
+                    Expect.equal (findIndices (\x -> modBy 2 x == 0) [ 1, 2, 3 ]) [ 1 ]
             , test "doesn't find indices of non-present" <|
                 \() ->
-                    Expect.equal (findIndices (\x -> x % 2 == 0) [ 1, 3, 5 ]) []
+                    Expect.equal (findIndices (\x -> modBy 2 x == 0) [ 1, 3, 5 ]) []
             , test "finds all indices" <|
                 \() ->
-                    Expect.equal (findIndices (\x -> x % 2 == 0) [ 1, 2, 4 ]) [ 1, 2 ]
+                    Expect.equal (findIndices (\x -> modBy 2 x == 0) [ 1, 2, 4 ]) [ 1, 2 ]
             ]
         , describe "count" <|
             [ test "isOdd predicate" <|
                 \() ->
-                    Expect.equal (count (\n -> n % 2 == 1) [ 1, 2, 3, 4, 5, 6, 7 ]) 4
+                    Expect.equal (count (\n -> modBy 2 n == 1) [ 1, 2, 3, 4, 5, 6, 7 ]) 4
             , test "equal predicate" <|
                 \() ->
                     Expect.equal (count ((==) "yeah") [ "She", "loves", "you", "yeah", "yeah", "yeah" ]) 3
@@ -205,7 +205,7 @@ all =
                     Expect.equal (scanl1 (-) [ 1, 2, 3 ]) [ 1, 1, 2 ]
             , test "computes left to right flipped iterative difference" <|
                 \() ->
-                    Expect.equal (scanl1 (flip (-)) [ 1, 2, 3 ]) [ 1, -1, -4 ]
+                    Expect.equal (scanl1 (\x y -> y - x) [ 1, 2, 3 ]) [ 1, -1, -4 ]
             ]
         , describe "scanr" <|
             [ test "computes right to left iterative sum" <|
@@ -224,7 +224,7 @@ all =
                     Expect.equal (scanr1 (-) [ 1, 2, 3 ]) [ 2, -1, 3 ]
             , test "computes right to left flipped iterative difference" <|
                 \() ->
-                    Expect.equal (scanr1 (flip (-)) [ 1, 2, 3 ]) [ 0, 1, 3 ]
+                    Expect.equal (scanr1 (\x y -> y - x) [ 1, 2, 3 ]) [ 0, 1, 3 ]
             ]
         , describe "mapAccuml" <|
             [ test "on empty list" <|
@@ -278,6 +278,7 @@ all =
                             (\b ->
                                 if b == 0 then
                                     Nothing
+
                                 else
                                     Just ( b, b - 1 )
                             )
@@ -292,10 +293,12 @@ all =
                         collatz n =
                             if n == 1 then
                                 Nothing
+
                             else
                                 Just <|
-                                    if n % 2 == 0 then
-                                        n / 2
+                                    if modBy 2 n == 0 then
+                                        n // 2
+
                                     else
                                         3 * n + 1
                     in
@@ -425,7 +428,7 @@ all =
                 \() ->
                     Expect.equal
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
-                        [ ( 1, [ 2, 3, 2, 4 ] ), ( 1, [ 3, 2 ] ), ( 1, [] ) ]
+                        [ ( 1, [ 2, 3 ] ), ( 2, [ 4 ] ), ( 1, [ 3 ] ), ( 2, [] ), ( 1, [] ) ]
             ]
         , describe "inits" <|
             [ test "returns all initial segments" <|
@@ -650,7 +653,7 @@ all =
                     Expect.equal (updateIfIndex ((==) 2) ((+) 1) [ 1, 2, 3 ]) [ 1, 2, 4 ]
             , test "if the index is even, increment the element" <|
                 \() ->
-                    Expect.equal (updateIfIndex (\index -> index % 2 == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
+                    Expect.equal (updateIfIndex (\index -> modBy 2 index == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
             ]
         , describe "removeIfIndex"
             [ test "remove all the elements" <|
@@ -661,7 +664,7 @@ all =
                     Expect.equal (removeIfIndex ((==) 2) [ 1, 2, 3 ]) [ 1, 2 ]
             , test "remove all elements at even indices" <|
                 \() ->
-                    Expect.equal (removeIfIndex (\index -> index % 2 == 0) [ 1, 2, 3 ]) [ 2 ]
+                    Expect.equal (removeIfIndex (\index -> modBy 2 index == 0) [ 1, 2, 3 ]) [ 2 ]
             ]
         , describe "unconsLast"
             [ test "removes last element of list" <|
@@ -700,6 +703,63 @@ all =
                     Expect.equal (setIf (always True) 2 [ 1, 2, 3, 4 ]) [ 2, 2, 2, 2 ]
             , test "set only evens" <|
                 \() ->
-                    Expect.equal (setIf (\x -> x % 2 == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
+                    Expect.equal (setIf (\x -> modBy 2 x == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
+            ]
+        , describe "gatherEquals"
+            [ test "empty list" <|
+                \() ->
+                    gatherEquals []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEquals [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherEquals [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
+            ]
+        , describe "gatherEqualsBy"
+            [ test "empty list" <|
+                \() ->
+                    gatherEqualsBy identity []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEqualsBy identity [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherEqualsBy identity [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
+            ]
+        , describe "gatherWith"
+            [ test "empty list" <|
+                \() ->
+                    gatherWith (==) []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherWith (==) [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
             ]
         ]
