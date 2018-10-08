@@ -1,0 +1,28 @@
+{
+    "name": "list-extra",
+    "version": "8.0.0",
+    "description": "Convenience functions for working with List",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "elm-test",
+        "verify-examples": "elm-verify-examples"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/elm-community/list-extra.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/elm-community/list-extra/issues"
+    },
+    "homepage": "https://github.com/elm-community/list-extra#readme",
+    "dependencies": {
+        "elm": "^0.19.0",
+        "elm-test": "^0.19.0-beta9",
+        "elm-verify-examples": "^3.0.1"
+    }
+}
