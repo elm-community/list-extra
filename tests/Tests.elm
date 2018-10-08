@@ -685,4 +685,61 @@ all =
                 \() ->
                     Expect.equal (setIf (\x -> modBy 2 x == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
             ]
+        , describe "gatherEquals"
+            [ test "empty list" <|
+                \() ->
+                    gatherEquals []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEquals [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherEquals [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
+            ]
+        , describe "gatherEqualsBy"
+            [ test "empty list" <|
+                \() ->
+                    gatherEqualsBy identity []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherEqualsBy identity [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherEqualsBy identity [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
+            ]
+        , describe "gatherWith"
+            [ test "empty list" <|
+                \() ->
+                    gatherWith (==) []
+                        |> Expect.equal []
+            , test "single element" <|
+                \() ->
+                    gatherWith (==) [ 1 ]
+                        |> Expect.equal [ (1, []) ]
+            , test "proper test" <|
+                \() ->
+                    gatherWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
+                        |> Expect.equal
+                            [ ( 1, [ 1, 1 ])
+                            , ( 2, [ 2 ])
+                            , ( 3, [])
+                            , ( 4, [])
+                            ]
+            ]
         ]
