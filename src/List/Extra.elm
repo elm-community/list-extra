@@ -1,5 +1,6 @@
+
 module List.Extra exposing
-    ( last, init, getAt, uncons, unconsLast, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
@@ -11,12 +12,13 @@ module List.Extra exposing
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
     )
     
+
 {-| Convenience functions for working with List
 
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, minimumBy, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -285,6 +287,31 @@ maximumBy f ls =
             Nothing
 
 
+{-| Find the first maximum element in a list using a comparison function
+
+    maximumWith compare [] 
+    --> Nothing
+    
+    maximumWith 
+      (\x y -> compare x.val y.val) 
+      [{id=1, val=1}, {id=2, val=2}, {id=3,val=2}] 
+    --> Just { id = 2, val = 2 }
+
+-}
+maximumWith : (a -> a -> Order) -> List a -> Maybe a
+maximumWith comparator list =
+    foldl1
+        (\x y ->
+            case comparator x y of
+                GT ->
+                    x
+
+                _ ->
+                    y
+        )
+        list
+
+
 {-| Find the first minimum element in a list using a comparable transformation
 -}
 minimumBy : (a -> comparable) -> List a -> Maybe a
@@ -310,6 +337,30 @@ minimumBy f ls =
 
         _ ->
             Nothing
+
+
+{-| Find the first minimum element in a list using a comparison function
+
+    minimumWith compare [] 
+    --> Nothing
+    minimumWith 
+      (\x y -> compare x.val y.val) 
+      [{id=1, val=2}, {id=2, val=1}, {id=3,val=1}] 
+    --> Just { id = 2, val = 1 }
+
+-}
+minimumWith : (a -> a -> Order) -> List a -> Maybe a
+minimumWith comparator list =
+    foldl1
+        (\x y ->
+            case comparator x y of
+                LT ->
+                    x
+
+                _ ->
+                    y
+        )
+        list
 
 
 {-| Take elements in order as long as the predicate evaluates to `True`
