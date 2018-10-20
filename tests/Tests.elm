@@ -684,6 +684,14 @@ all =
                         (maximumWith (\x y -> compare x.val y.val) [ { id = 1, val = 1 }, { id = 2, val = 2 }, { id = 3, val = 2 } ])
                         (Just { id = 2, val = 2 })
             ]
+        , describe "maximumBy"
+            [ test "maximumBy of empty list" <|
+                \() -> Expect.equal (maximumBy (\x -> x) []) Nothing
+            , test "first maximumBy of records list" <|
+                \() ->
+                    Expect.equal (maximumBy (\x -> x.val) [ { id = 1, val = 1 }, { id = 2, val = 2 }, { id = 3, val = 2 } ])
+                        (Just { id = 2, val = 2 })
+            ]
         , describe "minimumWith"
             [ test "minimum of empty list" <|
                 \() ->
@@ -692,6 +700,14 @@ all =
                 \() ->
                     Expect.equal
                         (minimumWith (\x y -> compare x.val y.val) [ { id = 1, val = 2 }, { id = 2, val = 1 }, { id = 3, val = 1 } ])
+                        (Just { id = 2, val = 1 })
+            ]
+        , describe "minimumBy"
+            [ test "minimumBy of empty list" <|
+                \() -> Expect.equal (minimumBy (\x -> x) []) Nothing
+            , test "first minimumBy of records list" <|
+                \() ->
+                    Expect.equal (minimumBy (\x -> x.val) [ { id = 1, val = 2 }, { id = 2, val = 1 }, { id = 3, val = 1 } ])
                         (Just { id = 2, val = 1 })
             ]
         , describe "setIf"
@@ -713,15 +729,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherEquals [ 1 ]
-                        |> Expect.equal [ (1, []) ]
+                        |> Expect.equal [ ( 1, [] ) ]
             , test "proper test" <|
                 \() ->
                     gatherEquals [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ ( 1, [ 1, 1 ])
-                            , ( 2, [ 2 ])
-                            , ( 3, [])
-                            , ( 4, [])
+                            [ ( 1, [ 1, 1 ] )
+                            , ( 2, [ 2 ] )
+                            , ( 3, [] )
+                            , ( 4, [] )
                             ]
             ]
         , describe "gatherEqualsBy"
@@ -732,15 +748,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherEqualsBy identity [ 1 ]
-                        |> Expect.equal [ (1, []) ]
+                        |> Expect.equal [ ( 1, [] ) ]
             , test "proper test" <|
                 \() ->
                     gatherEqualsBy identity [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ ( 1, [ 1, 1 ])
-                            , ( 2, [ 2 ])
-                            , ( 3, [])
-                            , ( 4, [])
+                            [ ( 1, [ 1, 1 ] )
+                            , ( 2, [ 2 ] )
+                            , ( 3, [] )
+                            , ( 4, [] )
                             ]
             ]
         , describe "gatherWith"
@@ -751,15 +767,15 @@ all =
             , test "single element" <|
                 \() ->
                     gatherWith (==) [ 1 ]
-                        |> Expect.equal [ (1, []) ]
+                        |> Expect.equal [ ( 1, [] ) ]
             , test "proper test" <|
                 \() ->
                     gatherWith (==) [ 1, 2, 1, 2, 3, 4, 1 ]
                         |> Expect.equal
-                            [ ( 1, [ 1, 1 ])
-                            , ( 2, [ 2 ])
-                            , ( 3, [])
-                            , ( 4, [])
+                            [ ( 1, [ 1, 1 ] )
+                            , ( 2, [ 2 ] )
+                            , ( 3, [] )
+                            , ( 4, [] )
                             ]
             ]
         ]
