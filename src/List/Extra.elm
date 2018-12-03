@@ -1,7 +1,7 @@
 
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
-    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
+    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, pairings
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
@@ -23,7 +23,7 @@ module List.Extra exposing
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, pairings
 
 
 # Folds
@@ -1065,6 +1065,31 @@ cartesianProduct ll =
 
         xs :: xss ->
             lift2 (::) xs (cartesianProduct xss)
+
+
+{-| Return all ways to pair the elements of the list.
+(Essentially, enumerate the possible "handshakes.")
+
+    pairings [ 1, 2, 3, 4 ]
+    --> [ ( 1, 2 )
+        , ( 1, 3 )
+        , ( 1, 4 )
+        , ( 2, 3 )
+        , ( 2, 4 )
+        , ( 3, 4 )
+        ]
+
+In this example, everybody shakes hands with three other people.
+
+-}
+pairings : List a -> List ( a, a )
+pairings xs =
+    case xs of
+        [] ->
+            []
+
+        x :: xs_ ->
+            List.map (\y -> ( x, y )) xs_ ++ pairings xs_
 
 
 reverseAppend : List a -> List a -> List a
