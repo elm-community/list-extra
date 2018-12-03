@@ -1071,13 +1071,7 @@ cartesianProduct ll =
 (Essentially, enumerate the possible "handshakes.")
 
     pairings [ 1, 2, 3, 4 ]
-    --> [ ( 1, 2 )
-        , ( 1, 3 )
-        , ( 1, 4 )
-        , ( 2, 3 )
-        , ( 2, 4 )
-        , ( 3, 4 )
-        ]
+    --> [ ( 1, 2 ), ( 1, 3 ), ( 1, 4 ), ( 2, 3 ), ( 2, 4 ), ( 3, 4 ) ]
 
 In this example, everybody shakes hands with three other people.
 
