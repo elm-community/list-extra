@@ -1070,6 +1070,8 @@ cartesianProduct ll =
 {-| Return all ways to pair the elements of the list.
 (Essentially, enumerate the possible "handshakes.")
 
+In more mathematical terms these are 2-combinations without repetition.
+
     pairings [ 1, 2, 3, 4 ]
     --> [ ( 1, 2 ), ( 1, 3 ), ( 1, 4 ), ( 2, 3 ), ( 2, 4 ), ( 3, 4 ) ]
 
