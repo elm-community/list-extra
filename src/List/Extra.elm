@@ -1,7 +1,7 @@
 
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
-    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, pairings
+    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
@@ -23,7 +23,7 @@ module List.Extra exposing
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, pairings
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
 
 
 # Folds
@@ -1070,22 +1070,25 @@ cartesianProduct ll =
 {-| Return all ways to pair the elements of the list.
 (Essentially, enumerate the possible "handshakes.")
 
+The order of the pair elements doesn't matter, so if `(1,2)` is a returned pair,
+we don't return `(2,1)`.
+
 In more mathematical terms these are 2-combinations without repetition.
 
-    pairings [ 1, 2, 3, 4 ]
+    uniquePairs [ 1, 2, 3, 4 ]
     --> [ ( 1, 2 ), ( 1, 3 ), ( 1, 4 ), ( 2, 3 ), ( 2, 4 ), ( 3, 4 ) ]
 
 In this example, everybody shakes hands with three other people.
 
 -}
-pairings : List a -> List ( a, a )
-pairings xs =
+uniquePairs : List a -> List ( a, a )
+uniquePairs xs =
     case xs of
         [] ->
             []
 
         x :: xs_ ->
-            List.map (\y -> ( x, y )) xs_ ++ pairings xs_
+            List.map (\y -> ( x, y )) xs_ ++ uniquePairs xs_
 
 
 reverseAppend : List a -> List a -> List a

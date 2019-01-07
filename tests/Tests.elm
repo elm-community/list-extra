@@ -778,22 +778,22 @@ all =
                             , ( 4, [] )
                             ]
             ]
-        , describe "pairings"
+        , describe "uniquePairs"
             [ test "empty list" <|
                 \() ->
-                    pairings []
+                    uniquePairs []
                         |> Expect.equal []
             , test "single element has no counterpart to pair with" <|
                 \() ->
-                    pairings [ 1 ]
+                    uniquePairs [ 1 ]
                         |> Expect.equal []
             , test "two elements have exactly one way to pair" <|
                 \() ->
-                    pairings [ 1, 2 ]
+                    uniquePairs [ 1, 2 ]
                         |> Expect.equal [ ( 1, 2 ) ]
             , test "three elements have three ways to pair" <|
                 \() ->
-                    pairings [ 1, 2, 3 ]
+                    uniquePairs [ 1, 2, 3 ]
                         |> Expect.equal [ ( 1, 2 ), ( 1, 3 ), ( 2, 3 ) ]
             ]
         ]
