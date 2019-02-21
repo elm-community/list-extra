@@ -1554,83 +1554,21 @@ The behavior of this function has changed between major versions 7 and 8. In ver
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List ( a, List a )
 groupWhile isSameGroup items =
-    groupWhileTailRecursive isSameGroup items []
+    List.foldr
+        (\x acc ->
+            case acc of
+                [] ->
+                    [ ( x, [] ) ]
 
+                ( y, restOfGroup ) :: groups ->
+                    if isSameGroup x y then
+                        ( x, y :: restOfGroup ) :: groups
 
-{-| `groupWhile`, but in a tail-recursive way. The basic idea is that the final
-bit of every clause either needs to return a concrete value or a call to itself
-without using the return value of that call (so concretely, you can't do like
-`whatever :: groupWhileTailRecursive`, use it in a let block, or pass it into a
-pipeline.) Practically, this just means passing around an accumulator value
-(that empty list in `groupWhile`.)
-
-If the conditions above are met, the compiler will optimize it to an efficient
-loop that won't blow the stack, no matter how long our list is. Magical!
-
-If you want to verify that this function _is_ tail-recursive, search for
-`continue groupWhileTailRecursive` in the compiled output. If you see that plus
-a `while` loop we're good. Otherwise, please fix this by meeting the conditions
-above!
-
--}
-groupWhileTailRecursive : (a -> a -> Bool) -> List a -> List ( a, List a ) -> List ( a, List a )
-groupWhileTailRecursive isSameGroup remaining acc =
-    case ( remaining, acc ) of
-        -- let's start with the easy case. No items, no groups, no work. Go home
-        -- and watch Netflix. (Do compilers watch Netflix?)
-        ( [], [] ) ->
-            []
-
-        -- alright neat, some work came in! Turn off Netflix and make a new
-        -- item! This is the first thing that should actually happen for a
-        -- non-empty list!
-        ( now :: next, [] ) ->
-            groupWhileTailRecursive isSameGroup
-                next
-                [ ( now, [] ) ]
-
-        -- we're well underway in this case; we have *both* a new item to look
-        -- at and a existing item to compare it to. We'll finally use the
-        -- grouping function to figure out if we need to split into a new group!
-        ( now :: next, ( previous, alreadyGrouped ) :: finished ) ->
-            if isSameGroup previous now then
-                -- note that we're replacing the first item of this tuple here,
-                -- and storing the previous item at the front of the list. That
-                -- means that our inner lists are backwards, and we'll have to
-                -- reverse 'em when we finish the group.
-                groupWhileTailRecursive isSameGroup
-                    next
-                    (( now, previous :: alreadyGrouped )
-                        :: finished
-                    )
-
-            else
-                groupWhileTailRecursive isSameGroup
-                    next
-                    (( now, [] )
-                        :: reverseNonEmpty ( previous, alreadyGrouped )
-                        :: finished
-                    )
-
-        -- if we have one last item in the list, but no further items to
-        -- process, then both our final item and the entire list will need to be
-        -- flipped around because we've been consing of the groups onto the head
-        -- of the group list.
-        ( [], finalGroup :: groups ) ->
-            List.reverse (reverseNonEmpty finalGroup :: groups)
-
-
-reverseNonEmpty : ( a, List a ) -> ( a, List a )
-reverseNonEmpty ( head, tail ) =
-    case List.reverse (head :: tail) of
-        newHead :: newTail ->
-            ( newHead, newTail )
-
-        -- this _should_ be impossible, but let's return what would be valid 
-        -- anyway, just in case.
-        [] ->
-            ( head, tail )
-
+                    else
+                        ( x, [] ) :: acc
+        )
+        []
+        items
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
