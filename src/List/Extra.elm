@@ -1592,7 +1592,7 @@ groupWhileTailRecursive isSameGroup remaining acc =
         -- we're well underway in this case; we have *both* a new item to look
         -- at and a existing item to compare it to. We'll finally use the
         -- grouping function to figure out if we need to split into a new group!
-        ( now :: next, ( previous, group ) :: finished ) ->
+        ( now :: next, ( previous, alreadyGrouped ) :: finished ) ->
             if isSameGroup now previous then
                 -- note that we're replacing the first item of this tuple here,
                 -- and storing the previous item at the front of the list. That
@@ -1600,7 +1600,7 @@ groupWhileTailRecursive isSameGroup remaining acc =
                 -- reverse 'em when we finish the group.
                 groupWhileTailRecursive isSameGroup
                     next
-                    (( now, previous :: group )
+                    (( now, previous :: alreadyGrouped )
                         :: finished
                     )
 
@@ -1608,7 +1608,7 @@ groupWhileTailRecursive isSameGroup remaining acc =
                 groupWhileTailRecursive isSameGroup
                     next
                     (( now, [] )
-                        :: reverseNonEmpty ( previous, group )
+                        :: reverseNonEmpty ( previous, alreadyGrouped )
                         :: finished
                     )
 
