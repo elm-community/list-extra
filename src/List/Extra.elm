@@ -1593,7 +1593,7 @@ groupWhileTailRecursive isSameGroup remaining acc =
         -- at and a existing item to compare it to. We'll finally use the
         -- grouping function to figure out if we need to split into a new group!
         ( now :: next, ( previous, alreadyGrouped ) :: finished ) ->
-            if isSameGroup now previous then
+            if isSameGroup previous now then
                 -- note that we're replacing the first item of this tuple here,
                 -- and storing the previous item at the front of the list. That
                 -- means that our inner lists are backwards, and we'll have to
