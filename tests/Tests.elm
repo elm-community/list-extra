@@ -24,6 +24,11 @@ all =
                 \() ->
                     Expect.equal (List.Extra.allDifferent [ 0, 1, 1, 0, 1 ]) False
             ]
+        , describe "allSame" <|
+            [ test "detects all same values in list" <|
+                \() ->
+                    Expect.equal (List.Extra.allSame [ 0, 0, 0, 0, 0 ]) True
+            ]
         , describe "andMap" <|
             [ test "computes piecemeal" <|
                 \() ->
