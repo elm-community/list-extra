@@ -1553,43 +1553,22 @@ The behavior of this function has changed between major versions 7 and 8. In ver
 
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List ( a, List a )
-groupWhile condition list =
-    accumulateGroupWhile condition list []
+groupWhile isSameGroup items =
+    List.foldr
+        (\x acc ->
+            case acc of
+                [] ->
+                    [ ( x, [] ) ]
 
+                ( y, restOfGroup ) :: groups ->
+                    if isSameGroup x y then
+                        ( x, y :: restOfGroup ) :: groups
 
-accumulateGroupWhile : (a -> a -> Bool) -> List a -> List ( a, List a ) -> List ( a, List a )
-accumulateGroupWhile condition list accum =
-    case list of
-        [] ->
-            List.reverse accum
-
-        first :: rest ->
-            let
-                ( thisGroup, ungroupedRest ) =
-                    oneGroupWhileHelper condition first rest
-            in
-            accumulateGroupWhile
-                condition
-                ungroupedRest
-                (( first, thisGroup ) :: accum)
-
-
-oneGroupWhileHelper : (a -> a -> Bool) -> a -> List a -> ( List a, List a )
-oneGroupWhileHelper condition first list =
-    case list of
-        [] ->
-            ( [], [] )
-
-        second :: rest ->
-            if condition first second then
-                let
-                    ( thisGroup, ungroupedRest ) =
-                        oneGroupWhileHelper condition second rest
-                in
-                ( second :: thisGroup, ungroupedRest )
-
-            else
-                ( [], list )
+                    else
+                        ( x, [] ) :: acc
+        )
+        []
+        items
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
