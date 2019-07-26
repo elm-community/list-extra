@@ -1107,7 +1107,7 @@ reverseAppend list1 list2 =
     foldl1 min []
     --> Nothing
 
-**Note:** This function changed in a major way between version 7.0.0 and 8.0.0 of this package. The function `foldl1` took in 7.0.0 was `b -> a -> b` consistent with the Haskell implementation of `foldl`, but now its `a -> b -> b`, consistent with `List.foldl`. This function behaves differently in a breaking way, even tho its type signature is the same.
+**Note:** This function changed in a major way between version 7.0.0 and 8.0.0 of this package. The function `foldl1` took in 7.0.0 was `b -> a -> b` consistent with the Haskell implementation of `foldl`, but now its `a -> b -> b`, consistent with `List.foldl`. This function behaves differently in a breaking way, even though its type signature is the same.
 
 -}
 foldl1 : (a -> a -> a) -> List a -> Maybe a
