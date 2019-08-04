@@ -2,8 +2,8 @@
     "type": "package",
     "name": "elm-community/list-extra",
     "summary": "Convenience functions for working with List",
-    "license": "BSD-3-Clause",
-    "version": "8.2.1",
+    "license": "MIT",
+    "version": "8.2.2",
     "exposed-modules": [
         "List.Extra"
     ],
