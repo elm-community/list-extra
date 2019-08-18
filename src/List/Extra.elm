@@ -192,24 +192,14 @@ resulting list will be empty.
     --> [ 1, 2 ]
 
 -}
-cycle : Int -> List a -> List a
-cycle len list =
+cycle : Int -> List a -> List a 
+cycle c list =
     let
-        cycleLength =
-            List.length list
+        aux = List.length list
     in
-    if cycleLength == 0 || cycleLength == len then
-        list
-
-    else if cycleLength < len then
-        List.reverse
-            (reverseAppend
-                (List.take (remainderBy cycleLength len) list)
-                (cycleHelp [] (len // cycleLength) list)
-            )
-
-    else
-        List.take len list
+        if c == aux || aux == 0 then list
+            else if c < aux then (List.take c list)
+                else cycle c (list ++ list)
 
 
 cycleHelp : List a -> Int -> List a -> List a
