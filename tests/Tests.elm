@@ -796,4 +796,26 @@ all =
                     uniquePairs [ 1, 2, 3 ]
                         |> Expect.equal [ ( 1, 2 ), ( 1, 3 ), ( 2, 3 ) ]
             ]
+        , describe "oxfordJoin"
+            [ test "empty list" <|
+                \() ->
+                    oxfordJoin []
+                        |> Expect.equal ""
+            , test "single element list" <|
+                \() ->
+                    oxfordJoin [ "a" ]
+                        |> Expect.equal "a"
+            , test "two element list" <|
+                \() ->
+                    oxfordJoin [ "a", "b" ]
+                        |> Expect.equal "a and b"
+            , test "three element list" <|
+                \() ->
+                    oxfordJoin [ "a", "b", "c" ]
+                        |> Expect.equal "a, b, and c"
+            , test "much larger list" <|
+                \() ->
+                    oxfordJoin [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" ]
+                        |> Expect.equal "a, b, c, d, e, f, g, h, i, and j"
+            ]
         ]
