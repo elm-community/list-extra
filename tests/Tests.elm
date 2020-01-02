@@ -550,6 +550,9 @@ all =
             , test "stack safety" <|
                 \() ->
                     Expect.true "1, 2, ..., 6k is prefix of 1, 2, ..., 10k" (isPrefixOf (List.range 1 6000) (List.range 1 10000))
+            , fuzz2 (list int) (list int) "generalized fuzz test" <|
+                \prefix rest ->
+                    Expect.true "xs is prefix of xs ++ ys" (isPrefixOf prefix (prefix ++ rest))
             ]
         , describe "isSuffixOf"
             [ fuzz (list int) "[] is suffix to anything" <|
@@ -576,6 +579,9 @@ all =
             , test "stack safety" <|
                 \() ->
                     Expect.true "4000, 4001, ..., 10k is suffix of 1, 2, ..., 10k" (isSuffixOf (List.range 4000 10000) (List.range 1 10000))
+            , fuzz2 (list int) (list int) "generalized fuzz test" <|
+                \suffix rest ->
+                    Expect.true "ys is suffix of xs ++ ys" (isSuffixOf suffix (rest ++ suffix))
             ]
         , describe "isInfixOf"
             [ test "success" <|
@@ -593,6 +599,21 @@ all =
             , test "stack safety" <|
                 \() ->
                     Expect.true "1, 2, ..., 6k is infix of 1, 2, ..., 10k" (isInfixOf (List.range 1 6000) (List.range 1 10000))
+            , fuzz3 (list int) (list int) (list int) "generalized fuzz test" <|
+                \prefix match suffix ->
+                    Expect.true "ys is infix of xs ++ ys ++ zs" (isInfixOf match (prefix ++ match ++ suffix))
+            , test "empty is infix of empty" <|
+                \() ->
+                    Expect.true "empty is infix of empty" (isInfixOf [] [])
+            , fuzz (list int) "empty is infix of anything" <|
+                \list ->
+                    Expect.true "empty is infix of anything" (isInfixOf [] list)
+            , fuzz2 int (list int) "non-empty is not infix of empty" <|
+                \x xs ->
+                    Expect.false "non-empty is not infix of empty" (isInfixOf (x :: xs) [])
+            , fuzz (list int) "equal lists are infix" <|
+                \list ->
+                    Expect.true "equal lists are infix" (isInfixOf list list)
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
