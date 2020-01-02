@@ -581,6 +581,9 @@ all =
             , test "not in-order" <|
                 \() ->
                     Expect.false "3, 5, 2 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 3, 5, 2 ] [ 2, 3, 5, 7, 11, 13 ])
+            , test "partial match then real match" <|
+                \() ->
+                    Expect.true "1, 2 is infix of 1, 3, 1, 2" (isInfixOf [ 1, 2 ] [ 1, 3, 1, 2 ])
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
