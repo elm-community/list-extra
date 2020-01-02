@@ -1647,7 +1647,11 @@ isPrefixOf prefix list =
             False
 
         ( p :: ps, x :: xs ) ->
-            p == x && isPrefixOf ps xs
+            if p == x then
+                isPrefixOf ps xs
+
+            else
+                False
 
 
 {-| Take two lists and return `True`, if the first list is the suffix of the second list.

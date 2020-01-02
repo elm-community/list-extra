@@ -547,6 +547,9 @@ all =
                         || not (List.Extra.isPrefixOf listB listC)
                         || List.Extra.isPrefixOf listA listC
                         |> Expect.true "Expected prefix of prefix to be prefix."
+            , test "stack safety" <|
+                \() ->
+                    Expect.true "1, 2, ..., 6k is prefix of 1, 2, ..., 10k" (isPrefixOf (List.range 1 6000) (List.range 1 10000))
             ]
         , describe "isSuffixOf"
             [ fuzz (list int) "[] is suffix to anything" <|
@@ -570,6 +573,9 @@ all =
                         || not (List.Extra.isSuffixOf listB listC)
                         || List.Extra.isSuffixOf listA listC
                         |> Expect.true "Expected suffix of suffix to be suffix."
+            , test "stack safety" <|
+                \() ->
+                    Expect.true "4000, 4001, ..., 10k is suffix of 1, 2, ..., 10k" (isSuffixOf (List.range 4000 10000) (List.range 1 10000))
             ]
         , describe "isInfixOf"
             [ test "success" <|
@@ -584,6 +590,9 @@ all =
             , test "partial match then real match" <|
                 \() ->
                     Expect.true "1, 2 is infix of 1, 3, 1, 2" (isInfixOf [ 1, 2 ] [ 1, 3, 1, 2 ])
+            , test "stack safety" <|
+                \() ->
+                    Expect.true "1, 2, ..., 6k is infix of 1, 2, ..., 10k" (isInfixOf (List.range 1 6000) (List.range 1 10000))
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
