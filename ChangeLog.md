@@ -1,3 +1,6 @@
+### 8.2.3
+1. Fixed bug in `isInfixOf` that prevented the detection of infixes after a partial infix (Issue #132)
+
 ### 8.2.0
 Notes
 1. `groupWhile` implementation rewritten to be tail-recursive to eliminate risk of stack overflow errors. Trade off is its about 12% slower.
