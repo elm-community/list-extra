@@ -1,9 +1,8 @@
-
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
-    , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
+    , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
@@ -11,7 +10,6 @@ module List.Extra exposing
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
     )
-    
 
 {-| Convenience functions for working with List
 
@@ -33,7 +31,7 @@ module List.Extra exposing
 
 # Building lists
 
-@docs scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
+@docs scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
 
 
 # Sublists
@@ -221,6 +219,31 @@ cycleHelp acc n list =
         acc
 
 
+{-| Create a list of numbers, every element decreasing by one.
+You give the highest and lowest number that should be in the list.
+More efficient than calling `List.reverse (List.range lo hi)`
+
+    range 6 3 == [ 6, 5, 4, 3 ]
+
+    range 3 3 == [ 3 ]
+
+    range 3 6 == []
+
+-}
+reverseRange : Int -> Int -> List Int
+reverseRange hi lo =
+    let
+        reverseRangeHelp : Int -> Int -> List Int -> List Int
+        reverseRangeHelp hi_ lo_ list =
+            if hi_ >= lo_ then
+                reverseRangeHelp hi_ (lo_ + 1) (lo_ :: list)
+
+            else
+                list
+    in
+    reverseRangeHelp hi lo []
+
+
 {-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.
 
     uncons [1,2,3]
@@ -289,12 +312,12 @@ maximumBy f ls =
 
 {-| Find the first maximum element in a list using a comparison function
 
-    maximumWith compare [] 
+    maximumWith compare []
     --> Nothing
-    
-    maximumWith 
-      (\x y -> compare x.val y.val) 
-      [{id=1, val=1}, {id=2, val=2}, {id=3,val=2}] 
+
+    maximumWith
+      (\x y -> compare x.val y.val)
+      [{id=1, val=1}, {id=2, val=2}, {id=3,val=2}]
     --> Just { id = 2, val = 2 }
 
 -}
@@ -341,11 +364,11 @@ minimumBy f ls =
 
 {-| Find the first minimum element in a list using a comparison function
 
-    minimumWith compare [] 
+    minimumWith compare []
     --> Nothing
-    minimumWith 
-      (\x y -> compare x.val y.val) 
-      [{id=1, val=2}, {id=2, val=1}, {id=3,val=1}] 
+    minimumWith
+      (\x y -> compare x.val y.val)
+      [{id=1, val=2}, {id=2, val=1}, {id=3,val=1}]
     --> Just { id = 2, val = 1 }
 
 -}
@@ -431,7 +454,7 @@ allDifferent list =
     allDifferentBy identity list
 
 
-{-| Indicate if list has duplicate values when supplied function are applyed on each values.
+{-| Indicate if list has duplicate values when supplied function are applied on each values.
 -}
 allDifferentBy : (a -> comparable) -> List a -> Bool
 allDifferentBy f list =
@@ -1549,7 +1572,7 @@ group =
     --> [ ( { value = 4, id = 9 }, [] ), ( { value = 7, id = 2 }, [ { value = 1, id = 2 } ] ) ]
 
 **Note:**
-The behavior of this function has changed between major versions 7 and 8. In version 7 there was `groupWhile` and `groupWhileTransitively`. The behavior of the two was almost identical, however the transitive function was closer to what users found intuitive about grouping. `groupWhileTransively` has been deleted, and `groupWhile` has been replaced with the version 7s `groupWhileTransitively` behavior. Furthermore the group type was changed from `List a` to the non-empty list type `(a, List a)`. Sorry for any inconvenience this may cause.
+The behavior of this function has changed between major versions 7 and 8. In version 7 there was `groupWhile` and `groupWhileTransitively`. The behavior of the two was almost identical, however the transitive function was closer to what users found intuitive about grouping. `groupWhileTransitively` has been deleted, and `groupWhile` has been replaced with the version 7s `groupWhileTransitively` behavior. Furthermore the group type was changed from `List a` to the non-empty list type `(a, List a)`. Sorry for any inconvenience this may cause.
 
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List ( a, List a )
@@ -1847,13 +1870,13 @@ groupsOfWithStep size step xs =
 
 -}
 groupsOfVarying : List Int -> List a -> List (List a)
-groupsOfVarying listOflengths list =
-    groupsOfVarying_ listOflengths list []
+groupsOfVarying listOfLengths list =
+    groupsOfVarying_ listOfLengths list []
 
 
 groupsOfVarying_ : List Int -> List a -> List (List a) -> List (List a)
-groupsOfVarying_ listOflengths list accu =
-    case ( listOflengths, list ) of
+groupsOfVarying_ listOfLengths list accu =
+    case ( listOfLengths, list ) of
         ( length :: tailLengths, _ :: _ ) ->
             let
                 ( head, tail ) =
@@ -1916,15 +1939,17 @@ greedyGroupsOfWithStep size step xs =
     else
         []
 
+
 {-| Group equal elements together. This is different from `group` as each sublist
-will contain *all* equal elements of the original list. Elements will be grouped
+will contain _all_ equal elements of the original list. Elements will be grouped
 in the same order as they appear in the original list. The same applies to elements
 within each group.
 
-    gatherEquals [1,2,1,3,2] 
+    gatherEquals [1,2,1,3,2]
     --> [(1,[1]),(2,[2]),(3,[])]
+
 -}
-gatherEquals : List a -> List (a, List a)
+gatherEquals : List a -> List ( a, List a )
 gatherEquals list =
     gatherWith (==) list
 
@@ -1934,25 +1959,27 @@ and then the equality check is performed against the results of that function ev
 Elements will be grouped in the same order as they appear in the original list. The
 same applies to elements within each group.
 
-    gatherEqualsBy .age [{age=25},{age=23},{age=25}] 
+    gatherEqualsBy .age [{age=25},{age=23},{age=25}]
     --> [({age=25},[{age=25}]),({age=23},[])]
+
 -}
-gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
+gatherEqualsBy : (a -> b) -> List a -> List ( a, List a )
 gatherEqualsBy extract list =
-    gatherWith (\a b -> (extract a) == (extract b)) list
+    gatherWith (\a b -> extract a == extract b) list
 
 
 {-| Group equal elements together using a custom equality function. Elements will be
 grouped in the same order as they appear in the original list. The same applies to
 elements within each group.
 
-    gatherWith (==) [1,2,1,3,2] 
+    gatherWith (==) [1,2,1,3,2]
     --> [(1,[1]),(2,[2]),(3,[])]
+
 -}
-gatherWith : (a -> a -> Bool) -> List a -> List (a, List a)
+gatherWith : (a -> a -> Bool) -> List a -> List ( a, List a )
 gatherWith testFn list =
     let
-        helper : List a -> List (a,List a) -> List (a, List a)
+        helper : List a -> List ( a, List a ) -> List ( a, List a )
         helper scattered gathered =
             case scattered of
                 [] ->
@@ -1963,6 +1990,6 @@ gatherWith testFn list =
                         ( gathering, remaining ) =
                             List.partition (testFn toGather) population
                     in
-                    helper remaining <| (toGather, gathering) :: gathered
+                    helper remaining <| ( toGather, gathering ) :: gathered
     in
     helper list []
