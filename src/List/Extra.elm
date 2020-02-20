@@ -1,6 +1,6 @@
 
 module List.Extra exposing
-    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, setBy, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
@@ -18,7 +18,7 @@ module List.Extra exposing
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, setBy, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -696,6 +696,20 @@ count predicate =
 setIf : (a -> Bool) -> a -> List a -> List a
 setIf predicate replacement list =
     updateIf predicate (always replacement) list
+
+
+{-| Replace all values for which the given accessor returns the same value as
+for the replacement value.
+
+Mostly useful for cases when a value in a list should be replaced based on some identifying value.
+
+    setBy Tuple.first (1, 42) [ (3, 1), (2, 2), (1, 3) ]
+    --> [ (3, 1), (2, 2), (1, 42) ]
+
+-}
+setBy : (a -> b) -> a -> List a -> List a
+setBy accessor replacement =
+    setIf (\item -> accessor item == accessor replacement) replacement
 
 
 {-| Replace all values that satisfy a predicate by calling an update function.
