@@ -149,12 +149,16 @@ list and the iteration will continue with `f y`.
 -}
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
-    case f x of
-        Just x_ ->
-            x :: iterate f x_
+    let
+        go y acc =
+            case f y of
+                Just y_ ->
+                    go y_ (y :: acc)
 
-        Nothing ->
-            [ x ]
+                Nothing ->
+                    y :: acc
+    in
+    go x [] |> List.reverse
 
 
 {-| Initialize a list of some length with some function.
