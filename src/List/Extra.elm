@@ -860,7 +860,12 @@ removeAt index l =
         l
 
     else
-        take index l ++ drop (index + 1) l
+        case drop index l of
+            [] ->
+                l
+
+            _ :: rest ->
+                take index l ++ rest
 
 
 {-| Remove an element at an index that satisfies a predicate.
