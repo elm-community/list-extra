@@ -149,14 +149,14 @@ list and the iteration will continue with `f y`.
 -}
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
-    iterateInner f x [] |> List.reverse
+    iterateHelp f x [] |> List.reverse
 
 
-iterateInner : (a -> Maybe a) -> a -> List a -> List a
-iterateInner f x acc =
+iterateHelp : (a -> Maybe a) -> a -> List a -> List a
+iterateHelp f x acc =
     case f x of
         Just x_ ->
-            iterateInner f x_ (x :: acc)
+            iterateHelp f x_ (x :: acc)
 
         Nothing ->
             x :: acc
