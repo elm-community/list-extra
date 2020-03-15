@@ -303,6 +303,20 @@ all =
                                         3 * n + 1
                     in
                     Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
+            , test "should not raise RangeError" <|
+                \() ->
+                    let
+                        loop n =
+                            if n == 100000 then
+                                Nothing
+
+                            else
+                                Just (n + 1)
+
+                        _ =
+                            iterate loop 1
+                    in
+                    Expect.pass
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
