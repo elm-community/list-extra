@@ -865,19 +865,12 @@ removeAt index l =
         l
 
     else
-        let
-            head =
-                List.take index l
-
-            tail =
-                List.drop index l |> List.tail
-        in
-        case tail of
-            Nothing ->
+        case drop index l of
+            [] ->
                 l
 
-            Just t ->
-                List.append head t
+            _ :: rest ->
+                take index l ++ rest
 
 
 {-| Remove an element at an index that satisfies a predicate.
