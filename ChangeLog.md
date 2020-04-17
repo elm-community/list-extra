@@ -1,3 +1,7 @@
+### 8.2.4
+1. Speed up removeAt implementation
+2. Make iterate tail recursive
+
 ### 8.2.3
 1. Fixed bug in `isInfixOf` that prevented the detection of infixes after a partial infix (Issue #132)
 
