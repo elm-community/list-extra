@@ -94,6 +94,15 @@ last items =
             last rest
 
 
+mapIf : Bool -> (a -> a) -> a -> a
+mapIf condition f =
+    if condition then
+        f
+
+    else
+        identity
+
+
 {-| Return all elements of the list except the last one.
 
     init [ 1, 2, 3 ]
@@ -111,9 +120,13 @@ init items =
 
         nonEmptyList ->
             nonEmptyList
-                |> List.reverse
-                |> List.tail
-                |> Maybe.map List.reverse
+                |> foldr
+                    (\current ( isNotLast, accumulator ) ->
+                        Tuple.mapSecond (mapIf isNotLast ((::) current)) ( True, accumulator )
+                    )
+                    ( False, [] )
+                |> Tuple.second
+                |> Just
 
 
 {-| Returns `Just` the element at the given index in the list,
