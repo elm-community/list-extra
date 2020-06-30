@@ -328,20 +328,6 @@ all =
             , fuzz int "handles a non-empty list" <|
                 \x ->
                     Expect.equal (init [ 1, 2, x ]) (Just [ 1, 2 ])
-            , fuzz (list int) "handles any list" <|
-                \xs ->
-                    let
-                        length =
-                            List.length xs
-
-                        expected =
-                            if length > 1 then
-                                Just (List.take (length - 1) xs)
-
-                            else
-                                Nothing
-                    in
-                    Expect.equal (init xs) expected
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
