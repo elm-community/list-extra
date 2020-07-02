@@ -325,9 +325,9 @@ all =
             , fuzz int "handles a nearly-empty list" <|
                 \x ->
                     Expect.equal (init [ x ]) (Just [])
-            , fuzz int "handles a non-empty list" <|
-                \x ->
-                    Expect.equal (init [ 1, 2, x ]) (Just [ 1, 2 ])
+            , fuzz2 (list int) int "handles a non-empty list" <|
+                \list x ->
+                    Expect.equal (init <| list ++ [ x ]) (Just list)
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
