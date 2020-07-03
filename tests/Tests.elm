@@ -318,6 +318,17 @@ all =
                     in
                     Expect.pass
             ]
+        , describe "init" <|
+            [ test "handles an empty list" <|
+                \() ->
+                    Expect.equal (init []) Nothing
+            , fuzz int "handles a nearly-empty list" <|
+                \x ->
+                    Expect.equal (init [ x ]) (Just [])
+            , fuzz2 (list int) int "handles a non-empty list" <|
+                \list x ->
+                    Expect.equal (init <| list ++ [ x ]) (Just list)
+            ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
                 \() ->
