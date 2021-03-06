@@ -97,6 +97,26 @@ all =
                 \() ->
                     Expect.equal (findIndices (\x -> modBy 2 x == 0) [ 1, 2, 4 ]) [ 1, 2 ]
             ]
+        , describe "findMap" <|
+            [ test "Nothing for empty list" <|
+                \() ->
+                    Expect.equal (findMap identity []) Nothing
+            , test "Finds and maps for list of one with first element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [ 1 ] ]) (Just 1)
+            , test "Fails to find and map for list of one without element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [] ]) Nothing
+            , test "Finds and maps for list with middle element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [ 2 ], [] ]) (Just 2)
+            , test "Finds and maps for list with last element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [], [ 3 ] ]) (Just 3)
+            , test "Fails to find and map for list with no element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [], [] ]) Nothing
+            ]
         , describe "count" <|
             [ test "isOdd predicate" <|
                 \() ->

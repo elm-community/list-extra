@@ -670,25 +670,27 @@ findIndices predicate =
 
 {-| Apply a function that may succeed to values in the list and return the result of the first successful match. If none match, then return Nothing.
 
-    findMap
-        ( \\num ->
-            if num > 5 then
-                Just (num * 2)
+    mapOverFive : Int -> Maybe Int
+    mapOverFive num =
+        if num > 5 then
+            Just (num * 2)
+        else
+            Nothing
 
-            else
-                Nothing
-        )
-        [2, 4, 6, 8,]
+    findMap mapOverFive [2, 4, 6, 8]
     --> Just 12
 
 This is particularly useful in cases where you have a complex type in a list, and you need to pick out the the first one
 
-    type Property
-        = Rental RentalProperty
-        | House House
-        | Commercial CommercialBuilding
+    type alias HouseModel =
+        {}
 
-    toHouse : Property -> Maybe House
+    type Property
+        = Rental
+        | House HouseModel
+        | Commercial
+
+    toHouse : Property -> Maybe HouseModel
     toHouse property =
         case property of
             House house ->
