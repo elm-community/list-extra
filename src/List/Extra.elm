@@ -5,7 +5,7 @@ module List.Extra exposing
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
-    , notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
+    , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
