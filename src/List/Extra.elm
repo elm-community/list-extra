@@ -48,7 +48,7 @@ module List.Extra exposing
 
 # Searching
 
-@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
+@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
 
 
 # Zipping
@@ -668,6 +668,58 @@ findIndices predicate =
                 acc
     in
     indexedFoldr consIndexIf []
+
+
+{-| Apply a function that may succeed to values in the list and return the result of the first successful match. If none match, then return Nothing.
+
+    findMap
+        ( \\num ->
+            if num > 5 then
+                Just (num * 2)
+
+            else
+                Nothing
+        )
+        [2, 4, 6, 8,]
+    --> Just 12
+
+This is particularly useful in cases where you have a complex type in a list, and you need to pick out the the first one
+
+    type Property
+        = Rental RentalProperty
+        | House House
+        | Commercial CommercialBuilding
+
+    toHouse : Property -> Maybe House
+    toHouse property =
+        case property of
+            House house ->
+                Just house
+
+            _ ->
+                Nothing
+
+    viewFirstHomeOfInterest : Viewer -> List Property -> Html msg
+    viewFirstHomeOfInterest viewer propertiesQuery =
+        propertiesQuery
+            |> findMap toHome
+            |> Maybe.map homeView
+            |> Maybe.withDefaultnoHomeView
+
+-}
+findMap : (a -> Maybe b) -> List a -> Maybe b
+findMap f list =
+    case list of
+        [] ->
+            Nothing
+
+        a :: tail ->
+            case f a of
+                Just b ->
+                    Just b
+
+                Nothing ->
+                    findMap f tail
 
 
 {-| Returns the number of elements in a list that satisfy a given predicate.
