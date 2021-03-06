@@ -1,3 +1,6 @@
+###
+1. New function `findMap`
+
 ### 8.2.4
 1. Speed up removeAt implementation
 2. Make iterate tail recursive
