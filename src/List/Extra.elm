@@ -1,5 +1,5 @@
 module List.Extra exposing
-    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith, reverseSortBy
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
@@ -16,7 +16,7 @@ module List.Extra exposing
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith, reverseSortBy
 
 
 # List transformations
@@ -870,6 +870,24 @@ stableSortWith pred list =
                     result
     in
     List.sortWith predWithIndex listWithIndex |> List.map first
+
+
+{-| Sort values by a derived property, in a descending order.
+
+    alice = { name = "Alice", height = 1.62 }
+    bob   = { name = "Bob"  , height = 1.85 }
+    chuck = { name = "Chuck", height = 1.76 }
+
+    reverseSortBy .name   [chuck, alice, bob] == [chuck, bob, alice]
+    reverseSortBy .height [chuck, alice, bob] == [bob, chuck, alice]
+
+    reverseSortBy String.length ["cat", "mouse"] == ["mouse", "cat"]
+
+-}
+reverseSortBy : (a -> comparable) -> List a -> List a
+reverseSortBy toComparable =
+    -- flip args to reverse sort order
+    List.sortWith (\a b -> compare (toComparable b) (toComparable a))
 
 
 {-| Swap two values in a list by index. Return the original list if the index is out of range.
