@@ -35,6 +35,16 @@ all =
                         )
                         [ 9, 7, 9 ]
             ]
+        , describe "mapMaybe" <| 
+            [ test "returns a list only where f only yields Just" <|
+                \() ->
+                    Expect.equal
+                        (["1", "foo", "bar", "4", "5"]
+                            |> mapMaybe String.toInt
+                        )
+                        [1, 4, 5]
+
+            ]
         , describe "reverseMap" <|
             [ test "maps and reverses" <|
                 \() ->

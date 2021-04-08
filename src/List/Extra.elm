@@ -1,5 +1,5 @@
 module List.Extra exposing
-    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, mapMaybe, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
@@ -16,7 +16,7 @@ module List.Extra exposing
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, mapMaybe, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -721,6 +721,34 @@ findMap f list =
                 Nothing ->
                     findMap f tail
 
+
+{- | `mapMaybe` is a version of `map` which can throw out elements. In particular,
+the functional argument returns something of the type `Maybe b`. If this is `Nothing`,
+no element is added on to the result list. If it is `Just b`, then b is included in the result list.
+
+    mapMaybe Just [1, 2, 3]
+    --> [1, 2, 3]
+
+    mapMaybe Nothing [1, 2, 3]
+    --> []
+
+    mapMaybe String.toInt ["1", "foo", "bar", 4, 5]
+    --> [1, 4, 5]
+
+-}
+mapMaybe : (a -> Maybe b) -> List a -> List b
+mapMaybe f list =
+    case list of
+       [] -> 
+            []
+       
+       x :: xs ->
+            case f x of
+                Nothing -> 
+                    mapMaybe f xs
+                
+                Just v -> 
+                    v :: mapMaybe f xs
 
 {-| Returns the number of elements in a list that satisfy a given predicate.
 Equivalent to `List.length (List.filter pred list)` but more efficient.
