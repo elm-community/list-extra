@@ -732,7 +732,7 @@ no element is added on to the result list. If it is `Just b`, then b is included
     mapMaybe Nothing [1, 2, 3]
     --> []
 
-    mapMaybe String.toInt ["1", "foo", "bar", 4, 5]
+    mapMaybe String.toInt ["1", "foo", "bar", "4", "5"]
     --> [1, 4, 5]
 
 -}
