@@ -702,9 +702,9 @@ This is particularly useful in cases where you have a complex type in a list, an
     viewFirstHomeOfInterest : Viewer -> List Property -> Html msg
     viewFirstHomeOfInterest viewer propertiesQuery =
         propertiesQuery
-            |> findMap toHome
+            |> findMap toHouse
             |> Maybe.map homeView
-            |> Maybe.withDefaultnoHomeView
+            |> Maybe.withDefault noHomeView
 
 -}
 findMap : (a -> Maybe b) -> List a -> Maybe b
