@@ -9,6 +9,7 @@ module List.Extra exposing
     , zip, zip3
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+    , groupAssoc, groupAssocBy, groupAssocWith
     )
 
 {-| Convenience functions for working with List
@@ -1619,6 +1620,58 @@ groupWhile isSameGroup items =
         )
         []
         items
+
+
+reverseGroups : List ( k, List v ) -> List ( k, List v ) -> List ( k, List v )
+reverseGroups acc groups =
+    case groups of
+        ( k, v ) :: tl ->
+            reverseGroups (( k, List.reverse v ) :: acc) tl
+
+        [] ->
+            acc
+
+
+groupSortedStep : (k -> k -> Bool) -> ( k, v ) -> List ( k, List v ) -> List ( k, List v )
+groupSortedStep equal ( k1, v1 ) acc =
+    case acc of
+        ( k2, vs ) :: tl ->
+            if equal k1 k2 then
+                ( k1, v1 :: vs ) :: tl
+
+            else
+                ( k1, [ v1 ] ) :: acc
+
+        [] ->
+            [ ( k1, [ v1 ] ) ]
+
+
+groupSorted : (k -> k -> Bool) -> List ( k, v ) -> List ( k, List v )
+groupSorted equal assoc =
+    assoc
+        |> List.foldl (groupSortedStep equal) []
+        |> reverseGroups []
+
+
+groupAssocBy : (k -> comparable) -> List ( k, v ) -> List ( k, List v )
+groupAssocBy comp assoc =
+    assoc
+        |> List.sortBy (Tuple.first >> comp)
+        |> groupSorted (\k1 k2 -> comp k1 == comp k2)
+
+
+groupAssocWith : (k -> k -> Order) -> List ( k, v ) -> List ( k, List v )
+groupAssocWith ord assoc =
+    assoc
+        |> List.sortWith (\( k1, _ ) ( k2, _ ) -> ord k1 k2)
+        |> groupSorted (\k1 k2 -> ord k1 k2 == EQ)
+
+
+groupAssoc : List ( comparable, v ) -> List ( comparable, List v )
+groupAssoc assoc =
+    assoc
+        |> List.sortBy Tuple.first
+        |> groupSorted (==)
 
 
 {-| Return all initial segments of a list, from shortest to longest, empty list first, the list itself last.
