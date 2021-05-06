@@ -475,6 +475,13 @@ all =
                         (groupWhile (<) [ 1, 2, 3, 2, 4, 1, 3, 2, 1 ])
                         [ ( 1, [ 2, 3 ] ), ( 2, [ 4 ] ), ( 1, [ 3 ] ), ( 2, [] ), ( 1, [] ) ]
             ]
+        , describe "groupAssoc" <|
+            [ test "groups by key equality" <|
+                \() ->
+                    Expect.equal
+                        (groupAssoc [ ( 0, 'a' ), ( 1, 'c' ), ( 0, 'b' ), ( 1, 'd' ) ])
+                        [ ( 0, [ 'a', 'b' ] ), ( 1, [ 'c', 'd' ] ) ]
+            ]
         , describe "inits" <|
             [ test "returns all initial segments" <|
                 \() ->
