@@ -2017,6 +2017,6 @@ gatherWith testFn list =
                         ( gathering, remaining ) =
                             List.partition (testFn toGather) population
                     in
-                    helper remaining <| ( toGather, gathering ) :: gathered
+                    helper remaining (( toGather, gathering ) :: gathered)
     in
     helper list []
