@@ -1,4 +1,7 @@
-###
+### 8.3.1
+1. gatherWith is tail call optimized
+
+### 8.3.0
 1. New function `findMap`
 
 ### 8.2.4
