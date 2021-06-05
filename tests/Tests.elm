@@ -659,6 +659,10 @@ all =
             , fuzz (list int) "equal lists are infix" <|
                 \list ->
                     Expect.true "equal lists are infix" (isInfixOf list list)
+            , test "is stack safe" <|
+                \() ->
+                    isInfixOf [ 5, 7, 13 ] (List.repeat 1000000 5)
+                        |> Expect.false "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13"
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
