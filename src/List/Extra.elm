@@ -1742,7 +1742,11 @@ isInfixOfHelp infixHead infixTail list =
 
         x :: xs ->
             if x == infixHead then
-                isPrefixOf infixTail xs || isInfixOfHelp infixHead infixTail xs
+                if isPrefixOf infixTail xs then
+                    True
+
+                else
+                    isInfixOfHelp infixHead infixTail xs
 
             else
                 isInfixOfHelp infixHead infixTail xs
