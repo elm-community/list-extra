@@ -1741,8 +1741,8 @@ isInfixOfHelp infixHead infixTail list =
             False
 
         x :: xs ->
-            if x == infixHead then
-                isPrefixOf infixTail xs || isInfixOfHelp infixHead infixTail xs
+            if x == infixHead && isPrefixOf infixTail xs then
+                True
 
             else
                 isInfixOfHelp infixHead infixTail xs
