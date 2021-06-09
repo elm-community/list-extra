@@ -1,3 +1,7 @@
+
+### 8.3.2
+1. isInfixOf is tail call optimized
+
 ### 8.3.1
 1. gatherWith is tail call optimized
 
