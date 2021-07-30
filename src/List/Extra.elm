@@ -9,6 +9,7 @@ module List.Extra exposing
     , zip, zip3
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+    , joinOn
     )
 
 {-| Convenience functions for working with List
@@ -62,6 +63,11 @@ module List.Extra exposing
 # Split to groups of given size
 
 @docs groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+
+
+# Joins
+
+@docs joinOn
 
 -}
 
@@ -2020,3 +2026,84 @@ gatherWith testFn list =
                     helper remaining (( toGather, gathering ) :: gathered)
     in
     helper list []
+
+
+{-| Performs an inner join, combining data items from both lists if they match by their respective key functions.
+
+    employees : List { name : String, departmentId : Int }
+    employees =
+        [ { name = "Rafferty", departmentId = 31 }
+        , { name = "Jones", departmentId = 33 }
+        , { name = "Heisenberg", departmentId = 33 }
+        , { name = "Robinson", departmentId = 34 }
+        , { name = "Smith", departmentId = 34 }
+        ]
+
+    departments : List { name : String, departmentId : Int }
+    departments =
+        [ { departmentId = 31, name = "Sales" }
+        , { departmentId = 33, name = "Engineering" }
+        , { departmentId = 34, name = "Clerical" }
+        , { departmentId = 35, name = "Marketing" }
+        ]
+
+    joinOn (\empl dep -> { employee = empl.name, department = dep.name}) .departmentId .departmentId employees departments
+    --> [ { department = "Clerical", employee = "Robinson" }
+    --> , { department = "Clerical", employee = "Smith" }
+    --> , { department = "Engineering", employee = "Jones" }
+    --> , { department = "Engineering", employee = "Heisenberg" }
+    --> , { department = "Sales", employee = "Rafferty" }
+    --> ]
+
+This is akin to the SQL query:
+
+    SELECT employee.name, department.name
+    FROM employee
+    INNER JOIN department
+    ON employee.departmentId = department.departmentId
+
+-}
+joinOn : (a -> b -> c) -> (a -> comparable) -> (b -> comparable) -> List a -> List b -> List c
+joinOn selectFn aKeyFn bKeyFn aList bList =
+    let
+        aListWithKeys : List ( ( comparable, a ), List ( comparable, a ) )
+        aListWithKeys =
+            List.map (\a -> ( aKeyFn a, a )) aList
+                |> List.sortBy Tuple.first
+                |> gatherEqualsBy Tuple.first
+
+        bListWithKeys : List ( ( comparable, b ), List ( comparable, b ) )
+        bListWithKeys =
+            List.map (\b -> ( bKeyFn b, b )) bList
+                |> List.sortBy Tuple.first
+                |> gatherEqualsBy Tuple.first
+
+        helper : List ( ( comparable, a ), List ( comparable, a ) ) -> List ( ( comparable, b ), List ( comparable, b ) ) -> List c -> List c
+        helper aInp bInp result =
+            case ( aInp, bInp ) of
+                ( ( ( aKey, a ), ass ) :: restAs, ( ( bKey, b ), bss ) :: restBs ) ->
+                    if aKey == bKey then
+                        let
+                            prod =
+                                List.concatMap
+                                    (\( _, sA ) ->
+                                        List.map
+                                            (\( _, sB ) ->
+                                                selectFn sA sB
+                                            )
+                                            (( bKey, b ) :: bss)
+                                    )
+                                    (( aKey, a ) :: ass)
+                        in
+                        helper restAs restBs (prod ++ result)
+
+                    else if aKey < bKey then
+                        helper restAs bInp result
+
+                    else
+                        helper aInp restBs result
+
+                _ ->
+                    result
+    in
+    helper aListWithKeys bListWithKeys []
