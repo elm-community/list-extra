@@ -878,4 +878,18 @@ all =
                     uniquePairs [ 1, 2, 3 ]
                         |> Expect.equal [ ( 1, 2 ), ( 1, 3 ), ( 2, 3 ) ]
             ]
+        , describe "joinOn"
+            [ test "with first list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [] [ 1, 2, 3 ]
+                        |> Expect.equal []
+            , test "with second list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [ 1, 2, 3 ] []
+                        |> Expect.equal []
+            , test "with neither list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [ 1, 3, 2 ] [ 2, 1, 3 ]
+                        |> Expect.equal [ ( 3, 3 ), ( 2, 2 ), ( 1, 1 ) ]
+            ]
         ]
