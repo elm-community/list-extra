@@ -1,3 +1,5 @@
+### 8.40
+1. New function "joinOn"
 
 ### 8.3.2
 1. isInfixOf is tail call optimized
