@@ -13,7 +13,7 @@ This package uses [elm-test](https://github.com/elm-explorations/test) and [elm-
 
 ## Contributing
 
-Pull requests are welcome. You can expect some kind of response within 5 days.
+Pull requests are welcome. You can expect some kind of response within 14 days.
 
 If you are proposing a new function be added, please adhere to the following..
 
