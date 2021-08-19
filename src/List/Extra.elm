@@ -72,7 +72,6 @@ module List.Extra exposing
 -}
 
 import List exposing (..)
-import Set exposing (Set)
 import Tuple exposing (first, second)
 
 
