@@ -440,7 +440,7 @@ allDifferent list =
     allDifferentBy identity list
 
 
-{-| Indicate if list has duplicate values when supplied function are applyed on each values.
+{-| Indicate if list has duplicate values when supplied function are applied on each values.
 -}
 allDifferentBy : (a -> comparable) -> List a -> Bool
 allDifferentBy f list =
@@ -1903,13 +1903,13 @@ groupsOfWithStep size step xs =
 
 -}
 groupsOfVarying : List Int -> List a -> List (List a)
-groupsOfVarying listOflengths list =
-    groupsOfVarying_ listOflengths list []
+groupsOfVarying listOfLengths list =
+    groupsOfVarying_ listOfLengths list []
 
 
 groupsOfVarying_ : List Int -> List a -> List (List a) -> List (List a)
-groupsOfVarying_ listOflengths list accu =
-    case ( listOflengths, list ) of
+groupsOfVarying_ listOfLengths list accu =
+    case ( listOfLengths, list ) of
         ( length :: tailLengths, _ :: _ ) ->
             let
                 ( head, tail ) =
