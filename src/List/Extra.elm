@@ -1807,10 +1807,7 @@ In other words: Do the 2 `List`s contain the same elements but in a different or
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
     (length permut == length xs)
-        && (permut
-                |> List.all
-                    (\a -> xs |> member a)
-           )
+        && (permut |> all (\a -> xs |> member a))
 
 
 {-| Take two lists and returns a list of corresponding pairs
