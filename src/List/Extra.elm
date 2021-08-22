@@ -1789,7 +1789,11 @@ isSubsequenceOf subseq list =
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
-    member permut (permutations xs)
+    (length permut == length xs)
+        && (permut
+                |> List.all
+                    (\a -> xs |> member a)
+           )
 
 
 {-| Take two lists and returns a list of corresponding pairs
