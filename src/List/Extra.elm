@@ -1786,6 +1786,23 @@ isSubsequenceOf subseq list =
 
 
 {-| Take two lists and return `True`, if the first list is a permutation of the second list.
+In other words: Do the 2 `List`s contain the same elements but in a different order?
+
+    [ 3, 1, 2 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> True
+
+    [ 3, 1, 0 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> False
+
+    [ 3, 1, 2, 2 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> False
+
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
