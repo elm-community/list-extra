@@ -72,7 +72,6 @@ module List.Extra exposing
 -}
 
 import List exposing (..)
-import Set exposing (Set)
 import Tuple exposing (first, second)
 
 
@@ -414,16 +413,16 @@ dropWhile predicate list =
     --> [ 0, 1 ]
 
 -}
-unique : List comparable -> List comparable
+unique : List a -> List a
 unique list =
-    uniqueHelp identity Set.empty list []
+    uniqueHelp identity [] list []
 
 
 {-| Drop duplicates where what is considered to be a duplicate is the result of first applying the supplied function to the elements of the list.
 -}
-uniqueBy : (a -> comparable) -> List a -> List a
+uniqueBy : (a -> b) -> List a -> List a
 uniqueBy f list =
-    uniqueHelp f Set.empty list []
+    uniqueHelp f [] list []
 
 
 {-| Indicate if list has duplicate values.
@@ -435,19 +434,19 @@ uniqueBy f list =
     --> True
 
 -}
-allDifferent : List comparable -> Bool
+allDifferent : List a -> Bool
 allDifferent list =
     allDifferentBy identity list
 
 
 {-| Indicate if list has duplicate values when supplied function are applied on each values.
 -}
-allDifferentBy : (a -> comparable) -> List a -> Bool
+allDifferentBy : (a -> b) -> List a -> Bool
 allDifferentBy f list =
     List.length list == List.length (uniqueBy f list)
 
 
-uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a -> List a
+uniqueHelp : (a -> b) -> List b -> List a -> List a -> List a
 uniqueHelp f existing remaining accumulator =
     case remaining of
         [] ->
@@ -458,11 +457,11 @@ uniqueHelp f existing remaining accumulator =
                 computedFirst =
                     f first
             in
-            if Set.member computedFirst existing then
+            if List.member computedFirst existing then
                 uniqueHelp f existing rest accumulator
 
             else
-                uniqueHelp f (Set.insert computedFirst existing) rest (first :: accumulator)
+                uniqueHelp f (computedFirst :: existing) rest (first :: accumulator)
 
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
