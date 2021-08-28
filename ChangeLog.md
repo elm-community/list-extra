@@ -1,4 +1,8 @@
-### 8.40
+### Next
+1. `unique` and `uniqueBy` functions no longer requires comparable input arguments. This change increased performance for lists sized 0-100 elements by about 40% but decreases performance for lists sized >200 by about 35%. Seems like a worthy trade off.
+2. `isPermutationOf` is vastly more performant. @lue-bird 's benchmarks show cases of being 141,000% more performant. 
+
+### 8.4.0
 1. New function "joinOn"
 
 ### 8.3.2
