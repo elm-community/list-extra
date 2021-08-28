@@ -163,6 +163,32 @@ all =
                         (permutations [ 1, 2, 3 ])
                         [ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
             ]
+        , describe "isPermutationOf"
+            [ test "correctly notices permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
+                            |> List.map
+                                (\permutation () ->
+                                    permutation
+                                        |> isPermutationOf [ 1, 2, 3 ]
+                                        |> Expect.equal True
+                                )
+                        )
+                        ()
+            , test "correctly notices non-permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [], [ 1, 3 ], [ 2, 1, 3, 2 ], [ 4, 3, 1 ] ]
+                            |> List.map
+                                (\nonPermutation () ->
+                                    [ 1, 2, 3 ]
+                                        |> isPermutationOf nonPermutation
+                                        |> Expect.equal False
+                                )
+                        )
+                        ()
+            ]
         , describe "interweave" <|
             [ test "interweaves lists of equal length" <|
                 \() ->
