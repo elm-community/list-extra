@@ -97,6 +97,26 @@ all =
                 \() ->
                     Expect.equal (findIndices (\x -> modBy 2 x == 0) [ 1, 2, 4 ]) [ 1, 2 ]
             ]
+        , describe "findMap" <|
+            [ test "Nothing for empty list" <|
+                \() ->
+                    Expect.equal (findMap identity []) Nothing
+            , test "Finds and maps for list of one with first element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [ 1 ] ]) (Just 1)
+            , test "Fails to find and map for list of one without element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [] ]) Nothing
+            , test "Finds and maps for list with middle element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [ 2 ], [] ]) (Just 2)
+            , test "Finds and maps for list with last element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [], [ 3 ] ]) (Just 3)
+            , test "Fails to find and map for list with no element matching" <|
+                \() ->
+                    Expect.equal (findMap List.head [ [], [], [] ]) Nothing
+            ]
         , describe "count" <|
             [ test "isOdd predicate" <|
                 \() ->
@@ -142,6 +162,32 @@ all =
                     Expect.equal
                         (permutations [ 1, 2, 3 ])
                         [ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
+            ]
+        , describe "isPermutationOf"
+            [ test "correctly notices permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
+                            |> List.map
+                                (\permutation () ->
+                                    permutation
+                                        |> isPermutationOf [ 1, 2, 3 ]
+                                        |> Expect.equal True
+                                )
+                        )
+                        ()
+            , test "correctly notices non-permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [], [ 1, 3 ], [ 2, 1, 3, 2 ], [ 4, 3, 1 ] ]
+                            |> List.map
+                                (\nonPermutation () ->
+                                    [ 1, 2, 3 ]
+                                        |> isPermutationOf nonPermutation
+                                        |> Expect.equal False
+                                )
+                        )
+                        ()
             ]
         , describe "interweave" <|
             [ test "interweaves lists of equal length" <|
@@ -303,6 +349,31 @@ all =
                                         3 * n + 1
                     in
                     Expect.equal (iterate collatz 13) [ 13, 40, 20, 10, 5, 16, 8, 4, 2, 1 ]
+            , test "should not raise RangeError" <|
+                \() ->
+                    let
+                        loop n =
+                            if n == 100000 then
+                                Nothing
+
+                            else
+                                Just (n + 1)
+
+                        _ =
+                            iterate loop 1
+                    in
+                    Expect.pass
+            ]
+        , describe "init" <|
+            [ test "handles an empty list" <|
+                \() ->
+                    Expect.equal (init []) Nothing
+            , fuzz int "handles a nearly-empty list" <|
+                \x ->
+                    Expect.equal (init [ x ]) (Just [])
+            , fuzz2 (list int) int "handles a non-empty list" <|
+                \list x ->
+                    Expect.equal (init <| list ++ [ x ]) (Just list)
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
@@ -627,6 +698,10 @@ all =
             , fuzz (list int) "equal lists are infix" <|
                 \list ->
                     Expect.true "equal lists are infix" (isInfixOf list list)
+            , test "is stack safe" <|
+                \() ->
+                    isInfixOf [ 5, 7, 13 ] (List.repeat 1000000 5)
+                        |> Expect.false "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13"
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
@@ -841,5 +916,19 @@ all =
                 \() ->
                     uniquePairs [ 1, 2, 3 ]
                         |> Expect.equal [ ( 1, 2 ), ( 1, 3 ), ( 2, 3 ) ]
+            ]
+        , describe "joinOn"
+            [ test "with first list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [] [ 1, 2, 3 ]
+                        |> Expect.equal []
+            , test "with second list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [ 1, 2, 3 ] []
+                        |> Expect.equal []
+            , test "with neither list empty" <|
+                \() ->
+                    joinOn Tuple.pair identity identity [ 1, 3, 2 ] [ 2, 1, 3 ]
+                        |> Expect.equal [ ( 3, 3 ), ( 2, 2 ), ( 1, 1 ) ]
             ]
         ]

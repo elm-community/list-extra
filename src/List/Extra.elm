@@ -5,10 +5,11 @@ module List.Extra exposing
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
-    , notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
+    , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+    , joinOn
     )
 
 {-| Convenience functions for working with List
@@ -46,7 +47,7 @@ module List.Extra exposing
 
 # Searching
 
-@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, count
+@docs notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
 
 
 # Zipping
@@ -63,10 +64,14 @@ module List.Extra exposing
 
 @docs groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
 
+
+# Joins
+
+@docs joinOn
+
 -}
 
 import List exposing (..)
-import Set exposing (Set)
 import Tuple exposing (first, second)
 
 
@@ -147,12 +152,17 @@ list and the iteration will continue with `f y`.
 -}
 iterate : (a -> Maybe a) -> a -> List a
 iterate f x =
+    iterateHelp f x [] |> List.reverse
+
+
+iterateHelp : (a -> Maybe a) -> a -> List a -> List a
+iterateHelp f x acc =
     case f x of
         Just x_ ->
-            x :: iterate f x_
+            iterateHelp f x_ (x :: acc)
 
         Nothing ->
-            [ x ]
+            x :: acc
 
 
 {-| Initialize a list of some length with some function.
@@ -428,16 +438,16 @@ dropWhile predicate list =
     --> [ 0, 1 ]
 
 -}
-unique : List comparable -> List comparable
+unique : List a -> List a
 unique list =
-    uniqueHelp identity Set.empty list []
+    uniqueHelp identity [] list []
 
 
 {-| Drop duplicates where what is considered to be a duplicate is the result of first applying the supplied function to the elements of the list.
 -}
-uniqueBy : (a -> comparable) -> List a -> List a
+uniqueBy : (a -> b) -> List a -> List a
 uniqueBy f list =
-    uniqueHelp f Set.empty list []
+    uniqueHelp f [] list []
 
 
 {-| Indicate if list has duplicate values.
@@ -449,19 +459,19 @@ uniqueBy f list =
     --> True
 
 -}
-allDifferent : List comparable -> Bool
+allDifferent : List a -> Bool
 allDifferent list =
     allDifferentBy identity list
 
 
 {-| Indicate if list has duplicate values when supplied function are applied on each values.
 -}
-allDifferentBy : (a -> comparable) -> List a -> Bool
+allDifferentBy : (a -> b) -> List a -> Bool
 allDifferentBy f list =
     List.length list == List.length (uniqueBy f list)
 
 
-uniqueHelp : (a -> comparable) -> Set comparable -> List a -> List a -> List a
+uniqueHelp : (a -> b) -> List b -> List a -> List a -> List a
 uniqueHelp f existing remaining accumulator =
     case remaining of
         [] ->
@@ -472,11 +482,11 @@ uniqueHelp f existing remaining accumulator =
                 computedFirst =
                     f first
             in
-            if Set.member computedFirst existing then
+            if List.member computedFirst existing then
                 uniqueHelp f existing rest accumulator
 
             else
-                uniqueHelp f (Set.insert computedFirst existing) rest (first :: accumulator)
+                uniqueHelp f (computedFirst :: existing) rest (first :: accumulator)
 
 
 {-| Map functions taking multiple arguments over multiple lists. Each list should be of the same length.
@@ -688,6 +698,60 @@ findIndices predicate =
     indexedFoldr consIndexIf []
 
 
+{-| Apply a function that may succeed to values in the list and return the result of the first successful match. If none match, then return Nothing.
+
+    mapOverFive : Int -> Maybe Int
+    mapOverFive num =
+        if num > 5 then
+            Just (num * 2)
+        else
+            Nothing
+
+    findMap mapOverFive [2, 4, 6, 8]
+    --> Just 12
+
+This is particularly useful in cases where you have a complex type in a list, and you need to pick out the the first one
+
+    type alias HouseModel =
+        {}
+
+    type Property
+        = Rental
+        | House HouseModel
+        | Commercial
+
+    toHouse : Property -> Maybe HouseModel
+    toHouse property =
+        case property of
+            House house ->
+                Just house
+
+            _ ->
+                Nothing
+
+    viewFirstHomeOfInterest : Viewer -> List Property -> Html msg
+    viewFirstHomeOfInterest viewer propertiesQuery =
+        propertiesQuery
+            |> findMap toHouse
+            |> Maybe.map homeView
+            |> Maybe.withDefault noHomeView
+
+-}
+findMap : (a -> Maybe b) -> List a -> Maybe b
+findMap f list =
+    case list of
+        [] ->
+            Nothing
+
+        a :: tail ->
+            case f a of
+                Just b ->
+                    Just b
+
+                Nothing ->
+                    findMap f tail
+
+
 {-| Returns the number of elements in a list that satisfy a given predicate.
 Equivalent to `List.length (List.filter pred list)` but more efficient.
 
@@ -883,19 +947,12 @@ removeAt index l =
         l
 
     else
-        let
-            head =
-                List.take index l
-
-            tail =
-                List.drop index l |> List.tail
-        in
-        case tail of
-            Nothing ->
+        case drop index l of
+            [] ->
                 l
 
-            Just t ->
-                List.append head t
+            _ :: rest ->
+                take index l ++ rest
 
 
 {-| Remove an element at an index that satisfies a predicate.
@@ -1714,8 +1771,8 @@ isInfixOfHelp infixHead infixTail list =
             False
 
         x :: xs ->
-            if x == infixHead then
-                isPrefixOf infixTail xs || isInfixOfHelp infixHead infixTail xs
+            if x == infixHead && isPrefixOf infixTail xs then
+                True
 
             else
                 isInfixOfHelp infixHead infixTail xs
@@ -1753,10 +1810,28 @@ isSubsequenceOf subseq list =
 
 
 {-| Take two lists and return `True`, if the first list is a permutation of the second list.
+In other words: Do the 2 `List`s contain the same elements but in a different order?
+
+    [ 3, 1, 2 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> True
+
+    [ 3, 1, 0 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> False
+
+    [ 3, 1, 2, 2 ]
+        |> isPermutationOf
+            [ 1, 2, 3 ]
+    --> False
+
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
-    member permut (permutations xs)
+    (length permut == length xs)
+        && (permut |> all (\a -> xs |> member a))
 
 
 {-| Take two lists and returns a list of corresponding pairs
@@ -1990,6 +2065,87 @@ gatherWith testFn list =
                         ( gathering, remaining ) =
                             List.partition (testFn toGather) population
                     in
-                    helper remaining <| ( toGather, gathering ) :: gathered
+                    helper remaining (( toGather, gathering ) :: gathered)
     in
     helper list []
+
+
+{-| Performs an inner join, combining data items from both lists if they match by their respective key functions.
+
+    employees : List { name : String, departmentId : Int }
+    employees =
+        [ { name = "Rafferty", departmentId = 31 }
+        , { name = "Jones", departmentId = 33 }
+        , { name = "Heisenberg", departmentId = 33 }
+        , { name = "Robinson", departmentId = 34 }
+        , { name = "Smith", departmentId = 34 }
+        ]
+
+    departments : List { name : String, departmentId : Int }
+    departments =
+        [ { departmentId = 31, name = "Sales" }
+        , { departmentId = 33, name = "Engineering" }
+        , { departmentId = 34, name = "Clerical" }
+        , { departmentId = 35, name = "Marketing" }
+        ]
+
+    joinOn (\empl dep -> { employee = empl.name, department = dep.name}) .departmentId .departmentId employees departments
+    --> [ { department = "Clerical", employee = "Robinson" }
+    --> , { department = "Clerical", employee = "Smith" }
+    --> , { department = "Engineering", employee = "Jones" }
+    --> , { department = "Engineering", employee = "Heisenberg" }
+    --> , { department = "Sales", employee = "Rafferty" }
+    --> ]
+
+This is akin to the SQL query:
+
+    SELECT employee.name, department.name
+    FROM employee
+    INNER JOIN department
+    ON employee.departmentId = department.departmentId
+
+-}
+joinOn : (a -> b -> c) -> (a -> comparable) -> (b -> comparable) -> List a -> List b -> List c
+joinOn selectFn aKeyFn bKeyFn aList bList =
+    let
+        aListWithKeys : List ( ( comparable, a ), List ( comparable, a ) )
+        aListWithKeys =
+            List.map (\a -> ( aKeyFn a, a )) aList
+                |> List.sortBy Tuple.first
+                |> gatherEqualsBy Tuple.first
+
+        bListWithKeys : List ( ( comparable, b ), List ( comparable, b ) )
+        bListWithKeys =
+            List.map (\b -> ( bKeyFn b, b )) bList
+                |> List.sortBy Tuple.first
+                |> gatherEqualsBy Tuple.first
+
+        helper : List ( ( comparable, a ), List ( comparable, a ) ) -> List ( ( comparable, b ), List ( comparable, b ) ) -> List c -> List c
+        helper aInp bInp result =
+            case ( aInp, bInp ) of
+                ( ( ( aKey, a ), ass ) :: restAs, ( ( bKey, b ), bss ) :: restBs ) ->
+                    if aKey == bKey then
+                        let
+                            prod =
+                                List.concatMap
+                                    (\( _, sA ) ->
+                                        List.map
+                                            (\( _, sB ) ->
+                                                selectFn sA sB
+                                            )
+                                            (( bKey, b ) :: bss)
+                                    )
+                                    (( aKey, a ) :: ass)
+                        in
+                        helper restAs restBs (prod ++ result)
+
+                    else if aKey < bKey then
+                        helper restAs bInp result
+
+                    else
+                        helper aInp restBs result
+
+                _ ->
+                    result
+    in
+    helper aListWithKeys bListWithKeys []

@@ -1,3 +1,23 @@
+### Next
+1. `unique` and `uniqueBy` functions no longer requires comparable input arguments. This change increased performance for lists sized 0-100 elements by about 40% but decreases performance for lists sized >200 by about 35%. Seems like a worthy trade off.
+2. `isPermutationOf` is vastly more performant. @lue-bird 's benchmarks show cases of being 141,000% more performant. 
+
+### 8.4.0
+1. New function "joinOn"
+
+### 8.3.2
+1. isInfixOf is tail call optimized
+
+### 8.3.1
+1. gatherWith is tail call optimized
+
+### 8.3.0
+1. New function `findMap`
+
+### 8.2.4
+1. Speed up removeAt implementation
+2. Make iterate tail recursive
+
 ### 8.2.3
 1. Fixed bug in `isInfixOf` that prevented the detection of infixes after a partial infix (Issue #132)
 
