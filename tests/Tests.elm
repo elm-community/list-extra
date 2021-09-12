@@ -1,10 +1,10 @@
 module Tests exposing (all)
 
 import Expect
-import Fuzz exposing (int, list, tuple3)
+import Fuzz exposing (int, intRange, list)
 import List exposing (map, range)
 import List.Extra exposing (..)
-import Test exposing (..)
+import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 import Tuple exposing (first)
 
 
@@ -402,6 +402,19 @@ all =
             , test "resulting length smaller than cycle length" <|
                 \() ->
                     Expect.equal (cycle 2 [ 1, 2, 3, 4, 5 ]) [ 1, 2 ]
+            ]
+        , describe "reverseRange"
+            [ let
+                rangeCeiling =
+                    10000
+
+                rangeFloor =
+                    negate rangeCeiling
+              in
+              fuzz2 (intRange rangeFloor rangeCeiling) (intRange rangeFloor rangeCeiling) "always equal to the reverse of List.range" <|
+                \hi lo ->
+                    reverseRange hi lo
+                        |> Expect.equalLists (List.reverse (List.range lo hi))
             ]
         , describe "splitAt" <|
             [ test "splits a list in the middle" <|

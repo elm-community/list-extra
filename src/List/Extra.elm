@@ -2,7 +2,7 @@ module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr
-    , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
+    , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
@@ -32,7 +32,7 @@ module List.Extra exposing
 
 # Building lists
 
-@docs scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle
+@docs scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
 
 
 # Sublists
@@ -227,6 +227,31 @@ cycleHelp acc n list =
 
     else
         acc
+
+
+{-| Create a list of numbers, every element decreasing by one.
+You give the highest and lowest number that should be in the list.
+More efficient than calling `List.reverse (List.range lo hi)`
+
+    range 6 3 == [ 6, 5, 4, 3 ]
+
+    range 3 3 == [ 3 ]
+
+    range 3 6 == []
+
+-}
+reverseRange : Int -> Int -> List Int
+reverseRange =
+    let
+        helper : List Int -> Int -> Int -> List Int
+        helper list high low =
+            if high >= low then
+                helper (low :: list) high (low + 1)
+
+            else
+                list
+    in
+    helper []
 
 
 {-| Decompose a list into its head and tail. If the list is empty, return `Nothing`. Otherwise, return `Just (x, xs)`, where `x` is head and `xs` is tail.
@@ -1604,7 +1629,7 @@ group =
     --> [ ( { value = 4, id = 9 }, [] ), ( { value = 7, id = 2 }, [ { value = 1, id = 2 } ] ) ]
 
 **Note:**
-The behavior of this function has changed between major versions 7 and 8. In version 7 there was `groupWhile` and `groupWhileTransitively`. The behavior of the two was almost identical, however the transitive function was closer to what users found intuitive about grouping. `groupWhileTransively` has been deleted, and `groupWhile` has been replaced with the version 7s `groupWhileTransitively` behavior. Furthermore the group type was changed from `List a` to the non-empty list type `(a, List a)`. Sorry for any inconvenience this may cause.
+The behavior of this function has changed between major versions 7 and 8. In version 7 there was `groupWhile` and `groupWhileTransitively`. The behavior of the two was almost identical, however the transitive function was closer to what users found intuitive about grouping. `groupWhileTransitively` has been deleted, and `groupWhile` has been replaced with the version 7s `groupWhileTransitively` behavior. Furthermore the group type was changed from `List a` to the non-empty list type `(a, List a)`. Sorry for any inconvenience this may cause.
 
 -}
 groupWhile : (a -> a -> Bool) -> List a -> List ( a, List a )
