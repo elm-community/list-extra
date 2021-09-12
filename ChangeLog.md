@@ -4,13 +4,13 @@
 3. New `reverseRange`, a more performant combination of `reverse` and `range`.
 
 ### 8.4.0
-1. New function "joinOn"
+1. New function `joinOn`
 
 ### 8.3.2
-1. isInfixOf is tail call optimized
+1. `isInfixOf` is tail call optimized
 
 ### 8.3.1
-1. gatherWith is tail call optimized
+1. `gatherWith` is tail call optimized
 
 ### 8.3.0
 1. New function `findMap`
