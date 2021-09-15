@@ -164,7 +164,11 @@ all =
                         [ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
             ]
         , describe "isPermutationOf"
-            [ test "correctly notices permutations" <|
+            [ fuzz2 (list int) (list int) "works the same as sorting" <|
+                    \a b ->
+                        isPermutationOf a b
+                            |> Expect.equal (List.sort a == List.sort b)
+            , test "correctly notices permutations" <|
                 \() ->
                     Expect.all
                         ([ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
