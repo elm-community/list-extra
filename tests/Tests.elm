@@ -184,6 +184,10 @@ all =
                 \() ->
                     isPermutationOf [1,1,1] [1,2,3]
                         |> Expect.equal False
+            , test "Notices that 1,1,2 is not a permutation of 1,2,2" <|
+                \() ->
+                    isPermutationOf [ 1, 1, 2 ] [ 1, 2, 2 ]
+                        |> Expect.equal False
             , test "correctly notices non-permutations" <|
                 \() ->
                     Expect.all
