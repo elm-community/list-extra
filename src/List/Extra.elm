@@ -1830,8 +1830,43 @@ In other words: Do the 2 `List`s contain the same elements but in a different or
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
-    (length permut == length xs)
-        && (permut |> all (\a -> xs |> member a))
+    let
+        removeOneMember : a -> List a -> { foundAny : Bool, without : List a }
+        removeOneMember culprit =
+            removeOneMemberHelp culprit []
+
+        removeOneMemberHelp culprit before list =
+            case list of
+                [] ->
+                    { foundAny = False, without = [] }
+
+                head :: after ->
+                    if head == culprit then
+                        { foundAny = True, without = before ++ after }
+
+                    else
+                        removeOneMemberHelp culprit (head :: before) after
+    in
+    case ( permut, xs ) of
+        ( [], [] ) ->
+            True
+
+        ( [], _ :: _ ) ->
+            False
+
+        ( _ :: _, [] ) ->
+            False
+
+        ( _ :: _, x :: after ) ->
+            let
+                { foundAny, without } =
+                    removeOneMember x permut
+            in
+            if foundAny then
+                isPermutationOf without after
+
+            else
+                False
 
 
 {-| Take two lists and returns a list of corresponding pairs
