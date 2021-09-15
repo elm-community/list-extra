@@ -1,3 +1,6 @@
+### 8.5.1
+1. New `isPermutationOf` implemntation in 8.5.0 did not always give the correct output. In 8.5.1 a new implementation that is both performance and correct is used.
+
 ### 8.5.0
 1. `unique` and `uniqueBy` functions no longer requires comparable input arguments. This change increased performance for lists sized 0-100 elements by about 40% but decreases performance for lists sized >200 by about 35%. Seems like a worthy trade off.
 2. `isPermutationOf` is vastly more performant. @lue-bird 's benchmarks show cases of being 141,000% more performant. 
