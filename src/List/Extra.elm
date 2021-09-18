@@ -1824,7 +1824,7 @@ In other words: Do the 2 `List`s contain the same elements but in a different or
 
     [ 3, 1, 2, 2 ]
         |> isPermutationOf
-            [ 1, 2, 3 ]r
+            [ 1, 2, 3 ]
     --> False
 
 -}
