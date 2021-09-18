@@ -1824,40 +1824,17 @@ In other words: Do the 2 `List`s contain the same elements but in a different or
 
     [ 3, 1, 2, 2 ]
         |> isPermutationOf
-            [ 1, 2, 3 ]
+            [ 1, 2, 3 ]r
     --> False
 
 -}
 isPermutationOf : List a -> List a -> Bool
 isPermutationOf permut xs =
-    let
-        removeOneMember : a -> List a -> { foundAny : Bool, without : List a }
-        removeOneMember culprit =
-            removeOneMemberHelp culprit []
+    case xs of
+        [] ->
+            List.isEmpty permut
 
-        removeOneMemberHelp culprit before list =
-            case list of
-                [] ->
-                    { foundAny = False, without = [] }
-
-                head :: after ->
-                    if head == culprit then
-                        { foundAny = True, without = before ++ after }
-
-                    else
-                        removeOneMemberHelp culprit (head :: before) after
-    in
-    case ( permut, xs ) of
-        ( [], [] ) ->
-            True
-
-        ( [], _ :: _ ) ->
-            False
-
-        ( _ :: _, [] ) ->
-            False
-
-        ( _ :: _, x :: after ) ->
+        x :: after ->
             let
                 { foundAny, without } =
                     removeOneMember x permut
@@ -1867,6 +1844,24 @@ isPermutationOf permut xs =
 
             else
                 False
+
+
+removeOneMember : a -> List a -> { foundAny : Bool, without : List a }
+removeOneMember culprit l =
+    removeOneMemberHelp culprit [] l
+
+
+removeOneMemberHelp culprit before list =
+    case list of
+        [] ->
+            { foundAny = False, without = [] }
+
+        head :: after ->
+            if head == culprit then
+                { foundAny = True, without = before ++ after }
+
+            else
+                removeOneMemberHelp culprit (head :: before) after
 
 
 {-| Take two lists and returns a list of corresponding pairs
