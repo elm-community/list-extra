@@ -165,9 +165,9 @@ all =
             ]
         , describe "isPermutationOf"
             [ fuzz2 (list int) (list int) "works the same as sorting" <|
-                    \a b ->
-                        isPermutationOf a b
-                            |> Expect.equal (List.sort a == List.sort b)
+                \a b ->
+                    isPermutationOf a b
+                        |> Expect.equal (List.sort a == List.sort b)
             , test "correctly notices permutations" <|
                 \() ->
                     Expect.all
@@ -182,7 +182,7 @@ all =
                         ()
             , test "Notices that 1,1,1 is not a permutation of 1,2,3" <|
                 \() ->
-                    isPermutationOf [1,1,1] [1,2,3]
+                    isPermutationOf [ 1, 1, 1 ] [ 1, 2, 3 ]
                         |> Expect.equal False
             , test "Notices that 1,1,2 is not a permutation of 1,2,2" <|
                 \() ->
