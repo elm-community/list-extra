@@ -809,6 +809,16 @@ all =
                     [ 1, 2, 3, 3, 3 ]
                         |> remove 3
                         |> Expect.equal [ 1, 2, 3, 3 ]
+            , test "is stack-safe" <|
+                \() ->
+                    let
+                        list : List Int
+                        list =
+                            List.range 1 10000
+                    in
+                    list
+                        |> remove 100000
+                        |> Expect.equal list
             ]
         , describe "removeIfIndex"
             [ test "remove all the elements" <|
