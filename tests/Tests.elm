@@ -788,6 +788,28 @@ all =
                 \() ->
                     Expect.equal (updateIfIndex (\index -> modBy 2 index == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
             ]
+        , describe "remove"
+            [ test "leaves the list untouched if the value is not in the list" <|
+                \() ->
+                    let
+                        list : List Int
+                        list =
+                            [ 1, 2, 3 ]
+                    in
+                    list
+                        |> remove 1000
+                        |> Expect.equal list
+            , test "removes the element if it's present in the list" <|
+                \() ->
+                    [ 1, 2, 3 ]
+                        |> remove 2
+                        |> Expect.equal [ 1, 3 ]
+            , test "removes only the first element" <|
+                \() ->
+                    [ 1, 2, 3, 3, 3 ]
+                        |> remove 3
+                        |> Expect.equal [ 1, 2, 3, 3 ]
+            ]
         , describe "removeIfIndex"
             [ test "remove all the elements" <|
                 \() ->
