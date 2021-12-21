@@ -1878,11 +1878,12 @@ groupsOfWithStep size step list =
                     let
                         thisGroup =
                             List.take size xs
-
-                        rest =
-                            List.drop step xs
                     in
                     if size == List.length thisGroup then
+                        let
+                            rest =
+                                List.drop step xs
+                        in
                         go rest (thisGroup :: acc)
 
                     else
