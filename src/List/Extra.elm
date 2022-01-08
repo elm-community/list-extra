@@ -854,16 +854,21 @@ updateIfIndex predicate update list =
 -}
 remove : a -> List a -> List a
 remove x xs =
+    removeHelp xs x xs []
+
+
+removeHelp : List a -> a -> List a -> List a -> List a
+removeHelp list x xs previousElements =
     case xs of
         [] ->
-            []
+            list
 
         y :: ys ->
             if x == y then
-                ys
+                reverseAppend previousElements ys
 
             else
-                y :: remove x ys
+                removeHelp list x ys (y :: previousElements)
 
 
 {-| Set a value in a list by index. Return the original list if the index is out of range.

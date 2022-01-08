@@ -165,9 +165,9 @@ all =
             ]
         , describe "isPermutationOf"
             [ fuzz2 (list int) (list int) "works the same as sorting" <|
-                    \a b ->
-                        isPermutationOf a b
-                            |> Expect.equal (List.sort a == List.sort b)
+                \a b ->
+                    isPermutationOf a b
+                        |> Expect.equal (List.sort a == List.sort b)
             , test "correctly notices permutations" <|
                 \() ->
                     Expect.all
@@ -182,7 +182,7 @@ all =
                         ()
             , test "Notices that 1,1,1 is not a permutation of 1,2,3" <|
                 \() ->
-                    isPermutationOf [1,1,1] [1,2,3]
+                    isPermutationOf [ 1, 1, 1 ] [ 1, 2, 3 ]
                         |> Expect.equal False
             , test "Notices that 1,1,2 is not a permutation of 1,2,2" <|
                 \() ->
@@ -787,6 +787,38 @@ all =
             , test "if the index is even, increment the element" <|
                 \() ->
                     Expect.equal (updateIfIndex (\index -> modBy 2 index == 0) ((+) 1) [ 1, 2, 3 ]) [ 2, 2, 4 ]
+            ]
+        , describe "remove"
+            [ test "leaves the list untouched if the value is not in the list" <|
+                \() ->
+                    let
+                        list : List Int
+                        list =
+                            [ 1, 2, 3 ]
+                    in
+                    list
+                        |> remove 1000
+                        |> Expect.equal list
+            , test "removes the element if it's present in the list" <|
+                \() ->
+                    [ 1, 2, 3 ]
+                        |> remove 2
+                        |> Expect.equal [ 1, 3 ]
+            , test "removes only the first element" <|
+                \() ->
+                    [ 1, 2, 3, 3, 3 ]
+                        |> remove 3
+                        |> Expect.equal [ 1, 2, 3, 3 ]
+            , test "is stack-safe" <|
+                \() ->
+                    let
+                        list : List Int
+                        list =
+                            List.range 1 10000
+                    in
+                    list
+                        |> remove 100000
+                        |> Expect.equal list
             ]
         , describe "removeIfIndex"
             [ test "remove all the elements" <|
