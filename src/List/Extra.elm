@@ -815,17 +815,15 @@ updateAt index fn list =
 
     else
         let
-            head =
-                List.take index list
-
+            tail : List a
             tail =
                 List.drop index list
         in
         case tail of
             x :: xs ->
-                head ++ fn x :: xs
+                List.take index list ++ fn x :: xs
 
-            _ ->
+            [] ->
                 list
 
 
