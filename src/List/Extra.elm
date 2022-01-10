@@ -1949,25 +1949,33 @@ skipped and not appear in any groups.
 
 -}
 groupsOfWithStep : Int -> Int -> List a -> List (List a)
-groupsOfWithStep size step xs =
-    let
-        thisGroup =
-            List.take size xs
-
-        xs_ =
-            List.drop step xs
-
-        okayArgs =
-            size > 0 && step > 0
-
-        okayLength =
-            size == List.length thisGroup
-    in
-    if okayArgs && okayLength then
-        thisGroup :: groupsOfWithStep size step xs_
+groupsOfWithStep size step list =
+    if size <= 0 || step <= 0 then
+        []
 
     else
-        []
+        let
+            go : List a -> List (List a) -> List (List a)
+            go xs acc =
+                if List.isEmpty xs then
+                    List.reverse acc
+
+                else
+                    let
+                        thisGroup =
+                            List.take size xs
+                    in
+                    if size == List.length thisGroup then
+                        let
+                            rest =
+                                List.drop step xs
+                        in
+                        go rest (thisGroup :: acc)
+
+                    else
+                        List.reverse acc
+        in
+        go list []
 
 
 {-| `groupsOfVarying ns` takes `n` elements from a list for each `n` in `ns`, splitting the list into variably sized segments
@@ -2035,22 +2043,23 @@ elements will be skipped and not appear in any groups.
 
 -}
 greedyGroupsOfWithStep : Int -> Int -> List a -> List (List a)
-greedyGroupsOfWithStep size step xs =
-    let
-        xs_ =
-            List.drop step xs
-
-        okayArgs =
-            size > 0 && step > 0
-
-        okayXs =
-            List.length xs > 0
-    in
-    if okayArgs && okayXs then
-        List.take size xs :: greedyGroupsOfWithStep size step xs_
+greedyGroupsOfWithStep size step list =
+    if size <= 0 || step <= 0 then
+        []
 
     else
-        []
+        let
+            go : List a -> List (List a) -> List (List a)
+            go xs acc =
+                if List.isEmpty xs then
+                    List.reverse acc
+
+                else
+                    go
+                        (List.drop step xs)
+                        (List.take size xs :: acc)
+        in
+        go list []
 
 
 {-| Group equal elements together. This is different from `group` as each sublist
