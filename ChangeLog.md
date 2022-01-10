@@ -1,3 +1,9 @@
+### 8.5.2
+1. Performance improvement to `remove` by making it tail call optimized.
+2. Performance improvement to `updateAt` by only computing list head when necessary.
+3. `groupsOf` and `greedyGroupsOf` are now tail call optimized, making them stack safe, but unfortunately slightly slower (small lists and groups ~20% slower).
+4. Performance improvement to `isPermutationOf` by making helper functions top level, not currying functions, and putting most common `case` branches first.
+
 ### 8.5.1
 1. New `isPermutationOf` implemntation in 8.5.0 did not always give the correct output. In 8.5.1 a new implementation that is both performance and correct is used.
 
