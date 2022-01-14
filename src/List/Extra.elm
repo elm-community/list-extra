@@ -153,8 +153,6 @@ transferNegativeIndex idx len =
 -}
 islice: (Int, Int, Int) -> List a -> List a
 islice (start, end, step) xs =
-    
-        
         if step > 0 then
             let
                 s = transferNegativeIndex start (List.length xs)
@@ -1926,6 +1924,7 @@ zip =
 zip3 : List a -> List b -> List c -> List ( a, b, c )
 zip3 =
     map3 triple
+
 
 triple : a -> b -> c -> ( a, b, c )
 triple a b c =
