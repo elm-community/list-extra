@@ -975,4 +975,60 @@ all =
                     joinOn Tuple.pair identity identity [ 1, 3, 2 ] [ 2, 1, 3 ]
                         |> Expect.equal [ ( 3, 3 ), ( 2, 2 ), ( 1, 1 ) ]
             ]
+        , describe "enumerate"
+            [ test "empty list" <|
+                \() -> 
+                    enumerate []
+                        |> Expect.equal []
+            , test "proper test" <|
+                \() ->
+                    enumerate [ 1, 2, 4 ]
+                        |> Expect.equal [ ( 0, 1 ), ( 1, 2 ), ( 2, 4 )]
+            ]
+        , describe "islice"
+            [ test "empty list" <|
+                \() ->
+                    islice ( 1, 5, 1 ) []
+                        |> Expect.equal []
+            , test "proper test" <|
+                \() ->
+                    islice ( 2, 5, 1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [3, 4, 5]
+            , test "end index is greater then test" <|
+                \() ->
+                    islice ( 2, 7, 1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 3, 4, 5 ]
+            , test "with negative index" <|
+                \() ->
+                    islice ( -3, -1, 1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 3, 4 ]
+            , test "end index is less then start index" <|
+                \() ->
+                    islice ( 2, 1, 1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal []
+            , test "step is not 1" <|
+                \() ->
+                    islice ( 1, 5, 2 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 2, 4 ]
+            , test "step is negative number" <|
+                \() ->
+                    islice ( 5, 1, -2 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 5, 3 ]
+            , test "step is negative number and idx is negative number" <|
+                \() ->
+                    islice ( -1, 0, -1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 5, 4, 3, 2 ]
+            , test "step is negative number with end zero idx" <|
+                \() ->
+                    islice ( 5, 0, -1 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 5, 4, 3, 2 ]
+            , test "step, start, end are both negative" <|
+                \() ->
+                    islice ( -1, -4, -2 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal [ 5, 3 ]
+            , test "step is zero" <|
+                \() ->
+                    islice ( 1, 5, 0 ) [ 1, 2, 3, 4, 5 ]
+                        |> Expect.equal []
+            ]
         ]

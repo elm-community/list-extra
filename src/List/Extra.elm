@@ -10,6 +10,7 @@ module List.Extra exposing
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
     , joinOn
+    , enumerate, islice
     )
 
 {-| Convenience functions for working with List
@@ -17,7 +18,7 @@ module List.Extra exposing
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, enumerate, islice, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -113,7 +114,7 @@ init items =
             Nothing
 
         nonEmptyList ->
-            nonEmptyList
+             nonEmptyList
                 |> List.reverse
                 |> List.tail
                 |> Maybe.map List.reverse
@@ -130,6 +131,52 @@ getAt idx xs =
     else
         List.head <| List.drop idx xs
 
+
+{-| Add index to every items.
+-}
+enumerate: List a -> List (Int, a)
+enumerate xs =
+    List.indexedMap Tuple.pair xs
+
+
+{-| Transfer negative index to positive one 
+-}
+transferNegativeIndex: Int -> Int -> Int
+transferNegativeIndex idx len =
+    if idx < 0 then
+        len + idx
+    else
+        idx
+
+
+{-| Slicing fuction
+-}
+islice: (Int, Int, Int) -> List a -> List a
+islice (start, end, step) xs =
+    
+        
+        if step > 0 then
+            let
+                s = transferNegativeIndex start (List.length xs)
+                e = transferNegativeIndex end (List.length xs)
+            in
+                if s < e then
+                    List.drop s xs |>
+                        List.take (e - s) |>
+                            enumerate |>
+                                List.filter (\x -> (modBy step (Tuple.first x)) == 0) |>
+                                    List.map Tuple.second
+            else
+                []
+        else if step == 0 then
+                []
+            else
+                let
+                    s = transferNegativeIndex start <| (List.length xs) + 1
+                    e = transferNegativeIndex end <| (List.length xs)
+                    len = List.length xs
+                in
+                    islice (len - s, len - 1 - e, -step) <| List.reverse xs
 
 {-| Returns a list of repeated applications of `f`. If `f` returns `Nothing`
 the iteration will stop. If it returns `Just y` then `y` will be added to the
@@ -1879,7 +1926,6 @@ zip =
 zip3 : List a -> List b -> List c -> List ( a, b, c )
 zip3 =
     map3 triple
-
 
 triple : a -> b -> c -> ( a, b, c )
 triple a b c =
