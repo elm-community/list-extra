@@ -994,30 +994,4 @@ all =
                         (List.range 1 1000)
                         |> Expect.equal 55
             ]
-        , describe "stoppableFoldr"
-            [ fuzz (list int) "behaves like stoppableFoldl with reversed list" <|
-                \xs ->
-                    stoppableFoldr
-                        (\n acc ->
-                            if acc >= 50 then
-                                Stop acc
-
-                            else
-                                Continue (n + acc)
-                        )
-                        0
-                        xs
-                        |> Expect.equal
-                            (stoppableFoldl
-                                (\n acc ->
-                                    if acc >= 50 then
-                                        Stop acc
-
-                                    else
-                                        Continue (n + acc)
-                                )
-                                0
-                                (List.reverse xs)
-                            )
-            ]
         ]

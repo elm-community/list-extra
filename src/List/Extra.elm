@@ -1,7 +1,7 @@
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
-    , Step(..), foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl, stoppableFoldr
+    , Step(..), foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -27,7 +27,7 @@ module List.Extra exposing
 
 # Folds
 
-@docs Step, foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl, stoppableFoldr
+@docs Step, foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl
 
 
 # Building lists
@@ -1291,25 +1291,6 @@ stoppableFoldl func acc list =
 
                 Stop finalAcc ->
                     finalAcc
-
-
-{-| A `foldr` that can stop early instead of traversing the whole list.
-
-    stoppableFoldr
-        (\n acc ->
-            if acc >= 50 then
-                Stop acc
-            else
-                Continue (n + acc)
-        )
-        0
-        (List.range 1 10000)
-    --> 10000
-
--}
-stoppableFoldr : (a -> b -> Step b) -> b -> List a -> b
-stoppableFoldr func acc list =
-    stoppableFoldl func acc (List.reverse list)
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
