@@ -975,4 +975,62 @@ all =
                     joinOn Tuple.pair identity identity [ 1, 3, 2 ] [ 2, 1, 3 ]
                         |> Expect.equal [ ( 3, 3 ), ( 2, 2 ), ( 1, 1 ) ]
             ]
+        , describe "frequencies"
+            [ describe "Property testing with fuzz"
+                [ fuzz (list int) "Final value similar list and List.sort list" <|
+                    \list ->
+                        frequencies list
+                            |> List.sort
+                            |> Expect.equal (frequencies list)
+                , fuzz (list int) "Final value similar, no matter the order of composition for frequencies and List.sort" <|
+                    \list ->
+                        let
+                            freqFirst =
+                                list
+                                    |> frequencies
+                                    |> List.sort
+
+                            sortFirst =
+                                list
+                                    |> List.sort
+                                    |> frequencies
+                        in
+                        freqFirst
+                            |> Expect.equal sortFirst
+                , fuzz2 (list int) (list int) "Two (different/similar) lists should give 2 (different/similar) results" <|
+                    \list1 list2 ->
+                        let
+                            areListsSimilar =
+                                isPermutationOf list2 list1
+
+                            freq1 =
+                                frequencies list1
+
+                            freq2 =
+                                frequencies list2
+
+                            shouldFreqsBeSimilar =
+                                areListsSimilar
+
+                            areFreqsSimilar =
+                                isPermutationOf freq2 freq1
+                        in
+                        areFreqsSimilar
+                            |> Expect.equal shouldFreqsBeSimilar
+                ]
+            , describe "Unit testing on basic examples"
+                [ test "Frequencies on List Int" <|
+                    \() ->
+                        frequencies [ 4, 1, 3, 2, 2, 4, 3, 3, 4, 4 ]
+                            |> Expect.equal [ ( 1, 1 ), ( 2, 2 ), ( 3, 3 ), ( 4, 4 ) ]
+                , test "Frequencies on List String" <|
+                    \() ->
+                        frequencies [ "a", "b", "aa", "c", "b", "aa", "c", "C", "C", "D" ]
+                            |> Expect.equal [ ( "C", 2 ), ( "D", 1 ), ( "a", 1 ), ( "aa", 2 ), ( "b", 2 ), ( "c", 2 ) ]
+                , test "Frequencies on empty List a" <|
+                    \() ->
+                        frequencies []
+                            |> Expect.equal []
+                ]
+            ]
         ]
