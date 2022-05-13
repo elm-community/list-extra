@@ -8,8 +8,9 @@ module List.Extra exposing
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
     , lift2, lift3, lift4
-    , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
+    , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf
     , joinOn
+    , greedyGroupsOfTailRec, greedyGroupsOfWithStepTailRec, groupsOfTailRec, groupsOfWithStepTailRec, takeTailRec
     )
 
 {-| Convenience functions for working with List
@@ -1923,6 +1924,13 @@ groupsOf size xs =
     groupsOfWithStep size size xs
 
 
+{-| Fully tail recursive version of groupsOf (sacrificing some speed).
+-}
+groupsOfTailRec : Int -> List a -> List (List a)
+groupsOfTailRec size xs =
+    groupsOfWithStepTailRec size size xs
+
+
 {-| Split list into groups of length `size` at offsets `step` apart. If there
 are not enough elements to completely fill the last group, it will not be
 included. (See `greedyGroupsOfWithStep` if you would like the last group to be
@@ -1959,6 +1967,38 @@ groupsOfWithStep size step list =
                     let
                         thisGroup =
                             List.take size xs
+                    in
+                    if size == List.length thisGroup then
+                        let
+                            rest =
+                                List.drop step xs
+                        in
+                        go rest (thisGroup :: acc)
+
+                    else
+                        List.reverse acc
+        in
+        go list []
+
+
+{-| Fully tail recursive version of groupsOfWithStep (sacrificing some speed).
+-}
+groupsOfWithStepTailRec : Int -> Int -> List a -> List (List a)
+groupsOfWithStepTailRec size step list =
+    if size <= 0 || step <= 0 then
+        []
+
+    else
+        let
+            go : List a -> List (List a) -> List (List a)
+            go xs acc =
+                if List.isEmpty xs then
+                    List.reverse acc
+
+                else
+                    let
+                        thisGroup =
+                            takeTailRec size xs
                     in
                     if size == List.length thisGroup then
                         let
@@ -2018,6 +2058,13 @@ greedyGroupsOf size xs =
     greedyGroupsOfWithStep size size xs
 
 
+{-| Fully tail recursive version of greedyGroupsOf (sacrificing some speed).
+-}
+greedyGroupsOfTailRec : Int -> List a -> List (List a)
+greedyGroupsOfTailRec size xs =
+    greedyGroupsOfWithStepTailRec size size xs
+
+
 {-| Greedily split list into groups of length `size` at offsets `step` apart.
 The last group of elements will be included regardless of whether there are
 enough elements in the list to completely fill it. (See `groupsOfWithStep`
@@ -2053,6 +2100,28 @@ greedyGroupsOfWithStep size step list =
                     go
                         (List.drop step xs)
                         (List.take size xs :: acc)
+        in
+        go list []
+
+
+{-| Fully tail recursive version of greedyGroupsOfWithStep (sacrificing some speed).
+-}
+greedyGroupsOfWithStepTailRec : Int -> Int -> List a -> List (List a)
+greedyGroupsOfWithStepTailRec size step list =
+    if size <= 0 || step <= 0 then
+        []
+
+    else
+        let
+            go : List a -> List (List a) -> List (List a)
+            go xs acc =
+                if List.isEmpty xs then
+                    List.reverse acc
+
+                else
+                    go
+                        (List.drop step xs)
+                        (takeTailRec size xs :: acc)
         in
         go list []
 
@@ -2191,3 +2260,45 @@ joinOn selectFn aKeyFn bKeyFn aList bList =
                     result
     in
     helper aListWithKeys bListWithKeys []
+
+
+
+{- List.take starts out non-tail-recursive and switches to a tail-recursive
+   implementation after the first 1000 iterations.  For functions which are themselves
+   recursive and use List.take on each call (e.g. List.Extra.groupsOf), this can result
+   in potential call stack overflow from the successive accumulation of 1000-long
+   non-recursive List.take calls.  Here we provide an always tail recursive version of
+   List.take to avoid this problem.  The code is taken directly from the implementation
+   of elm/core and carries the following copywrite:
+
+   Copyright 2014-present Evan Czaplicki
+
+   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+   3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-}
+
+
+takeTailRec : Int -> List a -> List a
+takeTailRec n list =
+    List.reverse (takeReverse n list [])
+
+
+takeReverse : Int -> List a -> List a -> List a
+takeReverse n list kept =
+    if n <= 0 then
+        kept
+
+    else
+        case list of
+            [] ->
+                kept
+
+            x :: xs ->
+                takeReverse (n - 1) xs (x :: kept)
