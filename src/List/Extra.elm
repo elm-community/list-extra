@@ -27,7 +27,7 @@ module List.Extra exposing
 
 # Folds
 
-@docs Step, foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl
+@docs foldl1, foldr1, indexedFoldl, indexedFoldr, Step, stoppableFoldl
 
 
 # Building lists
