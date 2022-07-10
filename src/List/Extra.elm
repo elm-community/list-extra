@@ -1,7 +1,7 @@
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
-    , foldl1, foldr1, indexedFoldl, indexedFoldr
+    , Step(..), foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
@@ -27,7 +27,7 @@ module List.Extra exposing
 
 # Folds
 
-@docs foldl1, foldr1, indexedFoldl, indexedFoldr
+@docs foldl1, foldr1, indexedFoldl, indexedFoldr, Step, stoppableFoldl
 
 
 # Building lists
@@ -1242,6 +1242,55 @@ indexedFoldr func acc list =
             ( i - 1, func i x thisAcc )
     in
     second (List.foldr step ( List.length list - 1, acc ) list)
+
+
+{-| A custom type used for stoppable folds.
+
+    stoppableFoldl
+        (\n acc ->
+            if acc >= 50 then
+                Stop acc
+
+            else
+                Continue (n + acc)
+        )
+        0
+        (List.range 1 10000)
+    --> 55
+
+-}
+type Step a
+    = Continue a
+    | Stop a
+
+
+{-| A `foldl` that can stop early instead of traversing the whole list.
+
+    stoppableFoldl
+        (\n acc ->
+            if acc >= 50 then
+                Stop acc
+            else
+                Continue (n + acc)
+        )
+        0
+        (List.range 1 10000)
+    --> 55
+
+-}
+stoppableFoldl : (a -> b -> Step b) -> b -> List a -> b
+stoppableFoldl func acc list =
+    case list of
+        [] ->
+            acc
+
+        x :: xs ->
+            case func x acc of
+                Continue newAcc ->
+                    stoppableFoldl func newAcc xs
+
+                Stop finalAcc ->
+                    finalAcc
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.

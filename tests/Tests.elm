@@ -975,4 +975,23 @@ all =
                     joinOn Tuple.pair identity identity [ 1, 3, 2 ] [ 2, 1, 3 ]
                         |> Expect.equal [ ( 3, 3 ), ( 2, 2 ), ( 1, 1 ) ]
             ]
+        , describe "stoppableFoldl"
+            [ fuzz (list int) "behaves like foldl if function always returns Continue" <|
+                \xs ->
+                    stoppableFoldl (\n acc -> Continue (n + acc)) 0 xs
+                        |> Expect.equal (List.foldl (\n acc -> n + acc) 0 xs)
+            , test "simple example" <|
+                \() ->
+                    stoppableFoldl
+                        (\n acc ->
+                            if acc >= 50 then
+                                Stop acc
+
+                            else
+                                Continue (n + acc)
+                        )
+                        0
+                        (List.range 1 1000)
+                        |> Expect.equal 55
+            ]
         ]
