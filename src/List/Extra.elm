@@ -1244,24 +1244,11 @@ indexedFoldr func acc list =
     second (List.foldr step ( List.length list - 1, acc ) list)
 
 
-{-| A custom type used for stoppable folds.
-
-    stoppableFoldl
-        (\n acc ->
-            if acc >= 50 then
-                Stop acc
-
-            else
-                Continue (n + acc)
-        )
-        0
-        (List.range 1 10000)
-    --> 55
-
--}
+{-| A custom type used for stoppable folds.-}
 type Step a
     = Continue a
     | Stop a
+
 
 
 {-| A `foldl` that can stop early instead of traversing the whole list.

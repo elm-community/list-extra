@@ -1,3 +1,6 @@
+### 8.6.0
+1. `stoppableFoldl` function and `Step` type added. A stoppable fold has better performance in cases where a fold can be terminated part way through.
+
 ### 8.5.2
 1. Performance improvement to `remove` by making it tail call optimized.
 2. Performance improvement to `updateAt` by only computing list head when necessary.
