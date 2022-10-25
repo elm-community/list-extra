@@ -9,7 +9,7 @@
         "format": "elm-format --yes src tests/Tests.elm",
         "test:docs": "elm make --docs=docs.json && rm docs.json",
         "test:format": "elm-format --validate src tests/Tests.elm",
-        "test": "elm-verify-examples && elm-test && npm run test:format && npm run test:docs",
+        "test": "elm-verify-examples && elm-test-rs && npm run test:format && npm run test:docs",
         "postinstall": "elm-tooling install"
     },
     "repository": {
