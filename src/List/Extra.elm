@@ -1049,21 +1049,16 @@ subsequences xs =
 -}
 subsequencesNonEmpty : List a -> List (List a)
 subsequencesNonEmpty list =
-    subsequencesNonEmptyHelper list []
-
-
-subsequencesNonEmptyHelper : List a -> List (List a) -> List (List a)
-subsequencesNonEmptyHelper list result =
     case list of
         [] ->
-            result
+            []
 
         first :: rest ->
             let
                 f ys r =
                     ys :: (first :: ys) :: r
             in
-            subsequencesNonEmptyHelper rest ([ first ] :: foldr f [] result)
+            [ first ] :: foldr f [] (subsequencesNonEmpty rest)
 
 
 {-| Return the list of of all permutations of a list. The result is in lexicographic order.

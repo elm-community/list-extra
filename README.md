@@ -1,6 +1,6 @@
 # Convenience functions for working with List
 
-[![Build Status](https://travis-ci.org/elm-community/list-extra.svg?branch=master)](https://travis-ci.org/elm-community/list-extra)
+[![Build Status](https://github.com/elm-community/list-extra/workflows/test.yml/badge.svg)](https://github.com/elm-community/list-extra/actions)
 
 Experimental package with convenience functions for working with List.
 Note that this API is experimental and likely to go through many more iterations.
