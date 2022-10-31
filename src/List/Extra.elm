@@ -3,7 +3,7 @@ module List.Extra exposing
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr, Step(..), stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
-    , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty
+    , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty, frequencies
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
@@ -37,7 +37,7 @@ module List.Extra exposing
 
 # Sublists
 
-@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty, frequencies
 
 
 # Predicates
@@ -2138,6 +2138,22 @@ gatherWith testFn list =
                     helper remaining (( toGather, gathering ) :: gathered)
     in
     helper list []
+
+
+{-| Calculate the number of occurences for each element in a list. Elements
+will be ordered ascendingly, then grouped in a tuple with the number of
+occurences.
+
+    frequencies [2,1,3,2,3,3]
+    --> [(1,1),(2,2),(3,3)]
+
+-}
+frequencies : List comparable -> List ( comparable, Int )
+frequencies list =
+    list
+        |> List.sort
+        |> group
+        |> List.map (\( x, y ) -> ( x, 1 + List.length y ))
 
 
 {-| Performs an inner join, combining data items from both lists if they match by their respective key functions.
