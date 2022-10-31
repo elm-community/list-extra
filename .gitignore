@@ -1,3 +1,5 @@
 # Ignore build or dist files
 /elm-stuff
 /elm
+tests
+node_modules

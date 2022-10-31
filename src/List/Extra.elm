@@ -1,9 +1,9 @@
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
-    , Step(..), foldl1, foldr1, indexedFoldl, indexedFoldr, stoppableFoldl
+    , foldl1, foldr1, indexedFoldl, indexedFoldr, Step(..), stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
-    , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
+    , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty
     , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
@@ -37,7 +37,7 @@ module List.Extra exposing
 
 # Sublists
 
-@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith
+@docs splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty
 
 
 # Predicates
@@ -1046,14 +1046,6 @@ subsequences xs =
     subsequencesNonEmpty [ 1, 2, 3 ]
         == [ [ 1 ], [ 2 ], [ 1, 2 ], [ 3 ], [ 1, 3 ], [ 2, 3 ], [ 1, 2, 3 ] ]
 
-NOTE:
-This function is not exposed. It appears it was never exposed (
-at least not before elm-community/list-extra 1.0.0, but I know
-theres a prehistory at circuithub/list-extra). But it has
-documentation, suggesting someone intended it to be exposed.
-
-  - Chadtech October 6th, 2018
-
 -}
 subsequencesNonEmpty : List a -> List (List a)
 subsequencesNonEmpty list =
@@ -1244,11 +1236,11 @@ indexedFoldr func acc list =
     second (List.foldr step ( List.length list - 1, acc ) list)
 
 
-{-| A custom type used for stoppable folds.-}
+{-| A custom type used for stoppable folds.
+-}
 type Step a
     = Continue a
     | Stop a
-
 
 
 {-| A `foldl` that can stop early instead of traversing the whole list.

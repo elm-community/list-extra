@@ -1,0 +1,17 @@
+name: "Tests"
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.elm
+          key: ${{ runner.os }}-elm-${{ hashFiles('package-lock.json', 'elm-tooling.json', 'elm.json') }}
+      - run: npm ci
+      - run: npm test
