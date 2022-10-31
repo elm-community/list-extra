@@ -1114,7 +1114,7 @@ all =
                                 Stop n
 
                             else
-                                explode ()
+                                throwRangeErrorException ()
                         )
                         0
                         (List.range 1 1000)
