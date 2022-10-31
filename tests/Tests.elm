@@ -1036,5 +1036,30 @@ all =
                         0
                         (List.range 1 1000)
                         |> Expect.equal 55
+            , test "after Stop, the function is not called anymore" <|
+                let
+                    throwRangeErrorException : () -> a
+                    throwRangeErrorException () =
+                        preventTailCallOptimization ()
+
+                    preventTailCallOptimization : () -> a
+                    preventTailCallOptimization () =
+                        throwRangeErrorException ()
+                in
+                \() ->
+                    stoppableFoldl
+                        (\n acc ->
+                            if n < 50 then
+                                Continue n
+
+                            else if n == 50 then
+                                Stop n
+
+                            else
+                                explode ()
+                        )
+                        0
+                        (List.range 1 1000)
+                        |> Expect.equal 50
             ]
         ]
