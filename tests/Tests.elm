@@ -1075,6 +1075,7 @@ all =
                         frequencies []
                             |> Expect.equal []
                 ]
+            ]
         , describe "stoppableFoldl"
             [ fuzz (list int) "behaves like foldl if function always returns Continue" <|
                 \xs ->
