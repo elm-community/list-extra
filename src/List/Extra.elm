@@ -1038,7 +1038,7 @@ rowsLength listOfLists =
 -}
 subsequences : List a -> List (List a)
 subsequences xs =
-    [] :: subsequencesNonEmpty xs
+    [] :: subsequencesHelp xs
 
 
 {-| Return the list of all subsequences of the argument, except for the empty list.
@@ -1047,8 +1047,8 @@ subsequences xs =
         == [ [ 1 ], [ 2 ], [ 1, 2 ], [ 3 ], [ 1, 3 ], [ 2, 3 ], [ 1, 2, 3 ] ]
 
 -}
-subsequencesNonEmpty : List a -> List (List a)
-subsequencesNonEmpty list =
+subsequencesHelp : List a -> List (List a)
+subsequencesHelp list =
     case list of
         [] ->
             []
@@ -1058,7 +1058,28 @@ subsequencesNonEmpty list =
                 f ys r =
                     ys :: (first :: ys) :: r
             in
-            [ first ] :: foldr f [] (subsequencesNonEmpty rest)
+            [ first ] :: foldr f [] (subsequencesHelp rest)
+
+
+{-| Return the list of all subsequences of the argument, except for the empty list.
+
+    subsequencesNonEmpty [ 1, 2, 3 ]
+        == [ [ 1 ], [ 2 ], [ 1, 2 ], [ 3 ], [ 1, 3 ], [ 2, 3 ], [ 1, 2, 3 ] ]
+
+-}
+subsequencesNonEmpty : List a -> List ( a, List a )
+subsequencesNonEmpty list =
+    case list of
+        [] ->
+            []
+
+        first :: rest ->
+            let
+                f : ( a, List a ) -> List ( a, List a ) -> List ( a, List a )
+                f ( yf, ys ) r =
+                    ( yf, ys ) :: ( first, yf :: ys ) :: r
+            in
+            ( first, [] ) :: foldr f [] (subsequencesNonEmpty rest)
 
 
 {-| Return the list of of all permutations of a list. The result is in lexicographic order.

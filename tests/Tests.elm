@@ -156,6 +156,20 @@ all =
                         (subsequences [ 1, 2, 3 ])
                         [ [], [ 1 ], [ 2 ], [ 1, 2 ], [ 3 ], [ 1, 3 ], [ 2, 3 ], [ 1, 2, 3 ] ]
             ]
+        , describe "subsequencesNonEmpty" <|
+            [ test "computes subsequences to non-empty lists" <|
+                \() ->
+                    Expect.equal
+                        (subsequencesNonEmpty [ 1, 2, 3 ])
+                        [ ( 1, [] )
+                        , ( 2, [] )
+                        , ( 1, [ 2 ] )
+                        , ( 3, [] )
+                        , ( 1, [ 3 ] )
+                        , ( 2, [ 3 ] )
+                        , ( 1, [ 2, 3 ] )
+                        ]
+            ]
         , describe "permutations" <|
             [ test "computes permutations" <|
                 \() ->

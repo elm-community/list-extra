@@ -1,3 +1,7 @@
+### 8.7.0
+1. `frequencies` function, to count the number of occurences of each item in a list
+2. `subsequenceNonEmpty` function, to calculate each subsequence excluding the empty list.
+
 ### 8.6.0
 1. `stoppableFoldl` function and `Step` type added. A stoppable fold has better performance in cases where a fold can be terminated part way through.
 

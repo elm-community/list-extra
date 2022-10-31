@@ -1,11 +1,6 @@
-# Convenience functions for working with List
+# Convenience functions for working with `List`
 
-[![Build Status](https://github.com/elm-community/list-extra/workflows/test.yml/badge.svg)](https://github.com/elm-community/list-extra/actions)
-
-Experimental package with convenience functions for working with List.
-Note that this API is experimental and likely to go through many more iterations.
-
-Feedback and contributions are very welcome.
+Feedback and contributions are very welcome!
 
 ## Tests
 
@@ -21,4 +16,4 @@ If you are proposing a new function be added, please adhere to the following..
 2. Provide a detailed use case where your new function would be useful. Also, compare your new function to the best possible implementation that doesn't include use your function.
 3. Add tests to `Tests/Tests.elm`
 
-If you are improving existing functions please demonstrate the performance gains in something like [Ellie](https://ellie-app.com/) and by using a benchmark library like [this one](https://github.com/elm-explorations/benchmark).
+If you are improving existing functions please demonstrate the performance gains in something like [Ellie](https://ellie-app.com/) and by using a benchmark library like [this one](https://github.com/elm-explorations/benchmark). I usually copy and paste the last ellie bench mark I made, like [this one](https://ellie-app.com/gm9X8yfPLXMa1), so I don't have to set up the whole benchmark from scratch every time.
