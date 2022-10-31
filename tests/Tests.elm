@@ -551,13 +551,19 @@ all =
         , describe "isSubsequenceOf" <|
             [ test "success" <|
                 \() ->
-                    Expect.true "Elm is a subsequence of Eat lime" (isSubsequenceOf [ "E", "l", "m" ] [ "E", "a", "t", " ", "l", "i", "m", "e", "s" ])
+                    isSubsequenceOf [ "E", "l", "m" ] [ "E", "a", "t", " ", "l", "i", "m", "e", "s" ]
+                        |> Expect.equal True
+                        |> Expect.onFail "Elm is a subsequence of Eat lime"
             , test "failure" <|
                 \() ->
-                    Expect.false "Elm is not a subsequence of Email" (isSubsequenceOf [ "E", "l", "m" ] [ "E", "m", "a", "i", "l" ])
+                    isSubsequenceOf [ "E", "l", "m" ] [ "E", "m", "a", "i", "l" ]
+                        |> Expect.equal False
+                        |> Expect.onFail "Elm is not a subsequence of Email"
             , test "success at last element" <|
                 \() ->
-                    Expect.true "[] should be a subsequence of []" (isSubsequenceOf [ 1, 3 ] [ 1, 2, 3 ])
+                    isSubsequenceOf [ 1, 3 ] [ 1, 2, 3 ]
+                        |> Expect.equal True
+                        |> Expect.onFail "[] should be a subsequence of []"
             ]
         , describe "lift2" <|
             [ test "produces all combinations of addition" <|
@@ -625,95 +631,132 @@ all =
             [ fuzz (list int) "[] is prefix to anything" <|
                 \list ->
                     List.Extra.isPrefixOf [] list
-                        |> Expect.true "Expected [] to be a prefix."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected [] to be a prefix."
             , fuzz (list int) "reflexivity" <|
                 \list ->
                     List.Extra.isPrefixOf list list
-                        |> Expect.true "Expected list to be a prefix of itself."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected list to be a prefix of itself."
             , fuzz2 (list int) (list int) "antisymmetry" <|
                 \listA listB ->
                     not (List.Extra.isPrefixOf listA listB)
                         || not (List.Extra.isPrefixOf listB listA)
                         || listA
                         == listB
-                        |> Expect.true "Expected exactly one to be prefix of the other."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected exactly one to be prefix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
                     not (List.Extra.isPrefixOf listA listB)
                         || not (List.Extra.isPrefixOf listB listC)
                         || List.Extra.isPrefixOf listA listC
-                        |> Expect.true "Expected prefix of prefix to be prefix."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected prefix of prefix to be prefix."
             , test "stack safety" <|
                 \() ->
-                    Expect.true "1, 2, ..., 6k is prefix of 1, 2, ..., 10k" (isPrefixOf (List.range 1 6000) (List.range 1 10000))
+                    isPrefixOf (List.range 1 6000) (List.range 1 10000)
+                        |> Expect.equal True
+                        |> Expect.onFail "1, 2, ..., 6k is prefix of 1, 2, ..., 10k"
             , fuzz2 (list int) (list int) "generalized fuzz test" <|
                 \prefix rest ->
-                    Expect.true "xs is prefix of xs ++ ys" (isPrefixOf prefix (prefix ++ rest))
+                    isPrefixOf prefix (prefix ++ rest)
+                        |> Expect.equal True
+                        |> Expect.onFail "xs is prefix of xs ++ ys"
             ]
         , describe "isSuffixOf"
             [ fuzz (list int) "[] is suffix to anything" <|
                 \list ->
                     List.Extra.isSuffixOf [] list
-                        |> Expect.true "Expected [] to be a suffix."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected [] to be a suffix."
             , fuzz (list int) "reflexivity" <|
                 \list ->
                     List.Extra.isSuffixOf list list
-                        |> Expect.true "Expected list to be a suffix of itself."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected list to be a suffix of itself."
             , fuzz2 (list int) (list int) "antisymmetry" <|
                 \listA listB ->
                     not (List.Extra.isSuffixOf listA listB)
                         || not (List.Extra.isSuffixOf listB listA)
                         || listA
                         == listB
-                        |> Expect.true "Expected exactly one to be suffix of the other."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected exactly one to be suffix of the other."
             , fuzz3 (list int) (list int) (list int) "transitivity" <|
                 \listA listB listC ->
                     not (List.Extra.isSuffixOf listA listB)
                         || not (List.Extra.isSuffixOf listB listC)
                         || List.Extra.isSuffixOf listA listC
-                        |> Expect.true "Expected suffix of suffix to be suffix."
+                        |> Expect.equal True
+                        |> Expect.onFail "Expected suffix of suffix to be suffix."
             , test "stack safety" <|
                 \() ->
-                    Expect.true "4000, 4001, ..., 10k is suffix of 1, 2, ..., 10k" (isSuffixOf (List.range 4000 10000) (List.range 1 10000))
+                    isSuffixOf (List.range 4000 10000) (List.range 1 10000)
+                        |> Expect.equal True
+                        |> Expect.onFail "4000, 4001, ..., 10k is suffix of 1, 2, ..., 10k"
             , fuzz2 (list int) (list int) "generalized fuzz test" <|
                 \suffix rest ->
-                    Expect.true "ys is suffix of xs ++ ys" (isSuffixOf suffix (rest ++ suffix))
+                    isSuffixOf suffix (rest ++ suffix)
+                        |> Expect.equal True
+                        |> Expect.onFail "ys is suffix of xs ++ ys"
             ]
         , describe "isInfixOf"
             [ test "success" <|
                 \() ->
-                    Expect.true "5, 7, 11 is infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 5, 7, 11 ] [ 2, 3, 5, 7, 11, 13 ])
+                    isInfixOf [ 5, 7, 11 ] [ 2, 3, 5, 7, 11, 13 ]
+                        |> Expect.equal True
+                        |> Expect.onFail "5, 7, 11 is infix of 2, 3, 5, 7, 11, 13"
             , test "not consecutive" <|
                 \() ->
-                    Expect.false "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 5, 7, 13 ] [ 2, 3, 5, 7, 11, 13 ])
+                    isInfixOf [ 5, 7, 13 ] [ 2, 3, 5, 7, 11, 13 ]
+                        |> Expect.equal False
+                        |> Expect.onFail "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13"
             , test "not in-order" <|
                 \() ->
-                    Expect.false "3, 5, 2 is not infix of 2, 3, 5, 7, 11, 13" (isInfixOf [ 3, 5, 2 ] [ 2, 3, 5, 7, 11, 13 ])
+                    isInfixOf [ 3, 5, 2 ] [ 2, 3, 5, 7, 11, 13 ]
+                        |> Expect.equal False
+                        |> Expect.onFail "3, 5, 2 is not infix of 2, 3, 5, 7, 11, 13"
             , test "partial match then real match" <|
                 \() ->
-                    Expect.true "1, 2 is infix of 1, 3, 1, 2" (isInfixOf [ 1, 2 ] [ 1, 3, 1, 2 ])
+                    isInfixOf [ 1, 2 ] [ 1, 3, 1, 2 ]
+                        |> Expect.equal True
+                        |> Expect.onFail "1, 2 is infix of 1, 3, 1, 2"
             , test "stack safety" <|
                 \() ->
-                    Expect.true "1, 2, ..., 6k is infix of 1, 2, ..., 10k" (isInfixOf (List.range 1 6000) (List.range 1 10000))
+                    isInfixOf (List.range 1 6000) (List.range 1 10000)
+                        |> Expect.equal True
+                        |> Expect.onFail "1, 2, ..., 6k is infix of 1, 2, ..., 10k"
             , fuzz3 (list int) (list int) (list int) "generalized fuzz test" <|
                 \prefix match suffix ->
-                    Expect.true "ys is infix of xs ++ ys ++ zs" (isInfixOf match (prefix ++ match ++ suffix))
+                    isInfixOf match (prefix ++ match ++ suffix)
+                        |> Expect.equal True
+                        |> Expect.onFail "ys is infix of xs ++ ys ++ zs"
             , test "empty is infix of empty" <|
                 \() ->
-                    Expect.true "empty is infix of empty" (isInfixOf [] [])
+                    isInfixOf [] []
+                        |> Expect.equal True
+                        |> Expect.onFail "empty is infix of empty"
             , fuzz (list int) "empty is infix of anything" <|
                 \list ->
-                    Expect.true "empty is infix of anything" (isInfixOf [] list)
+                    isInfixOf [] list
+                        |> Expect.equal True
+                        |> Expect.onFail "empty is infix of anything"
             , fuzz2 int (list int) "non-empty is not infix of empty" <|
                 \x xs ->
-                    Expect.false "non-empty is not infix of empty" (isInfixOf (x :: xs) [])
+                    isInfixOf (x :: xs) []
+                        |> Expect.equal False
+                        |> Expect.onFail "non-empty is not infix of empty"
             , fuzz (list int) "equal lists are infix" <|
                 \list ->
-                    Expect.true "equal lists are infix" (isInfixOf list list)
+                    isInfixOf list list
+                        |> Expect.equal True
+                        |> Expect.onFail "equal lists are infix"
             , test "is stack safe" <|
                 \() ->
                     isInfixOf [ 5, 7, 13 ] (List.repeat 1000000 5)
-                        |> Expect.false "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13"
+                        |> Expect.equal False
+                        |> Expect.onFail "5, 7, 13 is not infix of 2, 3, 5, 7, 11, 13"
             ]
         , describe "swapAt"
             [ test "negative index as first argument returns the original list" <|
@@ -1032,5 +1075,48 @@ all =
                         frequencies []
                             |> Expect.equal []
                 ]
+        , describe "stoppableFoldl"
+            [ fuzz (list int) "behaves like foldl if function always returns Continue" <|
+                \xs ->
+                    stoppableFoldl (\n acc -> Continue (n + acc)) 0 xs
+                        |> Expect.equal (List.foldl (\n acc -> n + acc) 0 xs)
+            , test "simple example" <|
+                \() ->
+                    stoppableFoldl
+                        (\n acc ->
+                            if acc >= 50 then
+                                Stop acc
+
+                            else
+                                Continue (n + acc)
+                        )
+                        0
+                        (List.range 1 1000)
+                        |> Expect.equal 55
+            , test "after Stop, the function is not called anymore" <|
+                let
+                    throwRangeErrorException : () -> a
+                    throwRangeErrorException () =
+                        preventTailCallOptimization ()
+
+                    preventTailCallOptimization : () -> a
+                    preventTailCallOptimization () =
+                        throwRangeErrorException ()
+                in
+                \() ->
+                    stoppableFoldl
+                        (\n acc ->
+                            if n < 50 then
+                                Continue n
+
+                            else if n == 50 then
+                                Stop n
+
+                            else
+                                explode ()
+                        )
+                        0
+                        (List.range 1 1000)
+                        |> Expect.equal 50
             ]
         ]

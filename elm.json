@@ -3,7 +3,7 @@
     "name": "elm-community/list-extra",
     "summary": "Convenience functions for working with List",
     "license": "MIT",
-    "version": "8.5.2",
+    "version": "8.6.0",
     "exposed-modules": [
         "List.Extra"
     ],
@@ -12,6 +12,6 @@
         "elm/core": "1.0.0 <= v < 2.0.0"
     },
     "test-dependencies": {
-        "elm-explorations/test": "1.0.0 <= v < 2.0.0"
+        "elm-explorations/test": "2.0.0 <= v < 3.0.0"
     }
 }
