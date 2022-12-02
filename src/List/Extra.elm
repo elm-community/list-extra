@@ -350,8 +350,10 @@ maximumWith comparator list =
 minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy f ls =
     let
-        minBy x ( y, fy ) =
+        minBy : a -> ( a, comparable ) -> ( a, comparable )
+        minBy x (( _, fy ) as min) =
             let
+                fx : comparable
                 fx =
                     f x
             in
@@ -359,7 +361,7 @@ minimumBy f ls =
                 ( x, fx )
 
             else
-                ( y, fy )
+                min
     in
     case ls of
         [ l_ ] ->
