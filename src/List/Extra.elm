@@ -298,8 +298,10 @@ unconsLast list =
 maximumBy : (a -> comparable) -> List a -> Maybe a
 maximumBy f ls =
     let
-        maxBy x ( y, fy ) =
+        maxBy : a -> ( a, comparable ) -> ( a, comparable )
+        maxBy x (( _, fy ) as max) =
             let
+                fx : comparable
                 fx =
                     f x
             in
@@ -307,7 +309,7 @@ maximumBy f ls =
                 ( x, fx )
 
             else
-                ( y, fy )
+                max
     in
     case ls of
         [ l_ ] ->
@@ -350,8 +352,10 @@ maximumWith comparator list =
 minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy f ls =
     let
-        minBy x ( y, fy ) =
+        minBy : a -> ( a, comparable ) -> ( a, comparable )
+        minBy x (( _, fy ) as min) =
             let
+                fx : comparable
                 fx =
                     f x
             in
@@ -359,7 +363,7 @@ minimumBy f ls =
                 ( x, fx )
 
             else
-                ( y, fy )
+                min
     in
     case ls of
         [ l_ ] ->
