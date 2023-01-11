@@ -100,23 +100,15 @@ last items =
 {-| Return all elements of the list except the last one.
 
     init [ 1, 2, 3 ]
-    --> Just [ 1, 2 ]
+    --> [ 1, 2 ]
 
     init []
-    --> Nothing
+    --> []
 
 -}
-init : List a -> Maybe (List a)
+init : List a -> List a
 init items =
-    case items of
-        [] ->
-            Nothing
-
-        nonEmptyList ->
-            nonEmptyList
-                |> List.reverse
-                |> List.tail
-                |> Maybe.map List.reverse
+    List.take (List.length items - 1) items
 
 
 {-| Returns `Just` the element at the given index in the list,

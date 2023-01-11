@@ -393,13 +393,13 @@ all =
         , describe "init" <|
             [ test "handles an empty list" <|
                 \() ->
-                    Expect.equal (init []) Nothing
+                    Expect.equal (init []) []
             , fuzz int "handles a nearly-empty list" <|
                 \x ->
-                    Expect.equal (init [ x ]) (Just [])
+                    Expect.equal (init [ x ]) []
             , fuzz2 (list int) int "handles a non-empty list" <|
                 \list x ->
-                    Expect.equal (init <| list ++ [ x ]) (Just list)
+                    Expect.equal (init <| list ++ [ x ]) list
             ]
         , describe "initialize" <|
             [ test "creates a list starting from zero" <|
