@@ -943,6 +943,22 @@ all =
                 \() ->
                     Expect.equal (setIf (\x -> modBy 2 x == 0) 0 [ 17, 8, 2, 9 ]) [ 17, 0, 0, 9 ]
             ]
+        , describe "setBy"
+            [ test "empty list" <|
+                \() -> Expect.equal (setBy Tuple.first ( 1, 42 ) []) []
+            , test "set one" <|
+                \() ->
+                    Expect.equal (setBy Tuple.first ( 1, 42 ) [ ( 3, 1 ), ( 2, 2 ), ( 1, 3 ) ])
+                        [ ( 3, 1 ), ( 2, 2 ), ( 1, 42 ) ]
+            , test "set all" <|
+                \() ->
+                    Expect.equal (setBy (always True) ( 1, 42 ) [ ( 3, 1 ), ( 2, 2 ), ( 1, 3 ) ])
+                        [ ( 1, 42 ), ( 1, 42 ), ( 1, 42 ) ]
+            , test "set none" <|
+                \() ->
+                    Expect.equal (setBy Tuple.second ( 1, 42 ) [ ( 3, 1 ), ( 2, 2 ), ( 1, 3 ) ])
+                        [ ( 3, 1 ), ( 2, 2 ), ( 1, 3 ) ]
+            ]
         , describe "gatherEquals"
             [ test "empty list" <|
                 \() ->
