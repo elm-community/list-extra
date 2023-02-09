@@ -215,6 +215,44 @@ all =
                         )
                         ()
             ]
+        , describe "isPermutationOfWith"
+            [ fuzz2 (list int) (list int) "works the same as sorting" <|
+                \a b ->
+                    isPermutationOfWith (==) a b
+                        |> Expect.equal (List.sort a == List.sort b)
+            , test "correctly notices permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [ 1, 2, 3 ], [ 1, 3, 2 ], [ 2, 1, 3 ], [ 2, 3, 1 ], [ 3, 1, 2 ], [ 3, 2, 1 ] ]
+                            |> List.map
+                                (\permutation () ->
+                                    permutation
+                                        |> isPermutationOfWith (==) [ 1, 2, 3 ]
+                                        |> Expect.equal True
+                                )
+                        )
+                        ()
+            , test "Notices that 1,1,1 is not a permutation of 1,2,3" <|
+                \() ->
+                    isPermutationOfWith (==) [ 1, 1, 1 ] [ 1, 2, 3 ]
+                        |> Expect.equal False
+            , test "Notices that 1,1,2 is not a permutation of 1,2,2" <|
+                \() ->
+                    isPermutationOfWith (==) [ 1, 1, 2 ] [ 1, 2, 2 ]
+                        |> Expect.equal False
+            , test "correctly notices non-permutations" <|
+                \() ->
+                    Expect.all
+                        ([ [], [ 1, 3 ], [ 2, 1, 3, 2 ], [ 4, 3, 1 ] ]
+                            |> List.map
+                                (\nonPermutation () ->
+                                    [ 1, 2, 3 ]
+                                        |> isPermutationOfWith (==) nonPermutation
+                                        |> Expect.equal False
+                                )
+                        )
+                        ()
+            ]
         , describe "interweave" <|
             [ test "interweaves lists of equal length" <|
                 \() ->

@@ -4,7 +4,7 @@ module List.Extra exposing
     , foldl1, foldr1, indexedFoldl, indexedFoldr, Step(..), stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty, frequencies
-    , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
+    , isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf, isPermutationOfWith
     , notMember, find, elemIndex, elemIndices, findIndex, findIndices, findMap, count
     , zip, zip3
     , lift2, lift3, lift4
@@ -42,7 +42,7 @@ module List.Extra exposing
 
 # Predicates
 
-@docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf
+@docs isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, isPermutationOf, isPermutationOfWith
 
 
 # Searching
@@ -1885,39 +1885,65 @@ In other words: Do the 2 `List`s contain the same elements but in a different or
 
 -}
 isPermutationOf : List a -> List a -> Bool
-isPermutationOf permut xs =
-    case xs of
+isPermutationOf permut list =
+    isPermutationOfWith (==) permut list
+
+
+{-| Take two lists and return `True`, if the first list is a permutation of the second list
+using a custom equality function.
+In other words: Do the 2 `List`s contain the same elements but in a different order?
+
+    [ 3, 1, 2 ]
+        |> isPermutationOfWith (==)
+            [ 1, 2, 3 ]
+    --> True
+
+    [ 3, 1, 0 ]
+        |> isPermutationOfWith (==)
+            [ 1, 2, 3 ]
+    --> False
+
+    [ 3, 1, 2, 2 ]
+        |> isPermutationOfWith (==)
+            [ 1, 2, 3 ]
+    --> False
+
+-}
+isPermutationOfWith : (a -> a -> Bool) -> List a -> List a -> Bool
+isPermutationOfWith testFn permut list =
+    case list of
         [] ->
             List.isEmpty permut
 
         x :: after ->
             let
                 { foundAny, without } =
-                    removeOneMember x permut
+                    removeOneMemberWith testFn x permut
             in
             if foundAny then
-                isPermutationOf without after
+                isPermutationOfWith testFn without after
 
             else
                 False
 
 
-removeOneMember : a -> List a -> { foundAny : Bool, without : List a }
-removeOneMember culprit l =
-    removeOneMemberHelp culprit [] l
+removeOneMemberWith : (a -> a -> Bool) -> a -> List a -> { foundAny : Bool, without : List a }
+removeOneMemberWith testFn culprit list =
+    removeOneMemberWithHelp testFn culprit [] list
 
 
-removeOneMemberHelp culprit before list =
+removeOneMemberWithHelp : (a -> a -> Bool) -> a -> List a -> List a -> { foundAny : Bool, without : List a }
+removeOneMemberWithHelp testFn culprit before list =
     case list of
         [] ->
             { foundAny = False, without = [] }
 
         head :: after ->
-            if head == culprit then
+            if testFn head culprit then
                 { foundAny = True, without = before ++ after }
 
             else
-                removeOneMemberHelp culprit (head :: before) after
+                removeOneMemberWithHelp testFn culprit (head :: before) after
 
 
 {-| Take two lists and returns a list of corresponding pairs
