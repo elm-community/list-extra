@@ -1,6 +1,6 @@
 module List.Extra exposing
     ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
-    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
+    , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs, consecutivePairs, pairwise
     , foldl1, foldr1, indexedFoldl, indexedFoldr, Step(..), stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
     , splitAt, splitWhen, takeWhileRight, dropWhileRight, span, break, stripPrefix, group, groupWhile, inits, tails, select, selectSplit, gatherEquals, gatherEqualsBy, gatherWith, subsequencesNonEmpty, frequencies
@@ -22,7 +22,7 @@ module List.Extra exposing
 
 # List transformations
 
-@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
+@docs intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs, consecutivePairs, pairwise
 
 
 # Folds
@@ -1189,6 +1189,44 @@ uniquePairs xs =
 
         x :: xs_ ->
             List.map (\y -> ( x, y )) xs_ ++ uniquePairs xs_
+
+
+{-| Returns consecutive pairs found in the input list.
+
+Given a list with n items, the result has n-1 items.
+
+    consecutivePairs [ 1, 2, 3, 4 ]
+    --> [ ( 1, 2 ), ( 2, 3 ), ( 3, 4 ) ]
+
+    consecutivePairs []
+    --> []
+
+-}
+consecutivePairs : List a -> List ( a, a )
+consecutivePairs xs =
+    pairwise Tuple.pair xs
+
+
+{-| Runs a function on each pair of consecutive items.
+
+Given a list with n items, the result has n-1 items.
+
+    pairwise (+) [ 1, 2, 3, 4 ]
+    --> [ 3, 5, 7 ]
+
+    pairwise max [ 1, 2, 3, 4 ]
+    --> [ 2, 3, 4 ]
+
+    pairwise (-) [100, 10, 1]
+    --> [ 90, 9 ]
+
+    pairwise Tuple.pair [ 1, 2, 3, 4 ]
+    --> [ ( 1, 2 ), ( 2, 3 ), ( 3, 4 ) ]
+
+-}
+pairwise : (a -> a -> b) -> List a -> List b
+pairwise fn xs =
+    List.map2 fn xs (List.drop 1 xs)
 
 
 reverseAppend : List a -> List a -> List a

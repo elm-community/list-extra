@@ -1134,4 +1134,48 @@ all =
                         (List.range 1 1000)
                         |> Expect.equal 50
             ]
+        , describe "consecutivePairs"
+            [ fuzz (Fuzz.list Fuzz.int) "Length is one less" <|
+                \xs ->
+                    let
+                        output =
+                            consecutivePairs xs
+                    in
+                    case List.length xs of
+                        0 ->
+                            List.length output
+                                |> Expect.equal 0
+
+                        n ->
+                            List.length output
+                                |> Expect.equal (n - 1)
+            , test "Example" <|
+                \() ->
+                    consecutivePairs [ 1, 10, 100 ]
+                        |> Expect.equalLists [ ( 1, 10 ), ( 10, 100 ) ]
+            , test "Nothing weird going on with duplicates" <|
+                \() ->
+                    consecutivePairs [ 10, 10, 10, 10 ]
+                        |> Expect.equalLists [ ( 10, 10 ), ( 10, 10 ), ( 10, 10 ) ]
+            ]
+        , describe "pairwise"
+            [ fuzz (Fuzz.list Fuzz.int) "Length is one less" <|
+                \xs ->
+                    let
+                        output =
+                            consecutivePairs xs
+                    in
+                    case List.length xs of
+                        0 ->
+                            List.length output
+                                |> Expect.equal 0
+
+                        n ->
+                            List.length output
+                                |> Expect.equal (n - 1)
+            , test "Example showing off the order of arguments" <|
+                \() ->
+                    pairwise (-) [ 100, 10, 1 ]
+                        |> Expect.equalLists [ 90, 9 ]
+            ]
         ]
