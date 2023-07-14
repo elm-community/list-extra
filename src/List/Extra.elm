@@ -1,5 +1,5 @@
 module List.Extra exposing
-    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+    ( last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, reverseFilter, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
     , intercalate, transpose, subsequences, permutations, interweave, cartesianProduct, uniquePairs
     , foldl1, foldr1, indexedFoldl, indexedFoldr, Step(..), stoppableFoldl
     , scanl, scanl1, scanr, scanr1, mapAccuml, mapAccumr, unfoldr, iterate, initialize, cycle, reverseRange
@@ -17,7 +17,7 @@ module List.Extra exposing
 
 # Basics
 
-@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
+@docs last, init, getAt, uncons, unconsLast, maximumBy, maximumWith, minimumBy, minimumWith, andMap, andThen, reverseMap, reverseFilter, takeWhile, dropWhile, unique, uniqueBy, allDifferent, allDifferentBy, setIf, setAt, remove, updateIf, updateAt, updateIfIndex, removeAt, removeIfIndex, filterNot, swapAt, stableSortWith
 
 
 # List transformations
@@ -567,6 +567,27 @@ but is tail-recursive and slightly more efficient.
 reverseMap : (a -> b) -> List a -> List b
 reverseMap f xs =
     foldl (\x acc -> f x :: acc) [] xs
+
+
+{-| `reverseMap f xs` gives the same result as `List.reverse (List.map f xs)`,
+but is tail-recursive and slightly more efficient.
+
+    reverseFilter (\x -> x > 5) [ 1, 4, 9, 16]
+    --> [ 16, 9 ]
+
+-}
+reverseFilter : (a -> Bool) -> List a -> List a
+reverseFilter isGood xs =
+    foldl
+        (\x acc ->
+            if isGood x then
+                x :: acc
+
+            else
+                acc
+        )
+        []
+        xs
 
 
 {-| Negation of `member`.
