@@ -475,6 +475,14 @@ all =
                 \() ->
                     Expect.equal (splitWhen (\n -> n == 6) [ 1, 2, 3, 4, 5 ]) Nothing
             ]
+        , describe "splitOn" <|
+            [ test "splits a list beginning with each element for which the predicate is true" <|
+                \() ->
+                    Expect.equal (splitOn ((==) 3) [ 1, 2, 3, 3, 4, 5 ]) [ [ 1, 2 ], [ 3, 4, 5 ] ]
+            , test "doesn't falter on edge cases" <|
+                \() ->
+                    Expect.equal (splitOn ((==) 3) [ 3, 1, 2, 3, 3, 4, 5, 3 ]) [ [ 3, 1, 2 ], [ 3 ], [ 3, 4, 5 ], [ 3 ] ]
+            ]
         , describe "takeWhileRight" <|
             [ test "keeps the correct items" <|
                 \() ->

@@ -10,6 +10,7 @@ module List.Extra exposing
     , lift2, lift3, lift4
     , groupsOf, groupsOfWithStep, groupsOfVarying, greedyGroupsOf, greedyGroupsOfWithStep
     , joinOn
+    , splitOn
     )
 
 {-| Convenience functions for working with List
@@ -1562,6 +1563,52 @@ splitWhen : (a -> Bool) -> List a -> Maybe ( List a, List a )
 splitWhen predicate list =
     findIndex predicate list
         |> Maybe.map (\i -> splitAt i list)
+
+
+{-| Split a list into sublists, starting a new sublist with each element that satisfies a predicate.
+
+    splitOn ((==) 3) [ 1, 2, 3, 4, 5 ]
+    --> [ [ 1, 2 ], [ 3, 4, 5 ] ]
+
+    splitOn ((==) 3) [ 3, 1, 2, 3, 3, 4, 5, 3 ]
+    --> [ [ 3, 1, 2 ], [ 3 ], [ 3, 4, 5 ], [ 3 ] ]
+
+Single-pass algorithm without using reverse or list concatenation.
+Inspiration: <https://www.brics.dk/RS/01/39/BRICS-RS-01-39.pdf>
+
+-}
+splitOn : (a -> Bool) -> List a -> List (List a)
+splitOn pred xs =
+    let
+        fields list =
+            case list of
+                [] ->
+                    []
+
+                x :: rest ->
+                    let
+                        ( w, r ) =
+                            word rest
+                    in
+                    (x :: w) :: fields r
+
+        word list =
+            case list of
+                [] ->
+                    ( [], [] )
+
+                x :: rest ->
+                    if pred x then
+                        ( [], list )
+
+                    else
+                        let
+                            ( w, r ) =
+                                word rest
+                        in
+                        ( x :: w, r )
+    in
+    fields xs
 
 
 {-| Take elements from the right, while predicate still holds.
